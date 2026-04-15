@@ -1,0 +1,32 @@
+services:
+  user_db:
+    image: mariadb:lts
+    container_name: user_db
+    entrypoint: ["/usr/bin/mariadb", "-some-flag", "some-args"]
+    volumes:
+      - user_db_volume:/var/lib/mysql
+    networks:
+      - inception
+
+
+    
+
+networks:
+    backend:
+        driver: bridge
+
+volumes:
+    auth_db:
+        name: auth_db_volume
+    user_db:
+        name: user_db_volume
+    interview_store_db:
+        name: interview_store_db_volume
+    grading_db:
+        name: grading_db_volume
+    serialization_db:
+        name: serialization_db_volume
+    monitoring:
+        name: monitoring_volume
+    ingress:
+        name: ingress_volume
