@@ -13,11 +13,11 @@ full arrow one way
 sequenceDiagram
     actor User
     participant Client
+    participant 3rd Party Auth Server
     participant API_Gateway
     participant Authentication_svc
     participant User_svc
     participant Backend
-    participant 3rd Party Auth Server
 
     Note over User,3rd Party Auth Server: Authentication Flow
     User->>Client: login (internal account)
@@ -26,10 +26,11 @@ sequenceDiagram
     Authentication_svc->>Authentication_svc: hash password
     Authentication_svc->>Authentication_svc: verifyCredentials(email, hashed_password)
 
-    alt 3rd Party Authentication (OpenID Connect) (successful)
+    alt 3rd Party Authentication (OpenID Connect)
         User->>Client: login with Google, Github, 42, etc
-        Client->>API_Gateway: 3rd party login request
+        Client->>API_Gateway: 3rd party auth request
         API_Gateway-->>Client: redirection
+        Client-->>User: 3rd party login window
         User->>3rd Party Auth Server: login
         3rd Party Auth Server->>3rd Party Auth Server: validates login
         3rd Party Auth Server-->>API_Gateway: id_token
@@ -87,7 +88,4 @@ sequenceDiagram
     Authentication_svc-->>API_Gateway: 200 OK
     API_Gateway-->>Client: 200 OK
     Client->>Client: clear cookies
-
-
-
 ```
