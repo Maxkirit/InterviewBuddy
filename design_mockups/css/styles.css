@@ -5,7 +5,11 @@
 }
 
 body {
-    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    font-family:
+        "Segoe UI",
+        system-ui,
+        -apple-system,
+        sans-serif;
     background: #f4f6fb;
     color: #1a1d2e;
     min-height: 100vh;
@@ -29,8 +33,19 @@ nav {
     letter-spacing: -0.3px;
 }
 
+.nav-view-label {
+    font-size: 1.25rem;
+    font-weight: 400;
+    color: #9ca3af;
+    letter-spacing: -0.3px;
+}
+
+.nav-view-label::before {
+    content: " ";
+}
+
 /* Shared: both logo variants have a dark "Buddy" span */
-.nav-logo span,
+.nav-logo span:not(.nav-view-label),
 .auth-logo span {
     color: #1a1d2e;
 }
@@ -54,7 +69,9 @@ nav {
     color: #6b7280;
     padding: 6px 14px;
     border-radius: 8px;
-    transition: background 0.15s, color 0.15s;
+    transition:
+        background 0.15s,
+        color 0.15s;
 }
 
 .nav-links a:hover {
@@ -102,13 +119,149 @@ nav {
     color: #1a1d2e;
 }
 
-.badge {
-    background: #eef1ff;
-    color: #4f6ef7;
-    font-size: 0.8rem;
+/* ── Recruiter interview entries (rich rows) ── */
+.interview-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.interview-entry {
+    background: #fff;
+    border: 1px solid #e4e8f0;
+    border-radius: 14px;
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.interview-entry-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex: 0 0 240px;
+}
+
+.interview-entry-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.interview-entry-name {
+    font-size: 0.95rem;
     font-weight: 600;
-    padding: 2px 10px;
-    border-radius: 20px;
+    color: #1a1d2e;
+}
+
+.interview-entry-pos {
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+.interview-entry-question {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    margin-top: 1px;
+}
+
+.interview-entry-due {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    white-space: nowrap;
+}
+
+.interview-entry-due.overdue {
+    color: #ef4444;
+    font-weight: 600;
+}
+
+.interview-entry-right {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    justify-content: flex-end;
+}
+
+/* Completed rows: stack the top bar and mini-report vertically */
+.interview-entry-right--stacked {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+}
+
+.interview-entry-right-top {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Mini report preview (completed rows) */
+.interview-mini-report {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.interview-mini-score {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #4f6ef7;
+    min-width: 44px;
+    text-align: center;
+}
+
+.interview-mini-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 180px;
+}
+
+.mini-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.7rem;
+    color: #6b7280;
+}
+
+.mini-bar-label {
+    width: 80px;
+    flex-shrink: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mini-bar-wrap {
+    flex: 1;
+    height: 4px;
+    background: #f0f3ff;
+    border-radius: 2px;
+}
+
+.mini-bar {
+    height: 100%;
+    background: #4f6ef7;
+    border-radius: 2px;
+}
+
+.mini-bar.amber,
+.dimension-bar.amber {
+    background: #f59e0b;
+}
+.mini-bar.green,
+.dimension-bar.green {
+    background: #10b981;
+}
+
+.mini-bar-score {
+    width: 24px;
+    text-align: right;
+    flex-shrink: 0;
 }
 
 /* ── Candidate list ── */
@@ -128,6 +281,17 @@ nav {
     justify-content: space-between;
 }
 
+.connection-date {
+    font-size: 0.8rem;
+    color: #9ca3af;
+}
+
+.candidate-row-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
 .candidate-name {
     font-size: 0.975rem;
     font-weight: 600;
@@ -141,16 +305,25 @@ nav {
 }
 
 /* ── Buttons ── */
-.btn-interview {
+
+/* Shared base for outlined action buttons */
+.btn-interview,
+.btn-delete {
     padding: 7px 16px;
     border-radius: 8px;
-    border: 1px solid #4f6ef7;
     background: #fff;
-    color: #4f6ef7;
     font-size: 0.85rem;
     font-weight: 500;
     cursor: pointer;
-    transition: background 0.15s, color 0.15s;
+    white-space: nowrap;
+    transition:
+        background 0.15s,
+        color 0.15s;
+}
+
+.btn-interview {
+    border: 1px solid #4f6ef7;
+    color: #4f6ef7;
 }
 
 .btn-interview:hover {
@@ -159,49 +332,50 @@ nav {
 }
 
 .btn-delete {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    border: 1px solid #e4e8f0;
-    background: #fff;
-    color: #9ca3af;
-    font-size: 0.75rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: border-color 0.15s, color 0.15s, background 0.15s;
+    border: 1px solid #ef4444;
+    color: #ef4444;
 }
 
 .btn-delete:hover {
-    border-color: #ef4444;
-    color: #ef4444;
-    background: #fff5f5;
+    background: #ef4444;
+    color: #fff;
+}
+
+/* Shared base for filled primary buttons */
+.btn-mock,
+.btn-primary,
+.btn-submit {
+    border: none;
+    background: #4f6ef7;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.btn-mock:hover,
+.btn-primary:hover,
+.btn-submit:hover {
+    background: #3d5ce6;
+}
+
+.btn-mock:disabled {
+    background: #e4e8f0;
+    color: #9ca3af;
+    cursor: not-allowed;
 }
 
 .btn-mock {
     padding: 9px 20px;
     border-radius: 8px;
-    border: none;
-    background: #4f6ef7;
-    color: #fff;
     font-size: 0.875rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.15s;
 }
 
 .btn-primary {
     width: 100%;
     padding: 11px;
     border-radius: 10px;
-    border: none;
-    background: #4f6ef7;
-    color: #fff;
     font-size: 0.925rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.15s;
     margin-top: 8px;
 }
 
@@ -215,22 +389,9 @@ nav {
 .btn-submit {
     padding: 11px 28px;
     border-radius: 10px;
-    border: none;
-    background: #4f6ef7;
-    color: #fff;
     font-size: 0.925rem;
-    font-weight: 600;
-    cursor: pointer;
     white-space: nowrap;
     flex-shrink: 0;
-    transition: background 0.15s;
-}
-
-/* Single hover rule for all filled primary buttons */
-.btn-mock:hover,
-.btn-primary:hover,
-.btn-submit:hover {
-    background: #3d5ce6;
 }
 
 .btn-cancel {
@@ -242,12 +403,41 @@ nav {
     font-size: 0.875rem;
     font-weight: 500;
     cursor: pointer;
-    transition: background 0.15s, border-color 0.15s;
+    transition:
+        background 0.15s,
+        border-color 0.15s;
 }
 
 .btn-cancel:hover {
     background: #f4f6fb;
     border-color: #d1d5db;
+}
+
+.btn-danger {
+    padding: 9px 20px;
+    border-radius: 8px;
+    border: none;
+    background: #ef4444;
+    color: #fff;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.btn-danger:hover {
+    background: #dc2626;
+}
+
+.modal-warning {
+    margin-top: 10px;
+    padding: 10px 14px;
+    background: #fef3c7;
+    border: 1px solid #fcd34d;
+    border-radius: 8px;
+    font-size: 0.825rem;
+    color: #92400e;
+    line-height: 1.5;
 }
 
 /* ── Interview status badges ── */
@@ -259,9 +449,30 @@ nav {
     white-space: nowrap;
 }
 
-.status-pending   { background: #fef3c7; color: #b45309; }
-.status-completed { background: #d1fae5; color: #065f46; }
-.status-mock      { background: #ede9fe; color: #6d28d9; }
+.status-pending {
+    background: #fef3c7;
+    color: #b45309;
+}
+.status-completed {
+    background: #d1fae5;
+    color: #065f46;
+}
+.status-overdue {
+    background: #fee2e2;
+    color: #991b1b;
+}
+.status-mock {
+    background: #ede9fe;
+    color: #6d28d9;
+}
+.status-candidate {
+    background: #eef1ff;
+    color: #4f6ef7;
+}
+.status-recruiter {
+    background: #fdf4ff;
+    color: #9333ea;
+}
 
 /* ── Modal (dialog) ── */
 dialog {
@@ -306,7 +517,9 @@ dialog::backdrop {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: border-color 0.15s, color 0.15s;
+    transition:
+        border-color 0.15s,
+        color 0.15s;
 }
 
 .modal-close:hover {
@@ -325,6 +538,12 @@ dialog::backdrop {
     justify-content: flex-end;
     gap: 10px;
     margin-top: 24px;
+}
+
+.modal-note {
+    font-size: 0.82rem;
+    color: #6b7280;
+    margin-top: 10px;
 }
 
 .copy-row {
@@ -354,7 +573,10 @@ dialog::backdrop {
     font-weight: 500;
     cursor: pointer;
     white-space: nowrap;
-    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    transition:
+        background 0.15s,
+        border-color 0.15s,
+        color 0.15s;
 }
 
 .btn-copy:hover {
@@ -387,6 +609,7 @@ dialog::backdrop {
 .form-group input,
 .form-group textarea,
 .form-group select {
+    width: 100%;
     padding: 10px 14px;
     border: 1px solid #e4e8f0;
     border-radius: 10px;
@@ -394,7 +617,9 @@ dialog::backdrop {
     font-family: inherit;
     color: #1a1d2e;
     outline: none;
-    transition: border-color 0.15s, box-shadow 0.15s;
+    transition:
+        border-color 0.15s,
+        box-shadow 0.15s;
 }
 
 .form-group input::placeholder,
@@ -435,8 +660,12 @@ dialog::backdrop {
     gap: 20px;
 }
 
-.interview-page { max-width: 900px; }
-.report-page    { max-width: 820px; }
+.interview-page {
+    max-width: 900px;
+}
+.report-page {
+    max-width: 820px;
+}
 
 .interview-card,
 .report-card {
@@ -504,7 +733,7 @@ dialog::backdrop {
 }
 
 .req-list li::before {
-    content: '';
+    content: "";
     width: 6px;
     height: 6px;
     border-radius: 50%;
@@ -537,7 +766,10 @@ dialog::backdrop {
     cursor: pointer;
     color: #6b7280;
     font-size: 0.9rem;
-    transition: border-color 0.15s, color 0.15s, background 0.15s;
+    transition:
+        border-color 0.15s,
+        color 0.15s,
+        background 0.15s;
 }
 
 .canvas-tool:hover {
@@ -557,21 +789,6 @@ dialog::backdrop {
     justify-content: center;
     color: #b0b7c3;
     font-size: 0.875rem;
-}
-
-.reasoning-wrap {
-    display: flex;
-    align-items: flex-end;
-    gap: 16px;
-}
-
-.reasoning-wrap .form-group {
-    flex: 1;
-    margin-bottom: 0;
-}
-
-.reasoning-wrap textarea {
-    min-height: 110px;
 }
 
 /* ── Profile page ── */
@@ -623,7 +840,9 @@ dialog::backdrop {
     font-size: 0.7rem;
     cursor: pointer;
     color: #6b7280;
-    transition: border-color 0.15s, color 0.15s;
+    transition:
+        border-color 0.15s,
+        color 0.15s;
 }
 
 .profile-avatar-edit:hover {
@@ -631,7 +850,9 @@ dialog::backdrop {
     color: #4f6ef7;
 }
 
-.profile-identity { text-align: center; }
+.profile-identity {
+    text-align: center;
+}
 
 .profile-identity .name {
     font-size: 1rem;
@@ -651,10 +872,58 @@ dialog::backdrop {
     gap: 16px;
 }
 
+.profile-page-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1a1d2e;
+    margin-bottom: 4px;
+}
+
 .profile-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 16px;
+}
+
+/* Read-only profile field (profile-view page) */
+.profile-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.profile-field-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.profile-field-value {
+    font-size: 0.925rem;
+    color: #1a1d2e;
+    line-height: 1.5;
+}
+
+.profile-field-value a {
+    color: #4f6ef7;
+    text-decoration: none;
+}
+
+.profile-field-value a:hover {
+    text-decoration: underline;
+}
+
+.profile-field-value.bio {
+    color: #374151;
+    line-height: 1.65;
+}
+
+.profile-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 8px;
 }
 
 .profile-save {
@@ -721,7 +990,7 @@ dialog::backdrop {
 
 .auth-divider::before,
 .auth-divider::after {
-    content: '';
+    content: "";
     flex: 1;
     height: 1px;
     background: #e4e8f0;
@@ -741,7 +1010,9 @@ dialog::backdrop {
     align-items: center;
     justify-content: center;
     gap: 10px;
-    transition: background 0.15s, border-color 0.15s;
+    transition:
+        background 0.15s,
+        border-color 0.15s;
 }
 
 .btn-google:hover {
@@ -786,10 +1057,14 @@ dialog::backdrop {
     padding: 16px 12px;
     text-align: center;
     cursor: pointer;
-    transition: border-color 0.15s, background 0.15s;
+    transition:
+        border-color 0.15s,
+        background 0.15s;
 }
 
-.role-option input[type="radio"] { display: none; }
+.role-option input[type="radio"] {
+    display: none;
+}
 
 .role-option:has(input:checked) {
     border-color: #4f6ef7;
@@ -901,8 +1176,6 @@ dialog::backdrop {
     background: #4f6ef7;
 }
 
-.dimension-bar.amber { background: #f59e0b; }
-.dimension-bar.green { background: #10b981; }
 
 .dimension-score {
     font-size: 0.85rem;
@@ -934,8 +1207,12 @@ dialog::backdrop {
     margin-bottom: 12px;
 }
 
-.feedback-col.strengths h3    { color: #059669; }
-.feedback-col.improvements h3 { color: #b45309; }
+.feedback-col.strengths h3 {
+    color: #059669;
+}
+.feedback-col.improvements h3 {
+    color: #b45309;
+}
 
 .feedback-list {
     list-style: none;
@@ -952,16 +1229,19 @@ dialog::backdrop {
     gap: 8px;
 }
 
-.feedback-list li::before { flex-shrink: 0; margin-top: 1px; }
+.feedback-list li::before {
+    flex-shrink: 0;
+    margin-top: 1px;
+}
 
 .strengths .feedback-list li::before {
-    content: '✓';
+    content: "✓";
     color: #10b981;
     font-weight: 700;
 }
 
 .improvements .feedback-list li::before {
-    content: '○';
+    content: "○";
     color: #f59e0b;
     font-weight: 700;
 }
@@ -993,6 +1273,140 @@ dialog::backdrop {
     border: 1px solid #e4e8f0;
     border-radius: 10px;
     padding: 16px 18px;
+}
+
+/* ── Empty state ── */
+.empty-state {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    text-align: center;
+    padding: 60px 24px;
+}
+
+.empty-state-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 20px;
+    background: #eef1ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #4f6ef7;
+}
+
+.empty-state-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1a1d2e;
+}
+
+.empty-state-desc {
+    font-size: 0.875rem;
+    color: #6b7280;
+    max-width: 320px;
+    line-height: 1.6;
+}
+
+/* ── Mock page layout ── */
+.mocks-layout {
+    display: flex;
+    height: calc(100vh - 60px);
+}
+
+.mocks-sidebar {
+    width: 260px;
+    flex-shrink: 0;
+    border-right: 1px solid #e4e8f0;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.mocks-sidebar-header {
+    padding: 20px 16px 14px;
+    border-bottom: 1px solid #e4e8f0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.mocks-sidebar-header h2 {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #9ca3af;
+}
+
+.btn-sidebar-link {
+    display: block;
+    text-align: center;
+    font-size: 0.82rem;
+    color: #4f6ef7;
+    text-decoration: none;
+    padding: 6px 0;
+}
+
+.btn-sidebar-link:hover {
+    text-decoration: underline;
+}
+
+.mocks-list {
+    overflow-y: auto;
+    flex: 1;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.mock-item {
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.mock-item:hover {
+    background: #f4f6fb;
+}
+
+.mock-item.active {
+    background: #eef1ff;
+}
+
+.mock-item-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #1a1d2e;
+    margin-bottom: 5px;
+    line-height: 1.3;
+}
+
+.mock-item.active .mock-item-title {
+    color: #4f6ef7;
+}
+
+.mock-item-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.mock-item-date {
+    font-size: 0.75rem;
+    color: #b0b7c3;
+}
+
+.mocks-main {
+    flex: 1;
+    overflow-y: auto;
+    background: #f4f6fb;
 }
 
 /* ── Page footer ── */

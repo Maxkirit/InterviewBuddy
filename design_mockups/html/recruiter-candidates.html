@@ -9,14 +9,17 @@
     <body>
         <!-- Nav -->
         <nav>
-            <div class="nav-logo">Interview<span>Buddy</span></div>
+            <div class="nav-logo">
+                Interview<span>Buddy</span
+                ><span class="nav-view-label">Recruiter</span>
+            </div>
             <ul class="nav-links">
+                <li><a href="recruiter-interviews.html">Interviews</a></li>
                 <li>
                     <a href="recruiter-candidates.html" class="active"
-                        >Candidates</a
+                        >Candidate List</a
                     >
                 </li>
-                <li><a href="recruiter-interviews.html">Interviews</a></li>
             </ul>
             <div class="nav-right">
                 <div class="avatar" title="Sarah K.">SK</div>
@@ -40,122 +43,162 @@
             <!-- Candidate rows -->
             <div class="candidates-list">
                 <div class="candidate-row">
-                    <span class="candidate-name">Alex Martinez</span>
+                    <div class="candidate-row-left">
+                        <div class="avatar">AM</div>
+                        <span class="candidate-name">Alex Martinez</span>
+                    </div>
                     <div class="row-actions">
                         <button
                             class="btn-interview"
                             onclick="openSchedule('Alex Martinez')"
                         >
-                            Setup interview
+                            Schedule interview
                         </button>
-                        <button class="btn-delete" title="Remove connection">
-                            &#10005;
-                        </button>
+                        <button
+                            class="btn-delete"
+                            title="Remove connection"
+                            onclick="openConfirm(this)"
+                        >Delete</button>
                     </div>
                 </div>
 
                 <div class="candidate-row">
-                    <span class="candidate-name">Priya Lakshmanan</span>
+                    <div class="candidate-row-left">
+                        <div class="avatar">PL</div>
+                        <span class="candidate-name">Priya Lakshmanan</span>
+                    </div>
                     <div class="row-actions">
                         <button
                             class="btn-interview"
                             onclick="openSchedule('Priya Lakshmanan')"
                         >
-                            Setup interview
+                            Schedule interview
                         </button>
-                        <button class="btn-delete" title="Remove connection">
-                            &#10005;
-                        </button>
+                        <button
+                            class="btn-delete"
+                            title="Remove connection"
+                            onclick="openConfirm(this)"
+                        >Delete</button>
                     </div>
                 </div>
 
                 <div class="candidate-row">
-                    <span class="candidate-name">James Walsh</span>
+                    <div class="candidate-row-left">
+                        <div class="avatar">JW</div>
+                        <span class="candidate-name">James Walsh</span>
+                    </div>
                     <div class="row-actions">
                         <button
                             class="btn-interview"
                             onclick="openSchedule('James Walsh')"
                         >
-                            Setup interview
+                            Schedule interview
                         </button>
-                        <button class="btn-delete" title="Remove connection">
-                            &#10005;
-                        </button>
+                        <button
+                            class="btn-delete"
+                            title="Remove connection"
+                            onclick="openConfirm(this)"
+                        >Delete</button>
                     </div>
                 </div>
 
                 <div class="candidate-row">
-                    <span class="candidate-name">Sara Kim</span>
+                    <div class="candidate-row-left">
+                        <div class="avatar">SK</div>
+                        <span class="candidate-name">Sara Kim</span>
+                    </div>
                     <div class="row-actions">
                         <button
                             class="btn-interview"
                             onclick="openSchedule('Sara Kim')"
                         >
-                            Setup interview
+                            Schedule interview
                         </button>
-                        <button class="btn-delete" title="Remove connection">
-                            &#10005;
-                        </button>
+                        <button
+                            class="btn-delete"
+                            title="Remove connection"
+                            onclick="openConfirm(this)"
+                        >Delete</button>
                     </div>
                 </div>
 
                 <div class="candidate-row">
-                    <span class="candidate-name">Diego Reyes</span>
+                    <div class="candidate-row-left">
+                        <div class="avatar">DR</div>
+                        <span class="candidate-name">Diego Reyes</span>
+                    </div>
                     <div class="row-actions">
                         <button
                             class="btn-interview"
                             onclick="openSchedule('Diego Reyes')"
                         >
-                            Setup interview
+                            Schedule interview
                         </button>
-                        <button class="btn-delete" title="Remove connection">
-                            &#10005;
-                        </button>
+                        <button
+                            class="btn-delete"
+                            title="Remove connection"
+                            onclick="openConfirm(this)"
+                        >Delete</button>
                     </div>
                 </div>
 
                 <div class="candidate-row">
-                    <span class="candidate-name">Maya Okafor</span>
+                    <div class="candidate-row-left">
+                        <div class="avatar">MO</div>
+                        <span class="candidate-name">Maya Okafor</span>
+                    </div>
                     <div class="row-actions">
                         <button
                             class="btn-interview"
                             onclick="openSchedule('Maya Okafor')"
                         >
-                            Setup interview
+                            Schedule interview
                         </button>
-                        <button class="btn-delete" title="Remove connection">
-                            &#10005;
-                        </button>
+                        <button
+                            class="btn-delete"
+                            title="Remove connection"
+                            onclick="openConfirm(this)"
+                        >Delete</button>
                     </div>
                 </div>
 
                 <div class="candidate-row">
-                    <span class="candidate-name">Tom Nguyen</span>
+                    <div class="candidate-row-left">
+                        <div class="avatar">TN</div>
+                        <span class="candidate-name">Tom Nguyen</span>
+                    </div>
                     <div class="row-actions">
                         <button
                             class="btn-interview"
                             onclick="openSchedule('Tom Nguyen')"
                         >
-                            Setup interview
+                            Schedule interview
                         </button>
-                        <button class="btn-delete" title="Remove connection">
-                            &#10005;
-                        </button>
+                        <button
+                            class="btn-delete"
+                            title="Remove connection"
+                            onclick="openConfirm(this)"
+                        >Delete</button>
                     </div>
                 </div>
 
                 <div class="candidate-row">
-                    <span class="candidate-name">Lena Brandt</span>
+                    <div class="candidate-row-left">
+                        <div class="avatar">LB</div>
+                        <span class="candidate-name">Lena Brandt</span>
+                    </div>
                     <div class="row-actions">
                         <button
                             class="btn-interview"
                             onclick="openSchedule('Lena Brandt')"
                         >
-                            Setup interview
+                            Schedule interview
                         </button>
-                        <button class="btn-delete" title="Remove connection">
-                            &#10005;
-                        </button>
+                        <button
+                            class="btn-delete"
+                            title="Remove connection"
+                            onclick="openConfirm(this)"
+                        >Delete</button>
                     </div>
                 </div>
             </div>
@@ -166,11 +209,11 @@
             <a href="#">Terms of Service</a>
         </footer>
 
-        <!-- Setup interview modal -->
+        <!-- Schedule interview modal -->
         <dialog id="schedule-modal">
             <div class="modal-header">
                 <h2>
-                    Setup interview —
+                    Schedule interview —
                     <span id="schedule-candidate-name"></span>
                 </h2>
                 <button
@@ -181,6 +224,14 @@
                 </button>
             </div>
             <div class="modal-body">
+                <div class="form-group">
+                    <label for="schedule-position">Position</label>
+                    <input
+                        type="text"
+                        id="schedule-position"
+                        placeholder="e.g. Backend Engineer"
+                    />
+                </div>
                 <div class="form-group">
                     <label for="schedule-question">Question</label>
                     <select id="schedule-question">
@@ -196,14 +247,19 @@
                         <option>Design an API Gateway</option>
                     </select>
                 </div>
+                <div class="form-group">
+                    <label for="schedule-due-date">Due date</label>
+                    <input type="date" id="schedule-due-date" />
+                </div>
             </div>
             <div class="modal-footer">
                 <button
-                    class="btn-primary"
-                    class="btn-primary--compact"
+                    class="btn-cancel"
+                    onclick="document.getElementById('schedule-modal').close()"
                 >
-                    Save
+                    Cancel
                 </button>
+                <button class="btn-primary btn-primary--compact">Save</button>
             </div>
         </dialog>
 
@@ -237,17 +293,17 @@
                         </button>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label for="invite-expiry">Expires on</label>
-                    <input type="date" id="invite-expiry" />
-                </div>
+                <p class="modal-note">This link will expire in 3 days.</p>
             </div>
             <div class="modal-footer">
                 <button
-                    class="btn-primary"
-                    class="btn-primary--compact"
+                    class="btn-cancel"
+                    onclick="document.getElementById('invite-modal').close()"
                 >
-                    Save
+                    Cancel
+                </button>
+                <button class="btn-primary btn-primary--compact">
+                    Copy link
                 </button>
             </div>
         </dialog>
@@ -279,6 +335,51 @@
                         if (e.target === this) this.close();
                     });
             });
+            function openConfirm(btn) {
+                const name = btn
+                    .closest(".candidate-row")
+                    .querySelector(".candidate-name")
+                    .textContent.trim();
+                document.getElementById("confirm-name").textContent = name;
+                document.getElementById("confirm-modal").showModal();
+            }
+
+            document
+                .getElementById("confirm-modal")
+                .addEventListener("click", function (e) {
+                    if (e.target === this) this.close();
+                });
         </script>
+
+        <dialog id="confirm-modal">
+            <div class="modal-header">
+                <h2>Remove connection?</h2>
+                <button
+                    class="modal-close"
+                    onclick="document.getElementById('confirm-modal').close()"
+                >
+                    &#10005;
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>
+                    Are you sure you want to remove
+                    <strong id="confirm-name"></strong> from your candidates?
+                </p>
+                <p class="modal-warning">
+                    Any pending interviews with this candidate will also be
+                    cancelled.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button
+                    class="btn-cancel"
+                    onclick="document.getElementById('confirm-modal').close()"
+                >
+                    Cancel
+                </button>
+                <button class="btn-danger">Remove</button>
+            </div>
+        </dialog>
     </body>
 </html>

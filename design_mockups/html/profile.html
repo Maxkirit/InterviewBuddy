@@ -9,10 +9,14 @@
     <body>
         <!-- Nav (candidate example) -->
         <nav>
-            <div class="nav-logo">Interview<span>Buddy</span></div>
+            <div class="nav-logo">
+                Interview<span>Buddy</span
+                ><span class="nav-view-label">Candidate</span>
+            </div>
             <ul class="nav-links">
                 <li><a href="candidate-recruiters.html">Recruiters</a></li>
                 <li><a href="candidate-interviews.html">Interviews</a></li>
+                <li><a href="candidate-mocks.html">Mock</a></li>
             </ul>
             <div class="nav-right">
                 <div class="avatar" title="Tom Nguyen">TN</div>
@@ -21,17 +25,17 @@
 
         <!-- Page -->
         <div class="page">
-            <div class="page-header">
-                <h1>Profile</h1>
-            </div>
-
             <div class="profile-layout">
-
                 <!-- Left column -->
                 <div class="profile-left">
                     <div class="profile-avatar-wrap">
                         <div class="profile-avatar">TN</div>
-                        <button class="profile-avatar-edit" title="Change photo">&#9998;</button>
+                        <button
+                            class="profile-avatar-edit"
+                            title="Change photo"
+                        >
+                            &#9998;
+                        </button>
                     </div>
                     <div class="profile-identity">
                         <div class="name">Tom Nguyen</div>
@@ -42,7 +46,7 @@
 
                 <!-- Right column -->
                 <div class="profile-right">
-
+                    <h1 class="profile-page-title">Profile</h1>
                     <div class="profile-row">
                         <div class="form-group">
                             <label for="firstname">First name</label>
@@ -57,33 +61,53 @@
                     <div class="profile-row">
                         <div class="form-group">
                             <label for="country">Country</label>
-                            <input type="text" id="country" value="Netherlands" />
+                            <input
+                                type="text"
+                                id="country"
+                                value="Netherlands"
+                            />
                         </div>
                         <div class="form-group">
                             <label for="org">Current organisation</label>
-                            <input type="text" id="org" placeholder="e.g. Acme Corp" />
+                            <input
+                                type="text"
+                                id="org"
+                                placeholder="e.g. Acme Corp"
+                            />
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label for="bio">Bio</label>
-                        <textarea id="bio" placeholder="Tell recruiters a bit about yourself…">SRE with 4 years of experience in cloud infrastructure, Kubernetes, and observability. Passionate about building reliable systems at scale.</textarea>
+                        <textarea
+                            id="bio"
+                            placeholder="Tell recruiters a bit about yourself…"
+                        >
+SRE with 4 years of experience in cloud infrastructure, Kubernetes, and observability. Passionate about building reliable systems at scale.</textarea
+                        >
                     </div>
 
                     <div class="form-group">
                         <label for="socials">Social links</label>
-                        <input type="url" id="socials" placeholder="https://linkedin.com/in/yourname" />
+                        <input
+                            type="url"
+                            id="socials"
+                            placeholder="https://linkedin.com/in/yourname"
+                        />
                     </div>
 
                     <div class="form-group">
                         <label for="phone">Phone number</label>
-                        <input type="tel" id="phone" placeholder="+1 555 000 0000" />
+                        <input
+                            type="tel"
+                            id="phone"
+                            placeholder="+1 555 000 0000"
+                        />
                     </div>
 
                     <div class="profile-save">
                         <button class="btn-primary">Save</button>
                     </div>
-
                 </div>
             </div>
         </div>

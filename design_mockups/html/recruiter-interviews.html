@@ -9,13 +9,18 @@
     <body>
         <!-- Nav -->
         <nav>
-            <div class="nav-logo">Interview<span>Buddy</span></div>
+            <div class="nav-logo">
+                Interview<span>Buddy</span
+                ><span class="nav-view-label">Recruiter</span>
+            </div>
             <ul class="nav-links">
-                <li><a href="recruiter-candidates.html">Candidates</a></li>
                 <li>
                     <a href="recruiter-interviews.html" class="active"
                         >Interviews</a
                     >
+                </li>
+                <li>
+                    <a href="recruiter-candidates.html">Candidate List</a>
                 </li>
             </ul>
             <div class="nav-right">
@@ -24,65 +29,300 @@
         </nav>
 
         <!-- Page -->
-        <div class="page">
+        <div class="page" style="max-width: 900px">
             <div class="page-header">
                 <h1>Interviews</h1>
                 <button
                     class="btn-mock"
                     onclick="document.getElementById('setup-modal').showModal()"
                 >
-                    Setup interview
+                    Schedule interview
                 </button>
             </div>
 
-            <div class="candidates-list">
-                <div class="candidate-row">
-                    <span class="candidate-name">Alex Martinez</span>
-                    <div class="row-actions">
+            <div class="interview-list">
+                <!-- Pending row -->
+                <div class="interview-entry">
+                    <div class="interview-entry-left">
+                        <div class="avatar">AM</div>
+                        <div class="interview-entry-info">
+                            <div class="interview-entry-name">
+                                Alex Martinez
+                            </div>
+                            <div class="interview-entry-pos">
+                                Frontend Engineer
+                            </div>
+                        </div>
+                    </div>
+                    <div class="interview-entry-right">
+                        <span class="interview-entry-question"
+                            >Design a URL Shortener</span
+                        >
+                        <span class="interview-entry-due">Due Apr 20</span>
                         <span class="status-badge status-pending">Pending</span>
-                        <button class="btn-delete" title="Cancel interview">
-                            &#10005;
-                        </button>
                     </div>
                 </div>
 
-                <div class="candidate-row">
-                    <span class="candidate-name">Priya Lakshmanan</span>
-                    <div class="row-actions">
-                        <span class="status-badge status-completed"
-                            >Completed</span
+                <!-- Completed row -->
+                <div class="interview-entry">
+                    <div class="interview-entry-left">
+                        <div class="avatar">PL</div>
+                        <div class="interview-entry-info">
+                            <div class="interview-entry-name">
+                                Priya Lakshmanan
+                            </div>
+                            <div class="interview-entry-pos">
+                                Backend Engineer
+                            </div>
+                        </div>
+                    </div>
+                    <div class="interview-entry-right interview-entry-right--stacked">
+                        <div class="interview-entry-right-top">
+                            <span class="interview-entry-question"
+                                >Design a Rate Limiter</span
+                            >
+                            <span class="status-badge status-completed"
+                                >Completed</span
+                            >
+                            <button
+                                class="btn-delete"
+                                title="Delete interview"
+                                onclick="
+                                    document
+                                        .getElementById('confirm-modal')
+                                        .showModal()
+                                "
+                            >Delete</button>
+                        </div>
+                        <div class="interview-mini-report">
+                            <div class="interview-mini-score">78%</div>
+                            <div class="interview-mini-bars">
+                                <div class="mini-bar-row">
+                                    <span class="mini-bar-label"
+                                        >Architecture</span
+                                    >
+                                    <div class="mini-bar-wrap">
+                                        <div
+                                            class="mini-bar"
+                                            style="width: 80%"
+                                        ></div>
+                                    </div>
+                                    <span class="mini-bar-score">4/5</span>
+                                </div>
+                                <div class="mini-bar-row">
+                                    <span class="mini-bar-label"
+                                        >Scalability</span
+                                    >
+                                    <div class="mini-bar-wrap">
+                                        <div
+                                            class="mini-bar amber"
+                                            style="width: 60%"
+                                        ></div>
+                                    </div>
+                                    <span class="mini-bar-score">3/5</span>
+                                </div>
+                                <div class="mini-bar-row">
+                                    <span class="mini-bar-label"
+                                        >Reasoning</span
+                                    >
+                                    <div class="mini-bar-wrap">
+                                        <div
+                                            class="mini-bar"
+                                            style="width: 80%"
+                                        ></div>
+                                    </div>
+                                    <span class="mini-bar-score">4/5</span>
+                                </div>
+                            </div>
+                            <a href="report.html"
+                                ><button class="btn-interview">
+                                    See report
+                                </button></a
+                            >
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Completed row -->
+                <div class="interview-entry">
+                    <div class="interview-entry-left">
+                        <div class="avatar">JW</div>
+                        <div class="interview-entry-info">
+                            <div class="interview-entry-name">James Walsh</div>
+                            <div class="interview-entry-pos">
+                                Full Stack Engineer
+                            </div>
+                        </div>
+                    </div>
+                    <div class="interview-entry-right interview-entry-right--stacked">
+                        <div class="interview-entry-right-top">
+                            <span class="interview-entry-question"
+                                >Design a News Feed</span
+                            >
+                            <span class="status-badge status-completed"
+                                >Completed</span
+                            >
+                            <button
+                                class="btn-delete"
+                                title="Delete interview"
+                                onclick="
+                                    document
+                                        .getElementById('confirm-modal')
+                                        .showModal()
+                                "
+                            >Delete</button>
+                        </div>
+                        <div class="interview-mini-report">
+                            <div class="interview-mini-score">91%</div>
+                            <div class="interview-mini-bars">
+                                <div class="mini-bar-row">
+                                    <span class="mini-bar-label"
+                                        >Architecture</span
+                                    >
+                                    <div class="mini-bar-wrap">
+                                        <div
+                                            class="mini-bar green"
+                                            style="width: 100%"
+                                        ></div>
+                                    </div>
+                                    <span class="mini-bar-score">5/5</span>
+                                </div>
+                                <div class="mini-bar-row">
+                                    <span class="mini-bar-label"
+                                        >Scalability</span
+                                    >
+                                    <div class="mini-bar-wrap">
+                                        <div
+                                            class="mini-bar green"
+                                            style="width: 80%"
+                                        ></div>
+                                    </div>
+                                    <span class="mini-bar-score">4/5</span>
+                                </div>
+                                <div class="mini-bar-row">
+                                    <span class="mini-bar-label"
+                                        >Reasoning</span
+                                    >
+                                    <div class="mini-bar-wrap">
+                                        <div
+                                            class="mini-bar green"
+                                            style="width: 100%"
+                                        ></div>
+                                    </div>
+                                    <span class="mini-bar-score">5/5</span>
+                                </div>
+                            </div>
+                            <a href="report.html"
+                                ><button class="btn-interview">
+                                    See report
+                                </button></a
+                            >
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Overdue row -->
+                <div class="interview-entry">
+                    <div class="interview-entry-left">
+                        <div class="avatar">SK</div>
+                        <div class="interview-entry-info">
+                            <div class="interview-entry-name">Sara Kim</div>
+                            <div class="interview-entry-pos">Data Engineer</div>
+                        </div>
+                    </div>
+                    <div class="interview-entry-right">
+                        <span class="interview-entry-question"
+                            >Design a Distributed Cache</span
                         >
-                        <button class="btn-interview">See report</button>
+                        <span class="interview-entry-due overdue">Due Apr 14</span>
+                        <span class="status-badge status-overdue">Past due date</span>
+                        <button
+                            class="btn-delete"
+                            title="Cancel interview"
+                            onclick="
+                                document
+                                    .getElementById('confirm-modal')
+                                    .showModal()
+                            "
+                        >Delete</button>
                     </div>
                 </div>
 
-                <div class="candidate-row">
-                    <span class="candidate-name">James Walsh</span>
-                    <div class="row-actions">
-                        <span class="status-badge status-completed"
-                            >Completed</span
-                        >
-                        <button class="btn-interview">See report</button>
+                <!-- Completed row -->
+                <div class="interview-entry">
+                    <div class="interview-entry-left">
+                        <div class="avatar">DR</div>
+                        <div class="interview-entry-info">
+                            <div class="interview-entry-name">Diego Reyes</div>
+                            <div class="interview-entry-pos">
+                                Site Reliability Engineer
+                            </div>
+                        </div>
                     </div>
-                </div>
-
-                <div class="candidate-row">
-                    <span class="candidate-name">Sara Kim</span>
-                    <div class="row-actions">
-                        <span class="status-badge status-pending">Pending</span>
-                        <button class="btn-delete" title="Cancel interview">
-                            &#10005;
-                        </button>
-                    </div>
-                </div>
-
-                <div class="candidate-row">
-                    <span class="candidate-name">Diego Reyes</span>
-                    <div class="row-actions">
-                        <span class="status-badge status-completed"
-                            >Completed</span
-                        >
-                        <button class="btn-interview">See report</button>
+                    <div class="interview-entry-right interview-entry-right--stacked">
+                        <div class="interview-entry-right-top">
+                            <span class="interview-entry-question"
+                                >Design a Notification System</span
+                            >
+                            <span class="status-badge status-completed"
+                                >Completed</span
+                            >
+                            <button
+                                class="btn-delete"
+                                title="Delete interview"
+                                onclick="
+                                    document
+                                        .getElementById('confirm-modal')
+                                        .showModal()
+                                "
+                            >Delete</button>
+                        </div>
+                        <div class="interview-mini-report">
+                            <div class="interview-mini-score">85%</div>
+                            <div class="interview-mini-bars">
+                                <div class="mini-bar-row">
+                                    <span class="mini-bar-label"
+                                        >Architecture</span
+                                    >
+                                    <div class="mini-bar-wrap">
+                                        <div
+                                            class="mini-bar green"
+                                            style="width: 80%"
+                                        ></div>
+                                    </div>
+                                    <span class="mini-bar-score">4/5</span>
+                                </div>
+                                <div class="mini-bar-row">
+                                    <span class="mini-bar-label"
+                                        >Scalability</span
+                                    >
+                                    <div class="mini-bar-wrap">
+                                        <div
+                                            class="mini-bar"
+                                            style="width: 80%"
+                                        ></div>
+                                    </div>
+                                    <span class="mini-bar-score">4/5</span>
+                                </div>
+                                <div class="mini-bar-row">
+                                    <span class="mini-bar-label"
+                                        >Reasoning</span
+                                    >
+                                    <div class="mini-bar-wrap">
+                                        <div
+                                            class="mini-bar amber"
+                                            style="width: 60%"
+                                        ></div>
+                                    </div>
+                                    <span class="mini-bar-score">3/5</span>
+                                </div>
+                            </div>
+                            <a href="report.html"
+                                ><button class="btn-interview">
+                                    See report
+                                </button></a
+                            >
+                        </div>
                     </div>
                 </div>
             </div>
@@ -93,10 +333,10 @@
             <a href="#">Terms of Service</a>
         </footer>
 
-        <!-- Setup interview modal -->
+        <!-- Schedule interview modal -->
         <dialog id="setup-modal">
             <div class="modal-header">
-                <h2>Setup interview</h2>
+                <h2>Schedule interview</h2>
                 <button
                     class="modal-close"
                     onclick="document.getElementById('setup-modal').close()"
@@ -106,6 +346,14 @@
             </div>
 
             <div class="modal-body">
+                <div class="form-group">
+                    <label for="modal-position">Position</label>
+                    <input
+                        type="text"
+                        id="modal-position"
+                        placeholder="e.g. Backend Engineer"
+                    />
+                </div>
                 <div class="form-group">
                     <label for="modal-candidate">Candidate</label>
                     <select id="modal-candidate">
@@ -138,15 +386,20 @@
                         <option>Design an API Gateway</option>
                     </select>
                 </div>
+                <div class="form-group">
+                    <label for="modal-due-date">Due date</label>
+                    <input type="date" id="modal-due-date" />
+                </div>
             </div>
 
             <div class="modal-footer">
                 <button
-                    class="btn-primary"
-                    class="btn-primary--compact"
+                    class="btn-cancel"
+                    onclick="document.getElementById('setup-modal').close()"
                 >
-                    Save
+                    Cancel
                 </button>
+                <button class="btn-primary btn-primary--compact">Save</button>
             </div>
         </dialog>
 
@@ -157,6 +410,38 @@
                 .addEventListener("click", function (e) {
                     if (e.target === this) this.close();
                 });
+            document
+                .getElementById("confirm-modal")
+                .addEventListener("click", function (e) {
+                    if (e.target === this) this.close();
+                });
         </script>
+
+        <dialog id="confirm-modal">
+            <div class="modal-header">
+                <h2>Cancel interview?</h2>
+                <button
+                    class="modal-close"
+                    onclick="document.getElementById('confirm-modal').close()"
+                >
+                    &#10005;
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>
+                    This interview will be permanently cancelled and cannot be
+                    undone.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button
+                    class="btn-cancel"
+                    onclick="document.getElementById('confirm-modal').close()"
+                >
+                    Keep
+                </button>
+                <button class="btn-danger">Cancel interview</button>
+            </div>
+        </dialog>
     </body>
 </html>

@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>InterviewBuddy – Mock Interviews</title>
+        <link rel="stylesheet" href="../css/styles.css" />
+    </head>
+    <body>
+        <!-- Nav -->
+        <nav>
+            <div class="nav-logo">
+                Interview<span>Buddy</span
+                ><span class="nav-view-label">Candidate view</span>
+            </div>
+            <ul class="nav-links">
+                <li>
+                    <a href="candidate-mocks.html" class="active"
+                        >Mock Interviews</a
+                    >
+                </li>
+                <li>
+                    <a href="candidate-interviews.html">Official Interviews</a>
+                </li>
+                <li>
+                    <a href="candidate-recruiters.html">Recruiter List</a>
+                </li>
+            </ul>
+            <div class="nav-right">
+                <div class="avatar" title="Tom Nguyen">TN</div>
+            </div>
+        </nav>
+
+        <div class="mocks-layout">
+            <!-- Sidebar -->
+            <aside class="mocks-sidebar">
+                <div class="mocks-sidebar-header">
+                    <h2>Mock interviews</h2>
+                    <button
+                        class="btn-mock"
+                        style="width: 100%"
+                        onclick="
+                            document.getElementById('mock-modal').showModal()
+                        "
+                    >
+                        + New mock
+                    </button>
+                    <a href="candidate-interviews.html" class="btn-sidebar-link"
+                        >See Official Interviews</a
+                    >
+                </div>
+                <div class="mocks-list">
+                    <!-- empty — no interviews yet -->
+                </div>
+            </aside>
+
+            <main class="mocks-main">
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <svg
+                            width="28"
+                            height="28"
+                            viewBox="0 0 28 28"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <rect x="3" y="3" width="22" height="22" rx="4" />
+                            <line x1="14" y1="9" x2="14" y2="19" />
+                            <line x1="9" y1="14" x2="19" y2="14" />
+                        </svg>
+                    </div>
+                    <div class="empty-state-title">
+                        Start a new mock interview
+                    </div>
+                    <div class="empty-state-desc">
+                        Practice systems design at your own pace. Pick a
+                        question, work through your design, and get instant AI
+                        feedback when you submit.
+                    </div>
+                    <button
+                        class="btn-mock"
+                        style="width: auto"
+                        onclick="
+                            document.getElementById('mock-modal').showModal()
+                        "
+                    >
+                        + New mock interview
+                    </button>
+                </div>
+            </main>
+        </div>
+
+        <!-- New mock modal -->
+        <dialog id="mock-modal">
+            <div class="modal-header">
+                <h2>Start mock interview</h2>
+                <button
+                    class="modal-close"
+                    onclick="document.getElementById('mock-modal').close()"
+                >
+                    &#10005;
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="mock-question">Question</label>
+                    <select id="mock-question">
+                        <option value="" disabled selected>
+                            Select a question…
+                        </option>
+                        <option>Design a URL Shortener</option>
+                        <option>Design a Rate Limiter</option>
+                        <option>Design a Notification System</option>
+                        <option>Design a Distributed Cache</option>
+                        <option>Design a News Feed</option>
+                        <option>Design a Chat Application</option>
+                        <option>Design an API Gateway</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button
+                    class="btn-cancel"
+                    onclick="document.getElementById('mock-modal').close()"
+                >
+                    Cancel
+                </button>
+                <button class="btn-primary btn-primary--compact">Start</button>
+            </div>
+        </dialog>
+
+        <script>
+            document
+                .getElementById("mock-modal")
+                .addEventListener("click", function (e) {
+                    if (e.target === this) this.close();
+                });
+        </script>
+    </body>
+</html>

@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>InterviewBuddy – Admin · Users</title>
+        <link rel="stylesheet" href="../css/styles.css" />
+    </head>
+    <body>
+        <!-- Nav -->
+        <nav>
+            <div class="nav-logo">Interview<span>Buddy</span><span class="nav-view-label">Admin</span></div>
+            <ul class="nav-links">
+                <li><a href="admin-users.html" class="active">Users</a></li>
+                <li><a href="admin-interviews.html">Interviews</a></li>
+                <li><a href="admin-reports.html">Reports</a></li>
+            </ul>
+            <div class="nav-right">
+                <div class="avatar" title="Admin">AD</div>
+            </div>
+        </nav>
+
+        <div class="page" style="max-width:900px;">
+            <div class="page-header">
+                <h1>Users</h1>
+                <button class="btn-mock" style="width:auto;"
+                    onclick="openUserModal()">
+                    + Add user
+                </button>
+            </div>
+
+            <div class="interview-list">
+
+                <div class="interview-entry">
+                    <div class="interview-entry-left">
+                        <div class="avatar">AM</div>
+                        <div class="interview-entry-info">
+                            <div class="interview-entry-name">Alex Martinez</div>
+                            <div class="interview-entry-pos">alexmartinez@gmail.com</div>
+                            <div class="interview-entry-question">Joined Apr 2, 2026</div>
+                        </div>
+                    </div>
+                    <div class="interview-entry-right">
+                        <span class="status-badge status-candidate">Candidate</span>
+                        <button class="btn-interview" onclick="openUserModal('Alex Martinez')">Edit</button>
+                        <button class="btn-delete" title="Delete user" onclick="document.getElementById('confirm-modal').showModal()">Delete</button>
+                    </div>
+                </div>
+
+                <div class="interview-entry">
+                    <div class="interview-entry-left">
+                        <div class="avatar">PL</div>
+                        <div class="interview-entry-info">
+                            <div class="interview-entry-name">Priya Lakshmanan</div>
+                            <div class="interview-entry-pos">priya.lakshmanan@gmail.com</div>
+                            <div class="interview-entry-question">Joined Apr 3, 2026</div>
+                        </div>
+                    </div>
+                    <div class="interview-entry-right">
+                        <span class="status-badge status-candidate">Candidate</span>
+                        <button class="btn-interview" onclick="openUserModal('Priya Lakshmanan')">Edit</button>
+                        <button class="btn-delete" title="Delete user" onclick="document.getElementById('confirm-modal').showModal()">Delete</button>
+                    </div>
+                </div>
+
+                <div class="interview-entry">
+                    <div class="interview-entry-left">
+                        <div class="avatar">SK</div>
+                        <div class="interview-entry-info">
+                            <div class="interview-entry-name">Sarah Klein</div>
+                            <div class="interview-entry-pos">s.klein@stripe.com</div>
+                            <div class="interview-entry-question">Joined Mar 18, 2026</div>
+                        </div>
+                    </div>
+                    <div class="interview-entry-right">
+                        <span class="status-badge status-recruiter">Recruiter</span>
+                        <button class="btn-interview" onclick="openUserModal('Sarah Klein')">Edit</button>
+                        <button class="btn-delete" title="Delete user" onclick="document.getElementById('confirm-modal').showModal()">Delete</button>
+                    </div>
+                </div>
+
+                <div class="interview-entry">
+                    <div class="interview-entry-left">
+                        <div class="avatar">JW</div>
+                        <div class="interview-entry-info">
+                            <div class="interview-entry-name">James Walsh</div>
+                            <div class="interview-entry-pos">james.walsh@outlook.com</div>
+                            <div class="interview-entry-question">Joined Apr 5, 2026</div>
+                        </div>
+                    </div>
+                    <div class="interview-entry-right">
+                        <span class="status-badge status-candidate">Candidate</span>
+                        <button class="btn-interview" onclick="openUserModal('James Walsh')">Edit</button>
+                        <button class="btn-delete" title="Delete user" onclick="document.getElementById('confirm-modal').showModal()">Delete</button>
+                    </div>
+                </div>
+
+                <div class="interview-entry">
+                    <div class="interview-entry-left">
+                        <div class="avatar">MB</div>
+                        <div class="interview-entry-info">
+                            <div class="interview-entry-name">Marcus Bell</div>
+                            <div class="interview-entry-pos">m.bell@vercel.com</div>
+                            <div class="interview-entry-question">Joined Mar 22, 2026</div>
+                        </div>
+                    </div>
+                    <div class="interview-entry-right">
+                        <span class="status-badge status-recruiter">Recruiter</span>
+                        <button class="btn-interview" onclick="openUserModal('Marcus Bell')">Edit</button>
+                        <button class="btn-delete" title="Delete user" onclick="document.getElementById('confirm-modal').showModal()">Delete</button>
+                    </div>
+                </div>
+
+                <div class="interview-entry">
+                    <div class="interview-entry-left">
+                        <div class="avatar">TN</div>
+                        <div class="interview-entry-info">
+                            <div class="interview-entry-name">Tom Nguyen</div>
+                            <div class="interview-entry-pos">tom.nguyen@gmail.com</div>
+                            <div class="interview-entry-question">Joined Apr 1, 2026</div>
+                        </div>
+                    </div>
+                    <div class="interview-entry-right">
+                        <span class="status-badge status-candidate">Candidate</span>
+                        <button class="btn-interview" onclick="openUserModal('Tom Nguyen')">Edit</button>
+                        <button class="btn-delete" title="Delete user" onclick="document.getElementById('confirm-modal').showModal()">Delete</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <footer class="page-footer">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+        </footer>
+
+        <!-- Add / Edit user modal -->
+        <dialog id="user-modal">
+            <div class="modal-header">
+                <h2 id="user-modal-title">Add user</h2>
+                <button class="modal-close" onclick="document.getElementById('user-modal').close()">&#10005;</button>
+            </div>
+            <div class="modal-body">
+                <div class="profile-row">
+                    <div class="form-group">
+                        <label for="u-firstname">First name</label>
+                        <input type="text" id="u-firstname" placeholder="First name" />
+                    </div>
+                    <div class="form-group">
+                        <label for="u-lastname">Last name</label>
+                        <input type="text" id="u-lastname" placeholder="Last name" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="u-email">Email</label>
+                    <input type="email" id="u-email" placeholder="user@example.com" />
+                </div>
+                <div class="form-group">
+                    <label for="u-role">Role</label>
+                    <select id="u-role">
+                        <option value="" disabled selected>Select a role…</option>
+                        <option>Candidate</option>
+                        <option>Recruiter</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="document.getElementById('user-modal').close()">Cancel</button>
+                <button class="btn-primary btn-primary--compact">Save</button>
+            </div>
+        </dialog>
+
+        <script>
+            function openUserModal(name) {
+                document.getElementById('user-modal-title').textContent = name ? 'Edit user' : 'Add user';
+                if (name) {
+                    document.getElementById('u-firstname').value = name.split(' ')[0];
+                    document.getElementById('u-lastname').value = name.split(' ')[1] || '';
+                } else {
+                    document.getElementById('u-firstname').value = '';
+                    document.getElementById('u-lastname').value = '';
+                    document.getElementById('u-email').value = '';
+                }
+                document.getElementById('user-modal').showModal();
+            }
+
+            document.getElementById('user-modal').addEventListener('click', function(e) {
+                if (e.target === this) this.close();
+            });
+            document.getElementById('confirm-modal').addEventListener('click', function(e) {
+                if (e.target === this) this.close();
+            });
+        </script>
+
+        <dialog id="confirm-modal">
+            <div class="modal-header">
+                <h2>Delete user?</h2>
+                <button class="modal-close" onclick="document.getElementById('confirm-modal').close()">&#10005;</button>
+            </div>
+            <div class="modal-body">
+                <p>This will permanently delete the user and all their associated data. This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="document.getElementById('confirm-modal').close()">Cancel</button>
+                <button class="btn-danger">Delete</button>
+            </div>
+        </dialog>
+    </body>
+</html>

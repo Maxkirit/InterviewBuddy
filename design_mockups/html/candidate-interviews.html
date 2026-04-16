@@ -9,13 +9,19 @@
     <body>
         <!-- Nav -->
         <nav>
-            <div class="nav-logo">Interview<span>Buddy</span></div>
+            <div class="nav-logo">
+                Interview<span>Buddy</span
+                ><span class="nav-view-label">Candidate</span>
+            </div>
             <ul class="nav-links">
-                <li><a href="candidate-recruiters.html">Recruiters</a></li>
+                <li><a href="candidate-mocks.html">Mock Interviews</a></li>
                 <li>
                     <a href="candidate-interviews.html" class="active"
-                        >Interviews</a
+                        >Official Interviews</a
                     >
+                </li>
+                <li>
+                    <a href="candidate-recruiters.html">Recruiter List</a>
                 </li>
             </ul>
             <div class="nav-right">
@@ -24,85 +30,185 @@
         </nav>
 
         <!-- Page -->
-        <div class="page">
+        <div class="page" style="max-width: 900px">
             <div class="page-header">
                 <h1>Interviews</h1>
-                <button
-                    class="btn-mock"
-                    onclick="document.getElementById('mock-modal').showModal()"
-                >
-                    Start mock interview
-                </button>
             </div>
 
-            <div class="candidates-list">
-                <div class="candidate-row">
-                    <span class="candidate-name">Sarah Klein · Stripe</span>
-                    <div class="row-actions">
+            <div class="interview-list">
+                <!-- Pending row -->
+                <div class="interview-entry">
+                    <div class="interview-entry-left">
+                        <div class="avatar">SK</div>
+                        <div class="interview-entry-info">
+                            <div class="interview-entry-name">Sarah Klein</div>
+                            <div class="interview-entry-pos">
+                                Stripe · Frontend Engineer
+                            </div>
+                        </div>
+                    </div>
+                    <div class="interview-entry-right">
+                        <span class="interview-entry-due">Due Apr 20</span>
                         <span class="status-badge status-pending">Pending</span>
+                        <button
+                            class="btn-mock"
+                            style="width: auto; padding: 7px 18px"
+                            onclick="document.getElementById('start-modal').showModal()"
+                        >
+                            Start
+                        </button>
                     </div>
                 </div>
 
-                <div class="candidate-row">
-                    <span class="candidate-name">Marcus Bell · Vercel</span>
-                    <div class="row-actions">
+                <!-- Completed row -->
+                <div class="interview-entry">
+                    <div class="interview-entry-left">
+                        <div class="avatar">MB</div>
+                        <div class="interview-entry-info">
+                            <div class="interview-entry-name">Marcus Bell</div>
+                            <div class="interview-entry-pos">
+                                Vercel · Backend Engineer
+                            </div>
+                        </div>
+                    </div>
+                    <div class="interview-entry-right">
                         <span class="status-badge status-completed"
                             >Completed</span
                         >
-                        <a href="report.html"
-                            ><button class="btn-interview">
-                                See report
-                            </button></a
-                        >
+                        <div class="interview-mini-report">
+                            <div class="interview-mini-score">78%</div>
+                            <div class="interview-mini-bars">
+                                <div class="mini-bar-row">
+                                    <span class="mini-bar-label"
+                                        >Architecture</span
+                                    >
+                                    <div class="mini-bar-wrap">
+                                        <div
+                                            class="mini-bar"
+                                            style="width: 80%"
+                                        ></div>
+                                    </div>
+                                    <span class="mini-bar-score">4/5</span>
+                                </div>
+                                <div class="mini-bar-row">
+                                    <span class="mini-bar-label"
+                                        >Scalability</span
+                                    >
+                                    <div class="mini-bar-wrap">
+                                        <div
+                                            class="mini-bar amber"
+                                            style="width: 60%"
+                                        ></div>
+                                    </div>
+                                    <span class="mini-bar-score">3/5</span>
+                                </div>
+                                <div class="mini-bar-row">
+                                    <span class="mini-bar-label"
+                                        >Reasoning</span
+                                    >
+                                    <div class="mini-bar-wrap">
+                                        <div
+                                            class="mini-bar"
+                                            style="width: 80%"
+                                        ></div>
+                                    </div>
+                                    <span class="mini-bar-score">4/5</span>
+                                </div>
+                            </div>
+                            <a href="report.html"
+                                ><button class="btn-interview">
+                                    See report
+                                </button></a
+                            >
+                        </div>
                     </div>
                 </div>
 
-                <div class="candidate-row">
-                    <span class="candidate-name"
-                        >Mock interview · Design a Rate Limiter</span
-                    >
-                    <div class="row-actions">
-                        <span class="status-badge status-mock">Mock</span>
-                        <a href="report.html"
-                            ><button class="btn-interview">
-                                See report
-                            </button></a
-                        >
+                <!-- Completed row -->
+                <div class="interview-entry">
+                    <div class="interview-entry-left">
+                        <div class="avatar">AP</div>
+                        <div class="interview-entry-info">
+                            <div class="interview-entry-name">Anika Patel</div>
+                            <div class="interview-entry-pos">
+                                Linear · Full Stack Engineer
+                            </div>
+                        </div>
                     </div>
-                </div>
-
-                <div class="candidate-row">
-                    <span class="candidate-name">Anika Patel · Linear</span>
-                    <div class="row-actions">
+                    <div class="interview-entry-right">
                         <span class="status-badge status-completed"
                             >Completed</span
                         >
-                        <a href="report.html"
-                            ><button class="btn-interview">
-                                See report
-                            </button></a
-                        >
+                        <div class="interview-mini-report">
+                            <div class="interview-mini-score">91%</div>
+                            <div class="interview-mini-bars">
+                                <div class="mini-bar-row">
+                                    <span class="mini-bar-label"
+                                        >Architecture</span
+                                    >
+                                    <div class="mini-bar-wrap">
+                                        <div
+                                            class="mini-bar green"
+                                            style="width: 100%"
+                                        ></div>
+                                    </div>
+                                    <span class="mini-bar-score">5/5</span>
+                                </div>
+                                <div class="mini-bar-row">
+                                    <span class="mini-bar-label"
+                                        >Scalability</span
+                                    >
+                                    <div class="mini-bar-wrap">
+                                        <div
+                                            class="mini-bar green"
+                                            style="width: 80%"
+                                        ></div>
+                                    </div>
+                                    <span class="mini-bar-score">4/5</span>
+                                </div>
+                                <div class="mini-bar-row">
+                                    <span class="mini-bar-label"
+                                        >Reasoning</span
+                                    >
+                                    <div class="mini-bar-wrap">
+                                        <div
+                                            class="mini-bar green"
+                                            style="width: 100%"
+                                        ></div>
+                                    </div>
+                                    <span class="mini-bar-score">5/5</span>
+                                </div>
+                            </div>
+                            <a href="report.html"
+                                ><button class="btn-interview">
+                                    See report
+                                </button></a
+                            >
+                        </div>
                     </div>
                 </div>
 
-                <div class="candidate-row">
-                    <span class="candidate-name"
-                        >Mock interview · Design a News Feed</span
-                    >
-                    <div class="row-actions">
-                        <span class="status-badge status-mock">Mock</span>
-                        <a href="report.html"
-                            ><button class="btn-interview">
-                                See report
-                            </button></a
-                        >
+                <!-- Overdue row -->
+                <div class="interview-entry">
+                    <div class="interview-entry-left">
+                        <div class="avatar">JL</div>
+                        <div class="interview-entry-info">
+                            <div class="interview-entry-name">Jordan Lee</div>
+                            <div class="interview-entry-pos">
+                                Figma · Data Engineer
+                            </div>
+                        </div>
                     </div>
-                </div>
-
-                <div class="candidate-row">
-                    <span class="candidate-name">Jordan Lee · Figma</span>
-                    <div class="row-actions">
-                        <span class="status-badge status-pending">Pending</span>
+                    <div class="interview-entry-right">
+                        <span class="interview-entry-due overdue">Due Apr 14</span>
+                        <span class="status-badge status-overdue">Past due date</span>
+                        <button
+                            class="btn-mock"
+                            style="width: auto; padding: 7px 18px"
+                            disabled
+                        >
+                            Start
+                        </button>
                     </div>
                 </div>
             </div>
@@ -113,49 +219,43 @@
             <a href="#">Terms of Service</a>
         </footer>
 
-        <!-- Start mock interview modal -->
-        <dialog id="mock-modal">
+        <!-- Start interview confirmation modal -->
+        <dialog id="start-modal">
             <div class="modal-header">
-                <h2>Start mock interview</h2>
+                <h2>Start interview?</h2>
                 <button
                     class="modal-close"
-                    onclick="document.getElementById('mock-modal').close()"
+                    onclick="document.getElementById('start-modal').close()"
                 >
                     &#10005;
                 </button>
             </div>
             <div class="modal-body">
-                <div class="form-group">
-                    <label for="mock-question">Question</label>
-                    <select id="mock-question">
-                        <option value="" disabled selected>
-                            Select a question…
-                        </option>
-                        <option>Design a URL Shortener</option>
-                        <option>Design a Rate Limiter</option>
-                        <option>Design a Notification System</option>
-                        <option>Design a Distributed Cache</option>
-                        <option>Design a News Feed</option>
-                        <option>Design a Chat Application</option>
-                        <option>Design an API Gateway</option>
-                    </select>
-                </div>
+                <p>You are about to start an official interview.</p>
+                <p class="modal-warning">
+                    Once started, the interview cannot be paused or restarted.
+                    Make sure you are in a quiet environment and have enough
+                    time to complete it before continuing.
+                </p>
             </div>
             <div class="modal-footer">
-                <a href="interview.html"
-                    ><button
-                        class="btn-primary"
-                        class="btn-primary--compact"
-                    >
-                        Start
-                    </button></a
+                <button
+                    class="btn-cancel"
+                    onclick="document.getElementById('start-modal').close()"
                 >
+                    Go back
+                </button>
+                <a href="interview.html">
+                    <button class="btn-primary btn-primary--compact">
+                        Start interview
+                    </button>
+                </a>
             </div>
         </dialog>
 
         <script>
             document
-                .getElementById("mock-modal")
+                .getElementById("start-modal")
                 .addEventListener("click", function (e) {
                     if (e.target === this) this.close();
                 });

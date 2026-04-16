@@ -9,10 +9,22 @@
     <body>
         <!-- Nav -->
         <nav>
-            <div class="nav-logo">Interview<span>Buddy</span></div>
+            <div class="nav-logo">
+                Interview<span>Buddy</span
+                ><span class="nav-view-label">Candidate</span>
+            </div>
             <ul class="nav-links">
-                <li><a href="candidate-recruiters.html" class="active">Recruiters</a></li>
-                <li><a href="candidate-interviews.html">Interviews</a></li>
+                <li>
+                    <a href="candidate-mocks.html">Mock Interviews</a>
+                </li>
+                <li>
+                    <a href="candidate-interviews.html">Official Interviews</a>
+                </li>
+                <li>
+                    <a href="candidate-recruiters.html" class="active"
+                        >Recruiter List</a
+                    >
+                </li>
             </ul>
             <div class="nav-right">
                 <div class="avatar" title="Tom Nguyen">TN</div>
@@ -28,30 +40,74 @@
             <!-- Recruiter rows -->
             <div class="candidates-list">
                 <div class="candidate-row">
-                    <span class="candidate-name">Sarah Klein · Stripe</span>
+                    <div class="candidate-row-left">
+                        <div class="avatar">SK</div>
+                        <div class="interview-entry-info">
+                            <div class="interview-entry-name">Sarah Klein</div>
+                            <div class="interview-entry-pos">Stripe</div>
+                        </div>
+                    </div>
                     <div class="row-actions">
-                        <button class="btn-delete" title="Remove connection">&#10005;</button>
+                        <span class="connection-date">Connected Mar 18</span>
+                        <button
+                            class="btn-delete"
+                            title="Remove connection"
+                            onclick="openConfirm(this)"
+                        >Delete</button>
                     </div>
                 </div>
 
                 <div class="candidate-row">
-                    <span class="candidate-name">Marcus Bell · Vercel</span>
+                    <div class="candidate-row-left">
+                        <div class="avatar">MB</div>
+                        <div class="interview-entry-info">
+                            <div class="interview-entry-name">Marcus Bell</div>
+                            <div class="interview-entry-pos">Vercel</div>
+                        </div>
+                    </div>
                     <div class="row-actions">
-                        <button class="btn-delete" title="Remove connection">&#10005;</button>
+                        <span class="connection-date">Connected Mar 22</span>
+                        <button
+                            class="btn-delete"
+                            title="Remove connection"
+                            onclick="openConfirm(this)"
+                        >Delete</button>
                     </div>
                 </div>
 
                 <div class="candidate-row">
-                    <span class="candidate-name">Anika Patel · Linear</span>
+                    <div class="candidate-row-left">
+                        <div class="avatar">AP</div>
+                        <div class="interview-entry-info">
+                            <div class="interview-entry-name">Anika Patel</div>
+                            <div class="interview-entry-pos">Linear</div>
+                        </div>
+                    </div>
                     <div class="row-actions">
-                        <button class="btn-delete" title="Remove connection">&#10005;</button>
+                        <span class="connection-date">Connected Apr 1</span>
+                        <button
+                            class="btn-delete"
+                            title="Remove connection"
+                            onclick="openConfirm(this)"
+                        >Delete</button>
                     </div>
                 </div>
 
                 <div class="candidate-row">
-                    <span class="candidate-name">Jordan Lee · Figma</span>
+                    <div class="candidate-row-left">
+                        <div class="avatar">JL</div>
+                        <div class="interview-entry-info">
+                            <div class="interview-entry-name">Jordan Lee</div>
+                            <div class="interview-entry-pos">Figma</div>
+                        </div>
+                    </div>
                     <div class="row-actions">
-                        <button class="btn-delete" title="Remove connection">&#10005;</button>
+                        <span class="connection-date">Connected Apr 8</span>
+                        <button
+                            class="btn-delete"
+                            title="Remove connection"
+                            onclick="openConfirm(this)"
+                        >Delete</button>
                     </div>
                 </div>
             </div>
@@ -60,5 +116,53 @@
             <a href="#">Privacy Policy</a>
             <a href="#">Terms of Service</a>
         </footer>
+
+        <dialog id="confirm-modal">
+            <div class="modal-header">
+                <h2>Disconnect recruiter?</h2>
+                <button
+                    class="modal-close"
+                    onclick="document.getElementById('confirm-modal').close()"
+                >
+                    &#10005;
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>
+                    Are you sure you want to disconnect
+                    <strong id="confirm-name"></strong>?
+                </p>
+                <p class="modal-warning">
+                    Any pending interviews scheduled by this recruiter will also
+                    be cancelled.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button
+                    class="btn-cancel"
+                    onclick="document.getElementById('confirm-modal').close()"
+                >
+                    Cancel
+                </button>
+                <button class="btn-danger">Disconnect</button>
+            </div>
+        </dialog>
+
+        <script>
+            function openConfirm(btn) {
+                const name = btn
+                    .closest(".candidate-row")
+                    .querySelector(".interview-entry-name")
+                    .textContent.trim();
+                document.getElementById("confirm-name").textContent = name;
+                document.getElementById("confirm-modal").showModal();
+            }
+
+            document
+                .getElementById("confirm-modal")
+                .addEventListener("click", function (e) {
+                    if (e.target === this) this.close();
+                });
+        </script>
     </body>
 </html>

@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>InterviewBuddy – Admin · Interviews</title>
+        <link rel="stylesheet" href="../css/styles.css" />
+    </head>
+    <body>
+        <!-- Nav -->
+        <nav>
+            <div class="nav-logo">Interview<span>Buddy</span><span class="nav-view-label">Admin</span></div>
+            <ul class="nav-links">
+                <li><a href="admin-users.html">Users</a></li>
+                <li><a href="admin-interviews.html" class="active">Interviews</a></li>
+                <li><a href="admin-reports.html">Reports</a></li>
+            </ul>
+            <div class="nav-right">
+                <div class="avatar" title="Admin">AD</div>
+            </div>
+        </nav>
+
+        <div class="page" style="max-width:900px;">
+            <div class="page-header">
+                <h1>Interviews</h1>
+                <button class="btn-mock" style="width:auto;"
+                    onclick="document.getElementById('create-modal').showModal()">
+                    + Create interview
+                </button>
+            </div>
+
+            <div class="interview-list">
+
+                <div class="interview-entry">
+                    <div class="interview-entry-left">
+                        <div class="avatar">AM</div>
+                        <div class="interview-entry-info">
+                            <div class="interview-entry-name">Alex Martinez</div>
+                            <div class="interview-entry-pos">via Sarah Klein · Stripe</div>
+                            <div class="interview-entry-question">Frontend Engineer · Design a URL Shortener</div>
+                        </div>
+                    </div>
+                    <div class="interview-entry-right">
+                        <span class="status-badge status-pending">Pending</span>
+                        <button class="btn-delete" title="Delete interview" onclick="document.getElementById('confirm-modal').showModal()">Delete</button>
+                    </div>
+                </div>
+
+                <div class="interview-entry">
+                    <div class="interview-entry-left">
+                        <div class="avatar">PL</div>
+                        <div class="interview-entry-info">
+                            <div class="interview-entry-name">Priya Lakshmanan</div>
+                            <div class="interview-entry-pos">via Sarah Klein · Stripe</div>
+                            <div class="interview-entry-question">Backend Engineer · Design a Rate Limiter</div>
+                        </div>
+                    </div>
+                    <div class="interview-entry-right">
+                        <span class="status-badge status-completed">Completed</span>
+                        <button class="btn-delete" title="Delete interview" onclick="document.getElementById('confirm-modal').showModal()">Delete</button>
+                    </div>
+                </div>
+
+                <div class="interview-entry">
+                    <div class="interview-entry-left">
+                        <div class="avatar">JW</div>
+                        <div class="interview-entry-info">
+                            <div class="interview-entry-name">James Walsh</div>
+                            <div class="interview-entry-pos">via Marcus Bell · Vercel</div>
+                            <div class="interview-entry-question">Full Stack Engineer · Design a News Feed</div>
+                        </div>
+                    </div>
+                    <div class="interview-entry-right">
+                        <span class="status-badge status-completed">Completed</span>
+                        <button class="btn-delete" title="Delete interview" onclick="document.getElementById('confirm-modal').showModal()">Delete</button>
+                    </div>
+                </div>
+
+                <div class="interview-entry">
+                    <div class="interview-entry-left">
+                        <div class="avatar">SK</div>
+                        <div class="interview-entry-info">
+                            <div class="interview-entry-name">Sara Kim</div>
+                            <div class="interview-entry-pos">via Sarah Klein · Stripe</div>
+                            <div class="interview-entry-question">Data Engineer · Design a Distributed Cache</div>
+                        </div>
+                    </div>
+                    <div class="interview-entry-right">
+                        <span class="status-badge status-pending">Pending</span>
+                        <button class="btn-delete" title="Delete interview" onclick="document.getElementById('confirm-modal').showModal()">Delete</button>
+                    </div>
+                </div>
+
+                <div class="interview-entry">
+                    <div class="interview-entry-left">
+                        <div class="avatar">DR</div>
+                        <div class="interview-entry-info">
+                            <div class="interview-entry-name">Diego Reyes</div>
+                            <div class="interview-entry-pos">via Marcus Bell · Vercel</div>
+                            <div class="interview-entry-question">SRE · Design a Notification System</div>
+                        </div>
+                    </div>
+                    <div class="interview-entry-right">
+                        <span class="status-badge status-completed">Completed</span>
+                        <button class="btn-delete" title="Delete interview" onclick="document.getElementById('confirm-modal').showModal()">Delete</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <footer class="page-footer">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+        </footer>
+
+        <!-- Create interview modal -->
+        <dialog id="create-modal">
+            <div class="modal-header">
+                <h2>Create interview</h2>
+                <button class="modal-close" onclick="document.getElementById('create-modal').close()">&#10005;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="ci-candidate">Candidate</label>
+                    <select id="ci-candidate">
+                        <option value="" disabled selected>Select a candidate…</option>
+                        <option>Alex Martinez</option>
+                        <option>Priya Lakshmanan</option>
+                        <option>James Walsh</option>
+                        <option>Sara Kim</option>
+                        <option>Diego Reyes</option>
+                        <option>Tom Nguyen</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="ci-recruiter">Recruiter</label>
+                    <select id="ci-recruiter">
+                        <option value="" disabled selected>Select a recruiter…</option>
+                        <option>Sarah Klein · Stripe</option>
+                        <option>Marcus Bell · Vercel</option>
+                        <option>Anika Patel · Linear</option>
+                        <option>Jordan Lee · Figma</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="ci-position">Position</label>
+                    <input type="text" id="ci-position" placeholder="e.g. Backend Engineer" />
+                </div>
+                <div class="form-group">
+                    <label for="ci-question">Question</label>
+                    <select id="ci-question">
+                        <option value="" disabled selected>Select a question…</option>
+                        <option>Design a URL Shortener</option>
+                        <option>Design a Rate Limiter</option>
+                        <option>Design a Notification System</option>
+                        <option>Design a Distributed Cache</option>
+                        <option>Design a News Feed</option>
+                        <option>Design a Chat Application</option>
+                        <option>Design an API Gateway</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="ci-due-date">Due date</label>
+                    <input type="date" id="ci-due-date" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="document.getElementById('create-modal').close()">Cancel</button>
+                <button class="btn-primary btn-primary--compact">Create</button>
+            </div>
+        </dialog>
+
+        <script>
+            document.getElementById('create-modal').addEventListener('click', function(e) {
+                if (e.target === this) this.close();
+            });
+            document.getElementById('confirm-modal').addEventListener('click', function(e) {
+                if (e.target === this) this.close();
+            });
+        </script>
+
+        <dialog id="confirm-modal">
+            <div class="modal-header">
+                <h2>Delete interview?</h2>
+                <button class="modal-close" onclick="document.getElementById('confirm-modal').close()">&#10005;</button>
+            </div>
+            <div class="modal-body">
+                <p>This will permanently delete the interview and its report. This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="document.getElementById('confirm-modal').close()">Cancel</button>
+                <button class="btn-danger">Delete</button>
+            </div>
+        </dialog>
+    </body>
+</html>

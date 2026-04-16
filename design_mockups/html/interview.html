@@ -9,23 +9,25 @@
     <body>
         <!-- Minimal nav -->
         <nav>
-            <div class="nav-logo">Interview<span>Buddy</span></div>
+            <div class="nav-logo">
+                Interview<span>Buddy</span
+                ><span class="nav-view-label">Candidate</span>
+            </div>
             <div class="nav-right">
                 <div class="avatar" title="Tom Nguyen">TN</div>
             </div>
         </nav>
 
         <div class="interview-page">
-
             <!-- Question -->
             <div class="interview-card">
                 <h2>Question</h2>
                 <div class="question-title">Design a URL Shortener</div>
                 <p class="question-body">
-                    Design a system like bit.ly that takes a long URL and returns a
-                    short alias. The service should redirect users to the original URL
-                    when the alias is visited. Consider scale, reliability, and latency
-                    in your design.
+                    Design a system like bit.ly that takes a long URL and
+                    returns a short alias. The service should redirect users to
+                    the original URL when the alias is visited. Consider scale,
+                    reliability, and latency in your design.
                 </p>
             </div>
 
@@ -36,8 +38,12 @@
                     <div class="req-group">
                         <h3>Functional</h3>
                         <ul class="req-list">
-                            <li>Given a long URL, generate a unique short alias</li>
-                            <li>Redirect users from short URL to original URL</li>
+                            <li>
+                                Given a long URL, generate a unique short alias
+                            </li>
+                            <li>
+                                Redirect users from short URL to original URL
+                            </li>
                             <li>Short links expire after a configurable TTL</li>
                             <li>Users can optionally choose a custom alias</li>
                         </ul>
@@ -45,7 +51,10 @@
                     <div class="req-group">
                         <h3>Non-functional</h3>
                         <ul class="req-list">
-                            <li>High availability — redirection must never be down</li>
+                            <li>
+                                High availability — redirection must never be
+                                down
+                            </li>
                             <li>Low latency — redirects under 10 ms</li>
                             <li>System should handle 100K writes/day</li>
                             <li>10:1 read-to-write ratio</li>
@@ -61,59 +70,108 @@
                     <div class="canvas-toolbar">
                         <!-- Rectangle -->
                         <button class="canvas-tool" title="Rectangle">
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <rect x="1" y="3" width="14" height="10" rx="1"/>
+                            <svg
+                                width="16"
+                                height="16"
+                                viewBox="0 0 16 16"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.5"
+                            >
+                                <rect
+                                    x="1"
+                                    y="3"
+                                    width="14"
+                                    height="10"
+                                    rx="1"
+                                />
                             </svg>
                         </button>
                         <!-- Cylinder (database) -->
                         <button class="canvas-tool" title="Database">
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
-                                <ellipse cx="8" cy="4" rx="5" ry="2"/>
-                                <line x1="3" y1="4" x2="3" y2="12"/>
-                                <line x1="13" y1="4" x2="13" y2="12"/>
-                                <ellipse cx="8" cy="12" rx="5" ry="2"/>
+                            <svg
+                                width="16"
+                                height="16"
+                                viewBox="0 0 16 16"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.5"
+                            >
+                                <ellipse cx="8" cy="4" rx="5" ry="2" />
+                                <line x1="3" y1="4" x2="3" y2="12" />
+                                <line x1="13" y1="4" x2="13" y2="12" />
+                                <ellipse cx="8" cy="12" rx="5" ry="2" />
                             </svg>
                         </button>
                         <!-- Arrow -->
                         <button class="canvas-tool" title="Arrow">
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                                <line x1="2" y1="8" x2="14" y2="8"/>
-                                <polyline points="10,4 14,8 10,12"/>
+                            <svg
+                                width="16"
+                                height="16"
+                                viewBox="0 0 16 16"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+                                <line x1="2" y1="8" x2="14" y2="8" />
+                                <polyline points="10,4 14,8 10,12" />
                             </svg>
                         </button>
                         <!-- Text -->
                         <button class="canvas-tool" title="Text">
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-                                <line x1="3" y1="3" x2="13" y2="3"/>
-                                <line x1="8" y1="3" x2="8" y2="13"/>
+                            <svg
+                                width="16"
+                                height="16"
+                                viewBox="0 0 16 16"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.5"
+                                stroke-linecap="round"
+                            >
+                                <line x1="3" y1="3" x2="13" y2="3" />
+                                <line x1="8" y1="3" x2="8" y2="13" />
                             </svg>
                         </button>
                         <!-- Trash -->
                         <button class="canvas-tool" title="Delete">
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-                                <polyline points="2,4 14,4"/>
-                                <path d="M5 4V2h6v2"/>
-                                <rect x="3" y="4" width="10" height="10" rx="1"/>
+                            <svg
+                                width="16"
+                                height="16"
+                                viewBox="0 0 16 16"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.5"
+                                stroke-linecap="round"
+                            >
+                                <polyline points="2,4 14,4" />
+                                <path d="M5 4V2h6v2" />
+                                <rect
+                                    x="3"
+                                    y="4"
+                                    width="10"
+                                    height="10"
+                                    rx="1"
+                                />
                             </svg>
                         </button>
                     </div>
-                    <div class="canvas-area">
-                        ReactFlow canvas renders here
-                    </div>
+                    <div class="canvas-area">ReactFlow canvas renders here</div>
                 </div>
             </div>
 
-            <!-- Reasoning + submit -->
+            <!-- Reasoning -->
             <div class="interview-card">
                 <h2>Reasoning</h2>
-                <div class="reasoning-wrap">
-                    <div class="form-group">
-                        <textarea placeholder="Explain the key decisions in your design — component choices, tradeoffs, bottlenecks, and how you'd scale further…"></textarea>
-                    </div>
-                    <button class="btn-submit">Submit</button>
+                <div class="form-group">
+                    <textarea
+                        placeholder="Explain the key decisions in your design — component choices, tradeoffs, bottlenecks, and how you'd scale further…"
+                    ></textarea>
                 </div>
             </div>
 
+            <button class="btn-submit">Submit</button>
         </div>
     </body>
 </html>

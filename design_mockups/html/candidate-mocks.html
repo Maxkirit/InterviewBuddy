@@ -1,0 +1,739 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>InterviewBuddy – Mock Interviews</title>
+        <link rel="stylesheet" href="../css/styles.css" />
+    </head>
+    <body>
+        <!-- Nav -->
+        <nav>
+            <div class="nav-logo">
+                Interview<span>Buddy</span
+                ><span class="nav-view-label">Candidate</span>
+            </div>
+            <ul class="nav-links">
+                <li>
+                    <a href="candidate-mocks.html" class="active"
+                        >Mock Interviews</a
+                    >
+                </li>
+                <li>
+                    <a href="candidate-interviews.html">Official Interviews</a>
+                </li>
+                <li>
+                    <a href="candidate-recruiters.html">Recruiter List</a>
+                </li>
+            </ul>
+            <div class="nav-right">
+                <div class="avatar" title="Tom Nguyen">TN</div>
+            </div>
+        </nav>
+
+        <div class="mocks-layout">
+            <!-- Sidebar -->
+            <aside class="mocks-sidebar">
+                <div class="mocks-sidebar-header">
+                    <h2>Mock interviews</h2>
+                    <button
+                        class="btn-mock"
+                        style="width: 100%"
+                        onclick="
+                            document.getElementById('mock-modal').showModal()
+                        "
+                    >
+                        + New mock
+                    </button>
+                    <a href="candidate-interviews.html" class="btn-sidebar-link"
+                        >See Official Interviews</a
+                    >
+                </div>
+
+                <div class="mocks-list">
+                    <div class="mock-item active" data-status="in-progress">
+                        <div class="mock-item-title">
+                            Design a URL Shortener
+                        </div>
+                        <div class="mock-item-meta">
+                            <span class="status-badge status-mock"
+                                >In progress</span
+                            >
+                            <span class="mock-item-date">Apr 15</span>
+                        </div>
+                    </div>
+
+                    <div class="mock-item" data-status="completed">
+                        <div class="mock-item-title">Design a Rate Limiter</div>
+                        <div class="mock-item-meta">
+                            <span class="status-badge status-completed"
+                                >Completed</span
+                            >
+                            <span class="mock-item-date">Apr 12</span>
+                        </div>
+                    </div>
+
+                    <div class="mock-item" data-status="completed">
+                        <div class="mock-item-title">Design a News Feed</div>
+                        <div class="mock-item-meta">
+                            <span class="status-badge status-completed"
+                                >Completed</span
+                            >
+                            <span class="mock-item-date">Apr 9</span>
+                        </div>
+                    </div>
+
+                    <div class="mock-item" data-status="in-progress">
+                        <div class="mock-item-title">
+                            Design a Distributed Cache
+                        </div>
+                        <div class="mock-item-meta">
+                            <span class="status-badge status-mock"
+                                >In progress</span
+                            >
+                            <span class="mock-item-date">Apr 7</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main area -->
+            <main class="mocks-main">
+                <!-- ── Interview view (in-progress) ── -->
+                <div id="view-interview" class="interview-page">
+                    <div class="interview-card">
+                        <h2>Question</h2>
+                        <div class="question-title" id="interview-title">
+                            Design a URL Shortener
+                        </div>
+                        <p class="question-body">
+                            Design a system like bit.ly that takes a long URL
+                            and returns a short alias. The service should
+                            redirect users to the original URL when the alias is
+                            visited. Consider scale, reliability, and latency in
+                            your design.
+                        </p>
+                    </div>
+
+                    <div class="interview-card">
+                        <h2>Requirements</h2>
+                        <div class="requirements-grid">
+                            <div class="req-group">
+                                <h3>Functional</h3>
+                                <ul class="req-list">
+                                    <li>
+                                        Given a long URL, generate a unique
+                                        short alias
+                                    </li>
+                                    <li>
+                                        Redirect users from short URL to
+                                        original URL
+                                    </li>
+                                    <li>
+                                        Short links expire after a configurable
+                                        TTL
+                                    </li>
+                                    <li>
+                                        Users can optionally choose a custom
+                                        alias
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="req-group">
+                                <h3>Non-functional</h3>
+                                <ul class="req-list">
+                                    <li>
+                                        High availability — redirection must
+                                        never be down
+                                    </li>
+                                    <li>Low latency — redirects under 10 ms</li>
+                                    <li>
+                                        System should handle 100K writes/day
+                                    </li>
+                                    <li>10:1 read-to-write ratio</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="interview-card">
+                        <h2>Diagram</h2>
+                        <div class="canvas-wrap">
+                            <div class="canvas-toolbar">
+                                <button class="canvas-tool" title="Rectangle">
+                                    <svg
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 16 16"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="1.5"
+                                    >
+                                        <rect
+                                            x="1"
+                                            y="3"
+                                            width="14"
+                                            height="10"
+                                            rx="1"
+                                        />
+                                    </svg>
+                                </button>
+                                <button class="canvas-tool" title="Database">
+                                    <svg
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 16 16"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="1.5"
+                                    >
+                                        <ellipse cx="8" cy="4" rx="5" ry="2" />
+                                        <line x1="3" y1="4" x2="3" y2="12" />
+                                        <line x1="13" y1="4" x2="13" y2="12" />
+                                        <ellipse cx="8" cy="12" rx="5" ry="2" />
+                                    </svg>
+                                </button>
+                                <button class="canvas-tool" title="Arrow">
+                                    <svg
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 16 16"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="1.5"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    >
+                                        <line x1="2" y1="8" x2="14" y2="8" />
+                                        <polyline points="10,4 14,8 10,12" />
+                                    </svg>
+                                </button>
+                                <button class="canvas-tool" title="Text">
+                                    <svg
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 16 16"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="1.5"
+                                        stroke-linecap="round"
+                                    >
+                                        <line x1="3" y1="3" x2="13" y2="3" />
+                                        <line x1="8" y1="3" x2="8" y2="13" />
+                                    </svg>
+                                </button>
+                                <button class="canvas-tool" title="Delete">
+                                    <svg
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 16 16"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="1.5"
+                                        stroke-linecap="round"
+                                    >
+                                        <polyline points="2,4 14,4" />
+                                        <path d="M5 4V2h6v2" />
+                                        <rect
+                                            x="3"
+                                            y="4"
+                                            width="10"
+                                            height="10"
+                                            rx="1"
+                                        />
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="canvas-area">
+                                ReactFlow canvas renders here
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="interview-card">
+                        <h2>Reasoning</h2>
+                        <div class="form-group">
+                            <textarea
+                                placeholder="Explain the key decisions in your design — component choices, tradeoffs, bottlenecks, and how you'd scale further…"
+                            ></textarea>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 8px">
+                        <button class="btn-submit">Submit</button>
+                        <button class="btn-cancel">Save progress</button>
+                    </div>
+                </div>
+
+                <!-- ── Report view (completed) ── -->
+                <div id="view-report" class="report-page" style="display: none">
+                    <div class="report-card">
+                        <h2>Overview</h2>
+                        <div class="report-overview">
+                            <div class="score-circle" style="--pct: 295deg">
+                                <div class="score-circle-inner">
+                                    <span class="score-number">82%</span>
+                                </div>
+                            </div>
+                            <div class="report-meta">
+                                <div class="question" id="report-title">
+                                    Design a Rate Limiter
+                                </div>
+                                <div class="detail">Mock interview</div>
+                                <div class="detail">
+                                    Completed · Apr 12, 2026
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="report-card">
+                        <h2>Score breakdown</h2>
+                        <div class="dimensions">
+                            <div class="dimension-row">
+                                <span class="dimension-label"
+                                    >Requirements coverage</span
+                                >
+                                <div class="dimension-bar-wrap">
+                                    <div
+                                        class="dimension-bar green"
+                                        style="width: 80%"
+                                    ></div>
+                                </div>
+                                <span class="dimension-score">4 / 5</span>
+                            </div>
+                            <div class="dimension-row">
+                                <span class="dimension-label"
+                                    >System architecture</span
+                                >
+                                <div class="dimension-bar-wrap">
+                                    <div
+                                        class="dimension-bar"
+                                        style="width: 80%"
+                                    ></div>
+                                </div>
+                                <span class="dimension-score">4 / 5</span>
+                            </div>
+                            <div class="dimension-row">
+                                <span class="dimension-label">Scalability</span>
+                                <div class="dimension-bar-wrap">
+                                    <div
+                                        class="dimension-bar amber"
+                                        style="width: 60%"
+                                    ></div>
+                                </div>
+                                <span class="dimension-score">3 / 5</span>
+                            </div>
+                            <div class="dimension-row">
+                                <span class="dimension-label"
+                                    >Tradeoffs &amp; reasoning</span
+                                >
+                                <div class="dimension-bar-wrap">
+                                    <div
+                                        class="dimension-bar"
+                                        style="width: 80%"
+                                    ></div>
+                                </div>
+                                <span class="dimension-score">4 / 5</span>
+                            </div>
+                            <div class="dimension-row">
+                                <span class="dimension-label"
+                                    >Depth of design</span
+                                >
+                                <div class="dimension-bar-wrap">
+                                    <div
+                                        class="dimension-bar amber"
+                                        style="width: 60%"
+                                    ></div>
+                                </div>
+                                <span class="dimension-score">3 / 5</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="report-card">
+                        <h2>Submitted diagram</h2>
+                        <div class="diagram-wrap">
+                            <svg
+                                viewBox="0 0 680 320"
+                                xmlns="http://www.w3.org/2000/svg"
+                                style="
+                                    width: 100%;
+                                    display: block;
+                                    font-family:
+                                        &quot;Segoe UI&quot;, system-ui,
+                                        sans-serif;
+                                "
+                            >
+                                <rect
+                                    x="20"
+                                    y="130"
+                                    width="90"
+                                    height="44"
+                                    rx="8"
+                                    fill="#fff"
+                                    stroke="#e4e8f0"
+                                    stroke-width="1.5"
+                                />
+                                <text
+                                    x="65"
+                                    y="156"
+                                    text-anchor="middle"
+                                    font-size="11"
+                                    fill="#1a1d2e"
+                                    font-weight="600"
+                                >
+                                    Client
+                                </text>
+                                <line
+                                    x1="110"
+                                    y1="152"
+                                    x2="148"
+                                    y2="152"
+                                    stroke="#c7d0f8"
+                                    stroke-width="1.5"
+                                    marker-end="url(#arr2)"
+                                />
+                                <rect
+                                    x="148"
+                                    y="130"
+                                    width="90"
+                                    height="44"
+                                    rx="8"
+                                    fill="#eef1ff"
+                                    stroke="#4f6ef7"
+                                    stroke-width="1.5"
+                                />
+                                <text
+                                    x="193"
+                                    y="156"
+                                    text-anchor="middle"
+                                    font-size="11"
+                                    fill="#4f6ef7"
+                                    font-weight="600"
+                                >
+                                    API Gateway
+                                </text>
+                                <line
+                                    x1="238"
+                                    y1="152"
+                                    x2="276"
+                                    y2="152"
+                                    stroke="#c7d0f8"
+                                    stroke-width="1.5"
+                                    marker-end="url(#arr2)"
+                                />
+                                <rect
+                                    x="276"
+                                    y="130"
+                                    width="100"
+                                    height="44"
+                                    rx="8"
+                                    fill="#fff"
+                                    stroke="#e4e8f0"
+                                    stroke-width="1.5"
+                                />
+                                <text
+                                    x="326"
+                                    y="150"
+                                    text-anchor="middle"
+                                    font-size="11"
+                                    fill="#1a1d2e"
+                                    font-weight="600"
+                                >
+                                    Rate Limiter
+                                </text>
+                                <text
+                                    x="326"
+                                    y="164"
+                                    text-anchor="middle"
+                                    font-size="11"
+                                    fill="#1a1d2e"
+                                    font-weight="600"
+                                >
+                                    Service
+                                </text>
+                                <line
+                                    x1="376"
+                                    y1="152"
+                                    x2="414"
+                                    y2="152"
+                                    stroke="#c7d0f8"
+                                    stroke-width="1.5"
+                                    marker-end="url(#arr2)"
+                                />
+                                <rect
+                                    x="414"
+                                    y="130"
+                                    width="100"
+                                    height="44"
+                                    rx="8"
+                                    fill="#fff"
+                                    stroke="#e4e8f0"
+                                    stroke-width="1.5"
+                                />
+                                <text
+                                    x="464"
+                                    y="150"
+                                    text-anchor="middle"
+                                    font-size="11"
+                                    fill="#1a1d2e"
+                                    font-weight="600"
+                                >
+                                    Backend
+                                </text>
+                                <text
+                                    x="464"
+                                    y="164"
+                                    text-anchor="middle"
+                                    font-size="11"
+                                    fill="#1a1d2e"
+                                    font-weight="600"
+                                >
+                                    Service
+                                </text>
+                                <line
+                                    x1="326"
+                                    y1="130"
+                                    x2="326"
+                                    y2="88"
+                                    stroke="#c7d0f8"
+                                    stroke-width="1.5"
+                                    marker-end="url(#arr2)"
+                                />
+                                <rect
+                                    x="276"
+                                    y="44"
+                                    width="100"
+                                    height="44"
+                                    rx="8"
+                                    fill="#d1fae5"
+                                    stroke="#10b981"
+                                    stroke-width="1.5"
+                                />
+                                <text
+                                    x="326"
+                                    y="64"
+                                    text-anchor="middle"
+                                    font-size="11"
+                                    fill="#065f46"
+                                    font-weight="600"
+                                >
+                                    Redis
+                                </text>
+                                <text
+                                    x="326"
+                                    y="78"
+                                    text-anchor="middle"
+                                    font-size="10"
+                                    fill="#065f46"
+                                >
+                                    Token Bucket
+                                </text>
+                                <line
+                                    x1="464"
+                                    y1="174"
+                                    x2="464"
+                                    y2="216"
+                                    stroke="#c7d0f8"
+                                    stroke-width="1.5"
+                                    marker-end="url(#arr2)"
+                                />
+                                <rect
+                                    x="414"
+                                    y="216"
+                                    width="100"
+                                    height="44"
+                                    rx="8"
+                                    fill="#ede9fe"
+                                    stroke="#7c3aed"
+                                    stroke-width="1.5"
+                                />
+                                <text
+                                    x="464"
+                                    y="236"
+                                    text-anchor="middle"
+                                    font-size="11"
+                                    fill="#6d28d9"
+                                    font-weight="600"
+                                >
+                                    PostgreSQL
+                                </text>
+                                <text
+                                    x="464"
+                                    y="250"
+                                    text-anchor="middle"
+                                    font-size="10"
+                                    fill="#6d28d9"
+                                >
+                                    Audit log
+                                </text>
+                                <defs>
+                                    <marker
+                                        id="arr2"
+                                        markerWidth="8"
+                                        markerHeight="8"
+                                        refX="6"
+                                        refY="3"
+                                        orient="auto"
+                                    >
+                                        <path
+                                            d="M0,0 L0,6 L8,3 z"
+                                            fill="#c7d0f8"
+                                        />
+                                    </marker>
+                                </defs>
+                                <text
+                                    x="348"
+                                    y="108"
+                                    text-anchor="start"
+                                    font-size="9"
+                                    fill="#9ca3af"
+                                >
+                                    check limit
+                                </text>
+                                <text
+                                    x="490"
+                                    y="200"
+                                    text-anchor="start"
+                                    font-size="9"
+                                    fill="#9ca3af"
+                                >
+                                    log
+                                </text>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="report-card">
+                        <h2>AI Feedback</h2>
+                        <div class="feedback-grid">
+                            <div class="feedback-col strengths">
+                                <h3>Strengths</h3>
+                                <ul class="feedback-list">
+                                    <li>
+                                        Correctly chose a token bucket algorithm
+                                        and justified it over fixed window
+                                        counting.
+                                    </li>
+                                    <li>
+                                        Redis as the backing store is
+                                        well-reasoned — fast, atomic increment
+                                        operations.
+                                    </li>
+                                    <li>
+                                        Considered both per-user and per-IP
+                                        limiting scopes.
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="feedback-col improvements">
+                                <h3>Areas for improvement</h3>
+                                <ul class="feedback-list">
+                                    <li>
+                                        No discussion of what happens when Redis
+                                        is unavailable — fail open or fail
+                                        closed?
+                                    </li>
+                                    <li>
+                                        Distributed rate limiting across
+                                        multiple nodes was not addressed.
+                                    </li>
+                                    <li>
+                                        Response headers (X-RateLimit-*) and
+                                        client communication were missing.
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="report-card">
+                        <h2>Candidate's reasoning</h2>
+                        <div class="reasoning-text">
+                            I chose a token bucket algorithm because it allows
+                            short bursts while enforcing a sustained rate limit,
+                            which is more user-friendly than a fixed window
+                            approach. Redis handles the token state with atomic
+                            DECR operations, keeping the check-and-decrement
+                            consistent under concurrent load. The API Gateway
+                            sits in front and delegates the limit check to a
+                            dedicated Rate Limiter service so the logic is
+                            centralised and reusable across endpoints.
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- New mock modal -->
+        <dialog id="mock-modal">
+            <div class="modal-header">
+                <h2>Start mock interview</h2>
+                <button
+                    class="modal-close"
+                    onclick="document.getElementById('mock-modal').close()"
+                >
+                    &#10005;
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="mock-question">Question</label>
+                    <select id="mock-question">
+                        <option value="" disabled selected>
+                            Select a question…
+                        </option>
+                        <option>Design a URL Shortener</option>
+                        <option>Design a Rate Limiter</option>
+                        <option>Design a Notification System</option>
+                        <option>Design a Distributed Cache</option>
+                        <option>Design a News Feed</option>
+                        <option>Design a Chat Application</option>
+                        <option>Design an API Gateway</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button
+                    class="btn-cancel"
+                    onclick="document.getElementById('mock-modal').close()"
+                >
+                    Cancel
+                </button>
+                <button class="btn-primary btn-primary--compact">Start</button>
+            </div>
+        </dialog>
+
+        <script>
+            const viewInterview = document.getElementById("view-interview");
+            const viewReport = document.getElementById("view-report");
+
+            function showView(status) {
+                if (status === "completed") {
+                    viewInterview.style.display = "none";
+                    viewReport.style.display = "";
+                } else {
+                    viewInterview.style.display = "";
+                    viewReport.style.display = "none";
+                }
+            }
+
+            document.querySelectorAll(".mock-item").forEach((item) => {
+                item.addEventListener("click", () => {
+                    document
+                        .querySelectorAll(".mock-item")
+                        .forEach((i) => i.classList.remove("active"));
+                    item.classList.add("active");
+                    showView(item.dataset.status);
+                });
+            });
+
+            document
+                .getElementById("mock-modal")
+                .addEventListener("click", function (e) {
+                    if (e.target === this) this.close();
+                });
+        </script>
+    </body>
+</html>

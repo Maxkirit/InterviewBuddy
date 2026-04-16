@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>InterviewBuddy – Alex Martinez</title>
+        <link rel="stylesheet" href="../css/styles.css" />
+    </head>
+    <body>
+        <!-- Nav (recruiter viewing a candidate profile) -->
+        <nav>
+            <div class="nav-logo">
+                Interview<span>Buddy</span
+                ><span class="nav-view-label">Recruiter</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="recruiter-interviews.html">Interviews</a></li>
+                <li>
+                    <a href="recruiter-candidates.html" class="active"
+                        >Candidate List</a
+                    >
+                </li>
+            </ul>
+            <div class="nav-right">
+                <div class="avatar" title="Sarah K.">SK</div>
+            </div>
+        </nav>
+
+        <!-- Page -->
+        <div class="page">
+            <div class="profile-layout">
+                <!-- Left column -->
+                <div class="profile-left">
+                    <div class="profile-avatar-wrap">
+                        <div class="profile-avatar">AM</div>
+                    </div>
+                    <div class="profile-identity">
+                        <div class="name">Alex Martinez</div>
+                        <div class="meta">Frontend Engineer</div>
+                        <div class="meta">Netherlands</div>
+                    </div>
+                </div>
+
+                <!-- Right column -->
+                <div class="profile-right">
+                    <h1 class="profile-page-title">Profile</h1>
+                    <div class="profile-row">
+                        <div class="profile-field">
+                            <div class="profile-field-label">First name</div>
+                            <div class="profile-field-value">Alex</div>
+                        </div>
+                        <div class="profile-field">
+                            <div class="profile-field-label">Last name</div>
+                            <div class="profile-field-value">Martinez</div>
+                        </div>
+                    </div>
+
+                    <div class="profile-row">
+                        <div class="profile-field">
+                            <div class="profile-field-label">Country</div>
+                            <div class="profile-field-value">Netherlands</div>
+                        </div>
+                        <div class="profile-field">
+                            <div class="profile-field-label">
+                                Current organisation
+                            </div>
+                            <div class="profile-field-value">—</div>
+                        </div>
+                    </div>
+
+                    <div class="profile-field">
+                        <div class="profile-field-label">Bio</div>
+                        <div class="profile-field-value bio">
+                            Frontend engineer with 5 years of experience
+                            building scalable web applications. Specialised in
+                            React, TypeScript, and performance optimisation.
+                            Looking for opportunities at product-led companies.
+                        </div>
+                    </div>
+
+                    <div class="profile-field">
+                        <div class="profile-field-label">Social links</div>
+                        <div class="profile-field-value">
+                            <a href="#">linkedin.com/in/alexmartinez</a>
+                        </div>
+                    </div>
+
+                    <div class="profile-actions">
+                        <button
+                            class="btn-mock"
+                            style="width: auto"
+                            onclick="
+                                document
+                                    .getElementById('schedule-modal')
+                                    .showModal()
+                            "
+                        >
+                            Schedule interview
+                        </button>
+                        <button class="btn-cancel">Remove connection</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="page-footer">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+        </footer>
+
+        <!-- Schedule interview modal -->
+        <dialog id="schedule-modal">
+            <div class="modal-header">
+                <h2>Setup interview — Alex Martinez</h2>
+                <button
+                    class="modal-close"
+                    onclick="document.getElementById('schedule-modal').close()"
+                >
+                    &#10005;
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="schedule-position">Position</label>
+                    <input
+                        type="text"
+                        id="schedule-position"
+                        placeholder="e.g. Frontend Engineer"
+                    />
+                </div>
+                <div class="form-group">
+                    <label for="schedule-question">Question</label>
+                    <select id="schedule-question">
+                        <option value="" disabled selected>
+                            Select a question…
+                        </option>
+                        <option>Design a URL Shortener</option>
+                        <option>Design a Rate Limiter</option>
+                        <option>Design a Notification System</option>
+                        <option>Design a Distributed Cache</option>
+                        <option>Design a News Feed</option>
+                        <option>Design a Chat Application</option>
+                        <option>Design an API Gateway</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="schedule-due-date">Due date</label>
+                    <input type="date" id="schedule-due-date" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button
+                    class="btn-cancel"
+                    onclick="document.getElementById('schedule-modal').close()"
+                >
+                    Cancel
+                </button>
+                <button class="btn-primary btn-primary--compact">Save</button>
+            </div>
+        </dialog>
+
+        <script>
+            document
+                .getElementById("schedule-modal")
+                .addEventListener("click", function (e) {
+                    if (e.target === this) this.close();
+                });
+        </script>
+    </body>
+</html>
