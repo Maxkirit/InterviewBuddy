@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>InterviewBuddy – Candidates</title>
+        <link rel="stylesheet" href="../css/styles.css" />
+    </head>
+    <body>
+        <!-- Nav -->
+        <nav>
+            <div class="nav-logo">Interview<span>Buddy</span></div>
+            <ul class="nav-links">
+                <li>
+                    <a href="recruiter-candidates.html" class="active"
+                        >Candidates</a
+                    >
+                </li>
+                <li><a href="recruiter-interviews.html">Interviews</a></li>
+            </ul>
+            <div class="nav-right">
+                <div class="avatar" title="Sarah K.">SK</div>
+            </div>
+        </nav>
+
+        <!-- Page -->
+        <div class="page">
+            <div class="page-header">
+                <h1>Candidates</h1>
+                <button
+                    class="btn-mock"
+                    onclick="
+                        document.getElementById('invite-modal').showModal()
+                    "
+                >
+                    Share invite link
+                </button>
+            </div>
+
+            <!-- Candidate rows -->
+            <div class="candidates-list">
+                <div class="candidate-row">
+                    <span class="candidate-name">Alex Martinez</span>
+                    <div class="row-actions">
+                        <button
+                            class="btn-interview"
+                            onclick="openSchedule('Alex Martinez')"
+                        >
+                            Schedule interview
+                        </button>
+                        <button class="btn-delete" title="Remove connection">
+                            &#10005;
+                        </button>
+                    </div>
+                </div>
+
+                <div class="candidate-row">
+                    <span class="candidate-name">Priya Lakshmanan</span>
+                    <div class="row-actions">
+                        <button
+                            class="btn-interview"
+                            onclick="openSchedule('Priya Lakshmanan')"
+                        >
+                            Schedule interview
+                        </button>
+                        <button class="btn-delete" title="Remove connection">
+                            &#10005;
+                        </button>
+                    </div>
+                </div>
+
+                <div class="candidate-row">
+                    <span class="candidate-name">James Walsh</span>
+                    <div class="row-actions">
+                        <button
+                            class="btn-interview"
+                            onclick="openSchedule('James Walsh')"
+                        >
+                            Schedule interview
+                        </button>
+                        <button class="btn-delete" title="Remove connection">
+                            &#10005;
+                        </button>
+                    </div>
+                </div>
+
+                <div class="candidate-row">
+                    <span class="candidate-name">Sara Kim</span>
+                    <div class="row-actions">
+                        <button
+                            class="btn-interview"
+                            onclick="openSchedule('Sara Kim')"
+                        >
+                            Schedule interview
+                        </button>
+                        <button class="btn-delete" title="Remove connection">
+                            &#10005;
+                        </button>
+                    </div>
+                </div>
+
+                <div class="candidate-row">
+                    <span class="candidate-name">Diego Reyes</span>
+                    <div class="row-actions">
+                        <button
+                            class="btn-interview"
+                            onclick="openSchedule('Diego Reyes')"
+                        >
+                            Schedule interview
+                        </button>
+                        <button class="btn-delete" title="Remove connection">
+                            &#10005;
+                        </button>
+                    </div>
+                </div>
+
+                <div class="candidate-row">
+                    <span class="candidate-name">Maya Okafor</span>
+                    <div class="row-actions">
+                        <button
+                            class="btn-interview"
+                            onclick="openSchedule('Maya Okafor')"
+                        >
+                            Schedule interview
+                        </button>
+                        <button class="btn-delete" title="Remove connection">
+                            &#10005;
+                        </button>
+                    </div>
+                </div>
+
+                <div class="candidate-row">
+                    <span class="candidate-name">Tom Nguyen</span>
+                    <div class="row-actions">
+                        <button
+                            class="btn-interview"
+                            onclick="openSchedule('Tom Nguyen')"
+                        >
+                            Schedule interview
+                        </button>
+                        <button class="btn-delete" title="Remove connection">
+                            &#10005;
+                        </button>
+                    </div>
+                </div>
+
+                <div class="candidate-row">
+                    <span class="candidate-name">Lena Brandt</span>
+                    <div class="row-actions">
+                        <button
+                            class="btn-interview"
+                            onclick="openSchedule('Lena Brandt')"
+                        >
+                            Schedule interview
+                        </button>
+                        <button class="btn-delete" title="Remove connection">
+                            &#10005;
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Schedule interview modal -->
+        <dialog id="schedule-modal">
+            <div class="modal-header">
+                <h2>
+                    Schedule interview —
+                    <span id="schedule-candidate-name"></span>
+                </h2>
+                <button
+                    class="modal-close"
+                    onclick="document.getElementById('schedule-modal').close()"
+                >
+                    &#10005;
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="schedule-question">Question</label>
+                    <select id="schedule-question">
+                        <option value="" disabled selected>
+                            Select a question…
+                        </option>
+                        <option>Design a URL Shortener</option>
+                        <option>Design a Rate Limiter</option>
+                        <option>Design a Notification System</option>
+                        <option>Design a Distributed Cache</option>
+                        <option>Design a News Feed</option>
+                        <option>Design a Chat Application</option>
+                        <option>Design an API Gateway</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button
+                    class="btn-primary"
+                    style="width: auto; padding: 9px 24px"
+                >
+                    Send invite
+                </button>
+            </div>
+        </dialog>
+
+        <!-- Share invite link modal -->
+        <dialog id="invite-modal">
+            <div class="modal-header">
+                <h2>Share invite link</h2>
+                <button
+                    class="modal-close"
+                    onclick="document.getElementById('invite-modal').close()"
+                >
+                    &#10005;
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Invite link</label>
+                    <div class="copy-row">
+                        <input
+                            type="text"
+                            id="invite-link"
+                            value="https://interviewbuddy.io/invite/sk-a3f9z"
+                            readonly
+                        />
+                        <button
+                            class="btn-copy"
+                            id="copy-btn"
+                            onclick="copyLink()"
+                        >
+                            Copy
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="invite-expiry">Expires on</label>
+                    <input type="date" id="invite-expiry" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button
+                    class="btn-primary"
+                    style="width: auto; padding: 9px 24px"
+                >
+                    Save
+                </button>
+            </div>
+        </dialog>
+
+        <script>
+            function openSchedule(name) {
+                document.getElementById("schedule-candidate-name").textContent =
+                    name;
+                document.getElementById("schedule-modal").showModal();
+            }
+
+            function copyLink() {
+                const input = document.getElementById("invite-link");
+                navigator.clipboard.writeText(input.value);
+                const btn = document.getElementById("copy-btn");
+                btn.textContent = "Copied!";
+                btn.classList.add("copied");
+                setTimeout(() => {
+                    btn.textContent = "Copy";
+                    btn.classList.remove("copied");
+                }, 2000);
+            }
+
+            // Close on backdrop click
+            ["schedule-modal", "invite-modal"].forEach((id) => {
+                document
+                    .getElementById(id)
+                    .addEventListener("click", function (e) {
+                        if (e.target === this) this.close();
+                    });
+            });
+        </script>
+    </body>
+</html>

@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>InterviewBuddy – Interviews</title>
+        <link rel="stylesheet" href="../css/styles.css" />
+    </head>
+    <body>
+        <!-- Nav -->
+        <nav>
+            <div class="nav-logo">Interview<span>Buddy</span></div>
+            <ul class="nav-links">
+                <li><a href="recruiter-candidates.html">Candidates</a></li>
+                <li>
+                    <a href="recruiter-interviews.html" class="active"
+                        >Interviews</a
+                    >
+                </li>
+            </ul>
+            <div class="nav-right">
+                <div class="avatar" title="Sarah K.">SK</div>
+            </div>
+        </nav>
+
+        <!-- Page -->
+        <div class="page">
+            <div class="page-header">
+                <h1>Interviews</h1>
+                <button
+                    class="btn-mock"
+                    onclick="document.getElementById('setup-modal').showModal()"
+                >
+                    Setup interview
+                </button>
+            </div>
+
+            <div class="candidates-list">
+                <div class="candidate-row">
+                    <span class="candidate-name">Alex Martinez</span>
+                    <div class="row-actions">
+                        <span class="status-badge status-pending">Pending</span>
+                        <button class="btn-delete" title="Cancel interview">
+                            &#10005;
+                        </button>
+                    </div>
+                </div>
+
+                <div class="candidate-row">
+                    <span class="candidate-name">Priya Lakshmanan</span>
+                    <div class="row-actions">
+                        <span class="status-badge status-completed"
+                            >Completed</span
+                        >
+                        <button class="btn-interview">See report</button>
+                    </div>
+                </div>
+
+                <div class="candidate-row">
+                    <span class="candidate-name">James Walsh</span>
+                    <div class="row-actions">
+                        <span class="status-badge status-completed"
+                            >Completed</span
+                        >
+                        <button class="btn-interview">See report</button>
+                    </div>
+                </div>
+
+                <div class="candidate-row">
+                    <span class="candidate-name">Sara Kim</span>
+                    <div class="row-actions">
+                        <span class="status-badge status-pending">Pending</span>
+                        <button class="btn-delete" title="Cancel interview">
+                            &#10005;
+                        </button>
+                    </div>
+                </div>
+
+                <div class="candidate-row">
+                    <span class="candidate-name">Diego Reyes</span>
+                    <div class="row-actions">
+                        <span class="status-badge status-completed"
+                            >Completed</span
+                        >
+                        <button class="btn-interview">See report</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Setup interview modal -->
+        <dialog id="setup-modal">
+            <div class="modal-header">
+                <h2>Setup interview</h2>
+                <button
+                    class="modal-close"
+                    onclick="document.getElementById('setup-modal').close()"
+                >
+                    &#10005;
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="modal-candidate">Candidate</label>
+                    <select id="modal-candidate">
+                        <option value="" disabled selected>
+                            Select a candidate…
+                        </option>
+                        <option>Alex Martinez</option>
+                        <option>Priya Lakshmanan</option>
+                        <option>James Walsh</option>
+                        <option>Sara Kim</option>
+                        <option>Diego Reyes</option>
+                        <option>Maya Okafor</option>
+                        <option>Tom Nguyen</option>
+                        <option>Lena Brandt</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="modal-question">Question</label>
+                    <select id="modal-question">
+                        <option value="" disabled selected>
+                            Select a question…
+                        </option>
+                        <option>Design a URL Shortener</option>
+                        <option>Design a Rate Limiter</option>
+                        <option>Design a Notification System</option>
+                        <option>Design a Distributed Cache</option>
+                        <option>Design a News Feed</option>
+                        <option>Design a Chat Application</option>
+                        <option>Design an API Gateway</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button
+                    class="btn-primary"
+                    style="width: auto; padding: 9px 24px"
+                >
+                    Send invite
+                </button>
+            </div>
+        </dialog>
+
+        <script>
+            // Close on backdrop click
+            document
+                .getElementById("setup-modal")
+                .addEventListener("click", function (e) {
+                    if (e.target === this) this.close();
+                });
+        </script>
+    </body>
+</html>

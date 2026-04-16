@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>InterviewBuddy – Sign up</title>
+        <link rel="stylesheet" href="../css/styles.css" />
+    </head>
+    <body>
+        <div class="auth-page">
+            <div class="auth-card">
+                <span class="auth-logo">Interview<span>Buddy</span></span>
+
+                <h1>Create an account</h1>
+                <p class="auth-subtitle">Who are you joining as?</p>
+
+                <!-- Role picker -->
+                <div class="role-picker">
+                    <label class="role-option">
+                        <input type="radio" name="role" value="candidate" checked />
+                        <div class="role-icon">&#128101;</div>
+                        <span class="role-label">Candidate</span>
+                        <span class="role-desc">I'm looking for a job</span>
+                    </label>
+                    <label class="role-option">
+                        <input type="radio" name="role" value="recruiter" />
+                        <div class="role-icon">&#128188;</div>
+                        <span class="role-label">Recruiter</span>
+                        <span class="role-desc">I'm hiring</span>
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label for="name">Full name</label>
+                    <input type="text" id="name" placeholder="Jane Smith" />
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="you@example.com" />
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="••••••••" />
+                </div>
+
+                <button class="btn-primary">Create account</button>
+
+                <p class="auth-footer">
+                    Already have an account? <a href="login.html">Log in</a>
+                </p>
+            </div>
+        </div>
+    </body>
+</html>
