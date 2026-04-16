@@ -1,0 +1,562 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>InterviewBuddy – Report</title>
+        <link rel="stylesheet" href="../css/styles.css" />
+    </head>
+    <body>
+        <!-- Nav (recruiter view) -->
+        <nav>
+            <div class="nav-logo">Interview<span>Buddy</span></div>
+            <ul class="nav-links">
+                <li><a href="recruiter-candidates.html">Candidates</a></li>
+                <li>
+                    <a href="recruiter-interviews.html" class="active"
+                        >Interviews</a
+                    >
+                </li>
+            </ul>
+            <div class="nav-right">
+                <div class="avatar" title="Sarah K.">SK</div>
+            </div>
+        </nav>
+
+        <div class="report-page">
+            <!-- Overview -->
+            <div class="report-card">
+                <h2>Overview</h2>
+                <div class="report-overview">
+                    <div class="score-circle" style="--pct: 295deg">
+                        <div class="score-circle-inner">
+                            <span class="score-number">82%</span>
+                        </div>
+                    </div>
+                    <div class="report-meta">
+                        <div class="question">Design a URL Shortener</div>
+                        <div class="detail">
+                            Candidate &nbsp;·&nbsp; Priya Lakshmanan
+                        </div>
+                        <div class="detail">
+                            Completed &nbsp;·&nbsp; April 14, 2026
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dimension scores -->
+            <div class="report-card">
+                <h2>Score breakdown</h2>
+                <div class="dimensions">
+                    <div class="dimension-row">
+                        <span class="dimension-label"
+                            >Requirements coverage</span
+                        >
+                        <div class="dimension-bar-wrap">
+                            <div
+                                class="dimension-bar green"
+                                style="width: 80%"
+                            ></div>
+                        </div>
+                        <span class="dimension-score">4 / 5</span>
+                    </div>
+                    <div class="dimension-row">
+                        <span class="dimension-label">System architecture</span>
+                        <div class="dimension-bar-wrap">
+                            <div class="dimension-bar" style="width: 80%"></div>
+                        </div>
+                        <span class="dimension-score">4 / 5</span>
+                    </div>
+                    <div class="dimension-row">
+                        <span class="dimension-label">Scalability</span>
+                        <div class="dimension-bar-wrap">
+                            <div
+                                class="dimension-bar amber"
+                                style="width: 60%"
+                            ></div>
+                        </div>
+                        <span class="dimension-score">3 / 5</span>
+                    </div>
+                    <div class="dimension-row">
+                        <span class="dimension-label"
+                            >Tradeoffs &amp; reasoning</span
+                        >
+                        <div class="dimension-bar-wrap">
+                            <div class="dimension-bar" style="width: 80%"></div>
+                        </div>
+                        <span class="dimension-score">4 / 5</span>
+                    </div>
+                    <div class="dimension-row">
+                        <span class="dimension-label">Depth of design</span>
+                        <div class="dimension-bar-wrap">
+                            <div
+                                class="dimension-bar amber"
+                                style="width: 60%"
+                            ></div>
+                        </div>
+                        <span class="dimension-score">3 / 5</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submitted diagram -->
+            <div class="report-card">
+                <h2>Submitted diagram</h2>
+                <div class="diagram-wrap">
+                    <svg
+                        viewBox="0 0 680 320"
+                        xmlns="http://www.w3.org/2000/svg"
+                        style="
+                            width: 100%;
+                            display: block;
+                            font-family:
+                                &quot;Segoe UI&quot;, system-ui, sans-serif;
+                        "
+                    >
+                        <!-- Client -->
+                        <rect
+                            x="20"
+                            y="130"
+                            width="90"
+                            height="44"
+                            rx="8"
+                            fill="#fff"
+                            stroke="#e4e8f0"
+                            stroke-width="1.5"
+                        />
+                        <text
+                            x="65"
+                            y="156"
+                            text-anchor="middle"
+                            font-size="11"
+                            fill="#1a1d2e"
+                            font-weight="600"
+                        >
+                            Client
+                        </text>
+
+                        <!-- Arrow: Client → CDN -->
+                        <line
+                            x1="110"
+                            y1="152"
+                            x2="148"
+                            y2="152"
+                            stroke="#c7d0f8"
+                            stroke-width="1.5"
+                            marker-end="url(#arr)"
+                        />
+
+                        <!-- CDN -->
+                        <rect
+                            x="148"
+                            y="130"
+                            width="90"
+                            height="44"
+                            rx="8"
+                            fill="#eef1ff"
+                            stroke="#4f6ef7"
+                            stroke-width="1.5"
+                        />
+                        <text
+                            x="193"
+                            y="156"
+                            text-anchor="middle"
+                            font-size="11"
+                            fill="#4f6ef7"
+                            font-weight="600"
+                        >
+                            CDN
+                        </text>
+
+                        <!-- Arrow: CDN → Load Balancer -->
+                        <line
+                            x1="238"
+                            y1="152"
+                            x2="276"
+                            y2="152"
+                            stroke="#c7d0f8"
+                            stroke-width="1.5"
+                            marker-end="url(#arr)"
+                        />
+
+                        <!-- Load Balancer -->
+                        <rect
+                            x="276"
+                            y="130"
+                            width="100"
+                            height="44"
+                            rx="8"
+                            fill="#fff"
+                            stroke="#e4e8f0"
+                            stroke-width="1.5"
+                        />
+                        <text
+                            x="326"
+                            y="150"
+                            text-anchor="middle"
+                            font-size="11"
+                            fill="#1a1d2e"
+                            font-weight="600"
+                        >
+                            Load
+                        </text>
+                        <text
+                            x="326"
+                            y="164"
+                            text-anchor="middle"
+                            font-size="11"
+                            fill="#1a1d2e"
+                            font-weight="600"
+                        >
+                            Balancer
+                        </text>
+
+                        <!-- Arrow: LB → API Servers -->
+                        <line
+                            x1="376"
+                            y1="152"
+                            x2="414"
+                            y2="152"
+                            stroke="#c7d0f8"
+                            stroke-width="1.5"
+                            marker-end="url(#arr)"
+                        />
+
+                        <!-- API Servers -->
+                        <rect
+                            x="414"
+                            y="130"
+                            width="100"
+                            height="44"
+                            rx="8"
+                            fill="#fff"
+                            stroke="#e4e8f0"
+                            stroke-width="1.5"
+                        />
+                        <text
+                            x="464"
+                            y="150"
+                            text-anchor="middle"
+                            font-size="11"
+                            fill="#1a1d2e"
+                            font-weight="600"
+                        >
+                            API
+                        </text>
+                        <text
+                            x="464"
+                            y="164"
+                            text-anchor="middle"
+                            font-size="11"
+                            fill="#1a1d2e"
+                            font-weight="600"
+                        >
+                            Servers
+                        </text>
+
+                        <!-- Arrow: API → Redis (up) -->
+                        <line
+                            x1="464"
+                            y1="130"
+                            x2="464"
+                            y2="88"
+                            stroke="#c7d0f8"
+                            stroke-width="1.5"
+                            marker-end="url(#arr)"
+                        />
+
+                        <!-- Redis cache -->
+                        <rect
+                            x="414"
+                            y="44"
+                            width="100"
+                            height="44"
+                            rx="8"
+                            fill="#d1fae5"
+                            stroke="#10b981"
+                            stroke-width="1.5"
+                        />
+                        <text
+                            x="464"
+                            y="64"
+                            text-anchor="middle"
+                            font-size="11"
+                            fill="#065f46"
+                            font-weight="600"
+                        >
+                            Redis
+                        </text>
+                        <text
+                            x="464"
+                            y="78"
+                            text-anchor="middle"
+                            font-size="10"
+                            fill="#065f46"
+                        >
+                            Cache
+                        </text>
+
+                        <!-- Arrow: API → DB (down) -->
+                        <line
+                            x1="464"
+                            y1="174"
+                            x2="464"
+                            y2="216"
+                            stroke="#c7d0f8"
+                            stroke-width="1.5"
+                            marker-end="url(#arr)"
+                        />
+
+                        <!-- PostgreSQL -->
+                        <rect
+                            x="414"
+                            y="216"
+                            width="100"
+                            height="44"
+                            rx="8"
+                            fill="#ede9fe"
+                            stroke="#7c3aed"
+                            stroke-width="1.5"
+                        />
+                        <text
+                            x="464"
+                            y="236"
+                            text-anchor="middle"
+                            font-size="11"
+                            fill="#6d28d9"
+                            font-weight="600"
+                        >
+                            PostgreSQL
+                        </text>
+                        <text
+                            x="464"
+                            y="250"
+                            text-anchor="middle"
+                            font-size="10"
+                            fill="#6d28d9"
+                        >
+                            (primary)
+                        </text>
+
+                        <!-- Arrow: DB → Replica -->
+                        <line
+                            x1="514"
+                            y1="238"
+                            x2="552"
+                            y2="238"
+                            stroke="#c7d0f8"
+                            stroke-width="1.5"
+                            marker-end="url(#arr)"
+                        />
+
+                        <!-- DB Replica -->
+                        <rect
+                            x="552"
+                            y="216"
+                            width="100"
+                            height="44"
+                            rx="8"
+                            fill="#f5f3ff"
+                            stroke="#c4b5fd"
+                            stroke-width="1.5"
+                        />
+                        <text
+                            x="602"
+                            y="236"
+                            text-anchor="middle"
+                            font-size="11"
+                            fill="#6d28d9"
+                            font-weight="600"
+                        >
+                            PostgreSQL
+                        </text>
+                        <text
+                            x="602"
+                            y="250"
+                            text-anchor="middle"
+                            font-size="10"
+                            fill="#6d28d9"
+                        >
+                            (replica)
+                        </text>
+
+                        <!-- Arrow marker -->
+                        <defs>
+                            <marker
+                                id="arr"
+                                markerWidth="8"
+                                markerHeight="8"
+                                refX="6"
+                                refY="3"
+                                orient="auto"
+                            >
+                                <path d="M0,0 L0,6 L8,3 z" fill="#c7d0f8" />
+                            </marker>
+                        </defs>
+
+                        <!-- Labels -->
+                        <text
+                            x="193"
+                            y="192"
+                            text-anchor="middle"
+                            font-size="9"
+                            fill="#9ca3af"
+                        >
+                            cache miss →
+                        </text>
+                        <text
+                            x="490"
+                            y="108"
+                            text-anchor="start"
+                            font-size="9"
+                            fill="#9ca3af"
+                        >
+                            read
+                        </text>
+                        <text
+                            x="490"
+                            y="200"
+                            text-anchor="start"
+                            font-size="9"
+                            fill="#9ca3af"
+                        >
+                            write
+                        </text>
+                        <text
+                            x="530"
+                            y="228"
+                            text-anchor="middle"
+                            font-size="9"
+                            fill="#9ca3af"
+                        >
+                            replicate
+                        </text>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- AI feedback -->
+            <div class="report-card">
+                <h2>AI Feedback</h2>
+                <div class="feedback-grid">
+                    <div class="feedback-col strengths">
+                        <h3>Strengths</h3>
+                        <ul class="feedback-list">
+                            <li>
+                                Correctly identified both functional and
+                                non-functional requirements before jumping into
+                                the design.
+                            </li>
+                            <li>
+                                Chose Base62 encoding for alias generation — a
+                                well-reasoned, standard approach.
+                            </li>
+                            <li>
+                                Included a CDN layer for redirect latency,
+                                showing awareness of read-heavy workloads.
+                            </li>
+                            <li>
+                                Clearly articulated the SQL vs. NoSQL tradeoff
+                                and justified the choice.
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="feedback-col improvements">
+                        <h3>Areas for improvement</h3>
+                        <ul class="feedback-list">
+                            <li>
+                                Scalability of the ID generation service was not
+                                addressed — single point of failure under high
+                                write load.
+                            </li>
+                            <li>
+                                No mention of a cache eviction policy (e.g. LRU)
+                                for the redirect cache.
+                            </li>
+                            <li>
+                                Rate limiting on the write endpoint was missing,
+                                leaving the system open to abuse.
+                            </li>
+                            <li>
+                                Could go deeper on replication strategy and
+                                failover for the primary database.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Guiding questions -->
+            <div class="report-card">
+                <h2>Guiding questions</h2>
+                <div class="guiding-list">
+                    <div class="guiding-item">
+                        <div class="guiding-question">
+                            Does the design handle 100K writes/day and a 10:1
+                            read ratio without bottlenecks?
+                        </div>
+                        <div class="guiding-answer">
+                            Partially. The candidate correctly separated the
+                            read and write paths and added caching for
+                            redirects, which addresses the read load well.
+                            However, the write path relies on a single ID
+                            generation service with no discussion of sharding or
+                            distributed ID generation (e.g. Snowflake IDs),
+                            which becomes a bottleneck at scale.
+                        </div>
+                    </div>
+                    <div class="guiding-item">
+                        <div class="guiding-question">
+                            Is high availability addressed for the redirection
+                            flow?
+                        </div>
+                        <div class="guiding-answer">
+                            Yes. The candidate placed a load balancer in front
+                            of stateless redirect servers and included a CDN,
+                            ensuring the hot path can survive individual node
+                            failures. Database replication was mentioned but not
+                            designed in detail.
+                        </div>
+                    </div>
+                    <div class="guiding-item">
+                        <div class="guiding-question">
+                            Are the tradeoffs of key design choices clearly
+                            explained?
+                        </div>
+                        <div class="guiding-answer">
+                            Mostly. The SQL vs. NoSQL decision was
+                            well-justified with reference to the data model. The
+                            choice of Base62 over hashing was explained. The
+                            candidate did not discuss tradeoffs around TTL
+                            storage or consistency vs. availability for the
+                            cache layer.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Candidate's reasoning -->
+            <div class="report-card">
+                <h2>Candidate's reasoning</h2>
+                <div class="reasoning-text">
+                    I chose a relational database (PostgreSQL) because the data
+                    model is simple and highly relational — a short code maps to
+                    exactly one long URL, and we want ACID guarantees for
+                    writes. For reads, I placed a Redis cache in front of the
+                    database keyed by the short code, since 90% of traffic will
+                    be redirects and these are extremely cache-friendly. Aliases
+                    are generated using Base62 encoding of an auto-incrementing
+                    ID, which gives us ~57 billion unique 6-character codes. I
+                    added a CDN at the edge to serve cached redirects with
+                    sub-millisecond latency for popular links. The write path is
+                    intentionally simple: accept URL, generate alias, persist,
+                    return alias. The main tradeoff I acknowledged is that
+                    Base62 + auto-increment leaks information about write
+                    volume; a hash-based approach would be more opaque but risks
+                    collisions.
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

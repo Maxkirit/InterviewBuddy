@@ -12,7 +12,11 @@
             <div class="nav-logo">Interview<span>Buddy</span></div>
             <ul class="nav-links">
                 <li><a href="candidate-recruiters.html">Recruiters</a></li>
-                <li><a href="candidate-interviews.html" class="active">Interviews</a></li>
+                <li>
+                    <a href="candidate-interviews.html" class="active"
+                        >Interviews</a
+                    >
+                </li>
             </ul>
             <div class="nav-right">
                 <div class="avatar" title="Tom Nguyen">TN</div>
@@ -23,7 +27,12 @@
         <div class="page">
             <div class="page-header">
                 <h1>Interviews</h1>
-                <button class="btn-mock">Start mock interview</button>
+                <button
+                    class="btn-mock"
+                    onclick="document.getElementById('mock-modal').showModal()"
+                >
+                    Start mock interview
+                </button>
             </div>
 
             <div class="candidates-list">
@@ -37,28 +46,56 @@
                 <div class="candidate-row">
                     <span class="candidate-name">Marcus Bell · Vercel</span>
                     <div class="row-actions">
-                        <span class="status-badge status-completed">Completed</span>
+                        <span class="status-badge status-completed"
+                            >Completed</span
+                        >
+                        <a href="report.html"
+                            ><button class="btn-interview">
+                                See report
+                            </button></a
+                        >
                     </div>
                 </div>
 
                 <div class="candidate-row">
-                    <span class="candidate-name">Mock interview</span>
+                    <span class="candidate-name"
+                        >Mock interview · Design a Rate Limiter</span
+                    >
                     <div class="row-actions">
                         <span class="status-badge status-mock">Mock</span>
+                        <a href="report.html"
+                            ><button class="btn-interview">
+                                See report
+                            </button></a
+                        >
                     </div>
                 </div>
 
                 <div class="candidate-row">
                     <span class="candidate-name">Anika Patel · Linear</span>
                     <div class="row-actions">
-                        <span class="status-badge status-completed">Completed</span>
+                        <span class="status-badge status-completed"
+                            >Completed</span
+                        >
+                        <a href="report.html"
+                            ><button class="btn-interview">
+                                See report
+                            </button></a
+                        >
                     </div>
                 </div>
 
                 <div class="candidate-row">
-                    <span class="candidate-name">Mock interview</span>
+                    <span class="candidate-name"
+                        >Mock interview · Design a News Feed</span
+                    >
                     <div class="row-actions">
                         <span class="status-badge status-mock">Mock</span>
+                        <a href="report.html"
+                            ><button class="btn-interview">
+                                See report
+                            </button></a
+                        >
                     </div>
                 </div>
 
@@ -70,5 +107,58 @@
                 </div>
             </div>
         </div>
+
+        <footer class="page-footer">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+        </footer>
+
+        <!-- Start mock interview modal -->
+        <dialog id="mock-modal">
+            <div class="modal-header">
+                <h2>Start mock interview</h2>
+                <button
+                    class="modal-close"
+                    onclick="document.getElementById('mock-modal').close()"
+                >
+                    &#10005;
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="mock-question">Question</label>
+                    <select id="mock-question">
+                        <option value="" disabled selected>
+                            Select a question…
+                        </option>
+                        <option>Design a URL Shortener</option>
+                        <option>Design a Rate Limiter</option>
+                        <option>Design a Notification System</option>
+                        <option>Design a Distributed Cache</option>
+                        <option>Design a News Feed</option>
+                        <option>Design a Chat Application</option>
+                        <option>Design an API Gateway</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="interview.html"
+                    ><button
+                        class="btn-primary"
+                        class="btn-primary--compact"
+                    >
+                        Start
+                    </button></a
+                >
+            </div>
+        </dialog>
+
+        <script>
+            document
+                .getElementById("mock-modal")
+                .addEventListener("click", function (e) {
+                    if (e.target === this) this.close();
+                });
+        </script>
     </body>
 </html>

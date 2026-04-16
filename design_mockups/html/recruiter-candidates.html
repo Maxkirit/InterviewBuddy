@@ -46,7 +46,7 @@
                             class="btn-interview"
                             onclick="openSchedule('Alex Martinez')"
                         >
-                            Schedule interview
+                            Setup interview
                         </button>
                         <button class="btn-delete" title="Remove connection">
                             &#10005;
@@ -61,7 +61,7 @@
                             class="btn-interview"
                             onclick="openSchedule('Priya Lakshmanan')"
                         >
-                            Schedule interview
+                            Setup interview
                         </button>
                         <button class="btn-delete" title="Remove connection">
                             &#10005;
@@ -76,7 +76,7 @@
                             class="btn-interview"
                             onclick="openSchedule('James Walsh')"
                         >
-                            Schedule interview
+                            Setup interview
                         </button>
                         <button class="btn-delete" title="Remove connection">
                             &#10005;
@@ -91,7 +91,7 @@
                             class="btn-interview"
                             onclick="openSchedule('Sara Kim')"
                         >
-                            Schedule interview
+                            Setup interview
                         </button>
                         <button class="btn-delete" title="Remove connection">
                             &#10005;
@@ -106,7 +106,7 @@
                             class="btn-interview"
                             onclick="openSchedule('Diego Reyes')"
                         >
-                            Schedule interview
+                            Setup interview
                         </button>
                         <button class="btn-delete" title="Remove connection">
                             &#10005;
@@ -121,7 +121,7 @@
                             class="btn-interview"
                             onclick="openSchedule('Maya Okafor')"
                         >
-                            Schedule interview
+                            Setup interview
                         </button>
                         <button class="btn-delete" title="Remove connection">
                             &#10005;
@@ -136,7 +136,7 @@
                             class="btn-interview"
                             onclick="openSchedule('Tom Nguyen')"
                         >
-                            Schedule interview
+                            Setup interview
                         </button>
                         <button class="btn-delete" title="Remove connection">
                             &#10005;
@@ -151,7 +151,7 @@
                             class="btn-interview"
                             onclick="openSchedule('Lena Brandt')"
                         >
-                            Schedule interview
+                            Setup interview
                         </button>
                         <button class="btn-delete" title="Remove connection">
                             &#10005;
@@ -161,11 +161,16 @@
             </div>
         </div>
 
-        <!-- Schedule interview modal -->
+        <footer class="page-footer">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+        </footer>
+
+        <!-- Setup interview modal -->
         <dialog id="schedule-modal">
             <div class="modal-header">
                 <h2>
-                    Schedule interview —
+                    Setup interview —
                     <span id="schedule-candidate-name"></span>
                 </h2>
                 <button
@@ -195,9 +200,9 @@
             <div class="modal-footer">
                 <button
                     class="btn-primary"
-                    style="width: auto; padding: 9px 24px"
+                    class="btn-primary--compact"
                 >
-                    Send invite
+                    Save
                 </button>
             </div>
         </dialog>
@@ -240,7 +245,7 @@
             <div class="modal-footer">
                 <button
                     class="btn-primary"
-                    style="width: auto; padding: 9px 24px"
+                    class="btn-primary--compact"
                 >
                     Save
                 </button>

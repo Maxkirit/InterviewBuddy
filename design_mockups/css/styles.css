@@ -5,11 +5,7 @@
 }
 
 body {
-    font-family:
-        "Segoe UI",
-        system-ui,
-        -apple-system,
-        sans-serif;
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
     background: #f4f6fb;
     color: #1a1d2e;
     min-height: 100vh;
@@ -33,7 +29,9 @@ nav {
     letter-spacing: -0.3px;
 }
 
-.nav-logo span {
+/* Shared: both logo variants have a dark "Buddy" span */
+.nav-logo span,
+.auth-logo span {
     color: #1a1d2e;
 }
 
@@ -56,9 +54,7 @@ nav {
     color: #6b7280;
     padding: 6px 14px;
     border-radius: 8px;
-    transition:
-        background 0.15s,
-        color 0.15s;
+    transition: background 0.15s, color 0.15s;
 }
 
 .nav-links a:hover {
@@ -115,7 +111,7 @@ nav {
     border-radius: 20px;
 }
 
-/* ── Candidate List ── */
+/* ── Candidate list ── */
 .candidates-list {
     display: flex;
     flex-direction: column;
@@ -144,6 +140,7 @@ nav {
     gap: 10px;
 }
 
+/* ── Buttons ── */
 .btn-interview {
     padding: 7px 16px;
     border-radius: 8px;
@@ -153,9 +150,7 @@ nav {
     font-size: 0.85rem;
     font-weight: 500;
     cursor: pointer;
-    transition:
-        background 0.15s,
-        color 0.15s;
+    transition: background 0.15s, color 0.15s;
 }
 
 .btn-interview:hover {
@@ -175,10 +170,7 @@ nav {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition:
-        border-color 0.15s,
-        color 0.15s,
-        background 0.15s;
+    transition: border-color 0.15s, color 0.15s, background 0.15s;
 }
 
 .btn-delete:hover {
@@ -187,31 +179,6 @@ nav {
     background: #fff5f5;
 }
 
-/* ── Interview status badges ── */
-.status-badge {
-    font-size: 0.775rem;
-    font-weight: 600;
-    padding: 3px 10px;
-    border-radius: 20px;
-    white-space: nowrap;
-}
-
-.status-pending {
-    background: #fef3c7;
-    color: #b45309;
-}
-
-.status-completed {
-    background: #d1fae5;
-    color: #065f46;
-}
-
-.status-mock {
-    background: #ede9fe;
-    color: #6d28d9;
-}
-
-/* ── Start mock button (primary CTA) ── */
 .btn-mock {
     padding: 9px 20px;
     border-radius: 8px;
@@ -224,9 +191,77 @@ nav {
     transition: background 0.15s;
 }
 
-.btn-mock:hover {
+.btn-primary {
+    width: 100%;
+    padding: 11px;
+    border-radius: 10px;
+    border: none;
+    background: #4f6ef7;
+    color: #fff;
+    font-size: 0.925rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    margin-top: 8px;
+}
+
+/* Compact variant — used inside modals and inline action spots */
+.btn-primary--compact {
+    width: auto;
+    padding: 9px 24px;
+    margin-top: 0;
+}
+
+.btn-submit {
+    padding: 11px 28px;
+    border-radius: 10px;
+    border: none;
+    background: #4f6ef7;
+    color: #fff;
+    font-size: 0.925rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: background 0.15s;
+}
+
+/* Single hover rule for all filled primary buttons */
+.btn-mock:hover,
+.btn-primary:hover,
+.btn-submit:hover {
     background: #3d5ce6;
 }
+
+.btn-cancel {
+    padding: 9px 20px;
+    border-radius: 8px;
+    border: 1px solid #e4e8f0;
+    background: #fff;
+    color: #4b5563;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.btn-cancel:hover {
+    background: #f4f6fb;
+    border-color: #d1d5db;
+}
+
+/* ── Interview status badges ── */
+.status-badge {
+    font-size: 0.775rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+.status-pending   { background: #fef3c7; color: #b45309; }
+.status-completed { background: #d1fae5; color: #065f46; }
+.status-mock      { background: #ede9fe; color: #6d28d9; }
 
 /* ── Modal (dialog) ── */
 dialog {
@@ -285,26 +320,11 @@ dialog::backdrop {
     gap: 16px;
 }
 
-.form-group select {
-    padding: 10px 14px;
-    border: 1px solid #e4e8f0;
-    border-radius: 10px;
-    font-size: 0.9rem;
-    font-family: inherit;
-    color: #1a1d2e;
-    background: #fff;
-    outline: none;
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239ca3af' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 14px center;
-    cursor: pointer;
-    transition: border-color 0.15s, box-shadow 0.15s;
-}
-
-.form-group select:focus {
-    border-color: #4f6ef7;
-    box-shadow: 0 0 0 3px rgba(79, 110, 247, 0.12);
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 24px;
 }
 
 .copy-row {
@@ -349,33 +369,65 @@ dialog::backdrop {
     background: #d1fae5;
 }
 
-.modal-footer {
+/* ── Forms ── */
+.form-group {
     display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 24px;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 16px;
 }
 
-.btn-cancel {
-    padding: 9px 20px;
-    border-radius: 8px;
+.form-group label {
+    font-size: 0.825rem;
+    font-weight: 600;
+    color: #374151;
+}
+
+/* Shared base for all field types */
+.form-group input,
+.form-group textarea,
+.form-group select {
+    padding: 10px 14px;
     border: 1px solid #e4e8f0;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    color: #1a1d2e;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: #b0b7c3;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    border-color: #4f6ef7;
+    box-shadow: 0 0 0 3px rgba(79, 110, 247, 0.12);
+}
+
+/* Select-specific: custom caret, hide native arrow */
+.form-group select {
     background: #fff;
-    color: #4b5563;
-    font-size: 0.875rem;
-    font-weight: 500;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239ca3af' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
     cursor: pointer;
-    transition: background 0.15s, border-color 0.15s;
 }
 
-.btn-cancel:hover {
-    background: #f4f6fb;
-    border-color: #d1d5db;
+/* Textarea-specific */
+.form-group textarea {
+    resize: vertical;
+    min-height: 90px;
 }
 
-/* ── Interview page ── */
-.interview-page {
-    max-width: 900px;
+/* ── Interview & Report pages (shared layout) ── */
+.interview-page,
+.report-page {
     margin: 0 auto;
     padding: 32px 24px 60px;
     display: flex;
@@ -383,22 +435,33 @@ dialog::backdrop {
     gap: 20px;
 }
 
-.interview-card {
+.interview-page { max-width: 900px; }
+.report-page    { max-width: 820px; }
+
+.interview-card,
+.report-card {
     background: #fff;
     border: 1px solid #e4e8f0;
     border-radius: 14px;
     padding: 24px 28px;
 }
 
-.interview-card h2 {
+.interview-card h2,
+.report-card h2 {
     font-size: 0.7rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: #9ca3af;
+    margin-bottom: 16px;
+}
+
+/* Interview sections have tighter label spacing */
+.interview-card h2 {
     margin-bottom: 10px;
 }
 
+/* ── Interview page specifics ── */
 .question-title {
     font-size: 1.3rem;
     font-weight: 700;
@@ -412,7 +475,6 @@ dialog::backdrop {
     line-height: 1.6;
 }
 
-/* Requirements */
 .requirements-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -451,7 +513,6 @@ dialog::backdrop {
     margin-top: 1px;
 }
 
-/* Canvas */
 .canvas-wrap {
     display: flex;
     gap: 12px;
@@ -498,7 +559,6 @@ dialog::backdrop {
     font-size: 0.875rem;
 }
 
-/* Reasoning */
 .reasoning-wrap {
     display: flex;
     align-items: flex-end;
@@ -512,24 +572,6 @@ dialog::backdrop {
 
 .reasoning-wrap textarea {
     min-height: 110px;
-}
-
-.btn-submit {
-    padding: 11px 28px;
-    border-radius: 10px;
-    border: none;
-    background: #4f6ef7;
-    color: #fff;
-    font-size: 0.925rem;
-    font-weight: 600;
-    cursor: pointer;
-    white-space: nowrap;
-    flex-shrink: 0;
-    transition: background 0.15s;
-}
-
-.btn-submit:hover {
-    background: #3d5ce6;
 }
 
 /* ── Profile page ── */
@@ -589,9 +631,7 @@ dialog::backdrop {
     color: #4f6ef7;
 }
 
-.profile-identity {
-    text-align: center;
-}
+.profile-identity { text-align: center; }
 
 .profile-identity .name {
     font-size: 1rem;
@@ -617,28 +657,6 @@ dialog::backdrop {
     gap: 16px;
 }
 
-.form-group textarea {
-    padding: 10px 14px;
-    border: 1px solid #e4e8f0;
-    border-radius: 10px;
-    font-size: 0.9rem;
-    font-family: inherit;
-    color: #1a1d2e;
-    resize: vertical;
-    min-height: 90px;
-    outline: none;
-    transition: border-color 0.15s, box-shadow 0.15s;
-}
-
-.form-group textarea::placeholder {
-    color: #b0b7c3;
-}
-
-.form-group textarea:focus {
-    border-color: #4f6ef7;
-    box-shadow: 0 0 0 3px rgba(79, 110, 247, 0.12);
-}
-
 .profile-save {
     display: flex;
     justify-content: flex-end;
@@ -648,6 +666,7 @@ dialog::backdrop {
 .profile-save .btn-primary {
     width: auto;
     padding: 10px 28px;
+    margin-top: 0;
 }
 
 /* ── Auth pages ── */
@@ -678,10 +697,6 @@ dialog::backdrop {
     cursor: default;
 }
 
-.auth-logo span {
-    color: #1a1d2e;
-}
-
 .auth-card h1 {
     font-size: 1.4rem;
     font-weight: 700;
@@ -693,56 +708,6 @@ dialog::backdrop {
     font-size: 0.875rem;
     color: #6b7280;
     margin-bottom: 28px;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    margin-bottom: 16px;
-}
-
-.form-group label {
-    font-size: 0.825rem;
-    font-weight: 600;
-    color: #374151;
-}
-
-.form-group input {
-    padding: 10px 14px;
-    border: 1px solid #e4e8f0;
-    border-radius: 10px;
-    font-size: 0.9rem;
-    color: #1a1d2e;
-    outline: none;
-    transition: border-color 0.15s, box-shadow 0.15s;
-}
-
-.form-group input::placeholder {
-    color: #b0b7c3;
-}
-
-.form-group input:focus {
-    border-color: #4f6ef7;
-    box-shadow: 0 0 0 3px rgba(79, 110, 247, 0.12);
-}
-
-.btn-primary {
-    width: 100%;
-    padding: 11px;
-    border-radius: 10px;
-    border: none;
-    background: #4f6ef7;
-    color: #fff;
-    font-size: 0.925rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.15s;
-    margin-top: 8px;
-}
-
-.btn-primary:hover {
-    background: #3d5ce6;
 }
 
 .auth-divider {
@@ -824,9 +789,7 @@ dialog::backdrop {
     transition: border-color 0.15s, background 0.15s;
 }
 
-.role-option input[type="radio"] {
-    display: none;
-}
+.role-option input[type="radio"] { display: none; }
 
 .role-option:has(input:checked) {
     border-color: #4f6ef7;
@@ -852,10 +815,201 @@ dialog::backdrop {
     margin-top: 2px;
 }
 
-/* ── Bottom note ── */
-.bottom-note {
-    text-align: center;
-    margin-top: 32px;
-    font-size: 0.825rem;
+/* ── Report page specifics ── */
+.report-overview {
+    display: flex;
+    align-items: center;
+    gap: 36px;
+}
+
+.score-circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: conic-gradient(#4f6ef7 var(--pct), #eef1ff 0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.score-circle-inner {
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.score-number {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #1a1d2e;
+    line-height: 1;
+}
+
+.report-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.report-meta .question {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1a1d2e;
+}
+
+.report-meta .detail {
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+.dimensions {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.dimension-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.dimension-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    width: 190px;
+    flex-shrink: 0;
+}
+
+.dimension-bar-wrap {
+    flex: 1;
+    height: 8px;
+    background: #f0f3ff;
+    border-radius: 99px;
+    overflow: hidden;
+}
+
+.dimension-bar {
+    height: 100%;
+    border-radius: 99px;
+    background: #4f6ef7;
+}
+
+.dimension-bar.amber { background: #f59e0b; }
+.dimension-bar.green { background: #10b981; }
+
+.dimension-score {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #1a1d2e;
+    width: 40px;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.diagram-wrap {
+    border: 1px solid #e4e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fafafa;
+}
+
+.feedback-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.feedback-col h3 {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-bottom: 12px;
+}
+
+.feedback-col.strengths h3    { color: #059669; }
+.feedback-col.improvements h3 { color: #b45309; }
+
+.feedback-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.feedback-list li {
+    font-size: 0.875rem;
+    color: #4b5563;
+    line-height: 1.5;
+    display: flex;
+    gap: 8px;
+}
+
+.feedback-list li::before { flex-shrink: 0; margin-top: 1px; }
+
+.strengths .feedback-list li::before {
+    content: '✓';
+    color: #10b981;
+    font-weight: 700;
+}
+
+.improvements .feedback-list li::before {
+    content: '○';
+    color: #f59e0b;
+    font-weight: 700;
+}
+
+.guiding-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.guiding-question {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #1a1d2e;
+    margin-bottom: 4px;
+}
+
+.guiding-answer {
+    font-size: 0.875rem;
+    color: #4b5563;
+    line-height: 1.55;
+}
+
+.reasoning-text {
+    font-size: 0.9rem;
+    color: #4b5563;
+    line-height: 1.65;
+    background: #f9fafb;
+    border: 1px solid #e4e8f0;
+    border-radius: 10px;
+    padding: 16px 18px;
+}
+
+/* ── Page footer ── */
+.page-footer {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 24px;
+    font-size: 0.8rem;
+}
+
+.page-footer a {
     color: #b0b7c3;
+    text-decoration: none;
+    transition: color 0.15s;
+}
+
+.page-footer a:hover {
+    color: #6b7280;
 }
