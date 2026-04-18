@@ -1,18 +1,110 @@
 services:
-  user_db:
-    image: mariadb:lts
-    container_name: user_db
-    entrypoint: ["/usr/bin/mariadb", "-some-flag", "some-args"]
-    volumes:
-      - user_db_volume:/var/lib/mysql
-    networks:
-      - inception
+    api-gateway:
+        container_name: api-gateway
+        build: services/api-gateway
+        networks:
+            - frontend-network
+            - backend-network
+        restart: unless-stopped
 
+    svc-auth:
+        container_name: svc-auth
+        build: services/svc-auth
+        networks:
+            - backend-network
+        restart: unless-stopped
 
-    
+    svc-user:
+        container_name: svc-user
+        build: services/svc-user
+        networks:
+            - backend-network
+        restart: unless-stopped
+
+    svc-interview-store:
+        container_name: svc-interview-store
+        build: services/svc-interview-store
+        networks:
+            - backend-network
+        restart: unless-stopped
+
+    svc-grading:
+        container_name: svc-grading
+        build: services/svc-grading
+        networks:
+            - backend-network
+        restart: unless-stopped
+
+    svc-serialization:
+        container_name: svc-serialization
+        build: services/svc-serialization
+        networks:
+            - backend-network
+        restart: unless-stopped
+
+    frontend:
+        container_name: frontend
+        build: infrastructure/nginx
+        ports:
+            - "443:443"
+        networks:
+            - frontend-network
+        restart: unless-stopped
+
+    auth-db:
+        container_name: auth-db
+        build: infrastructure/auth-db
+        networks:
+            - backend-network
+        restart: unless-stopped
+
+    user-db:
+        container_name: user-db
+        build: infrastructure/user-db
+        networks:
+            - backend-network
+        restart: unless-stopped
+
+    interview-store-db:
+        container_name: interview-store-db
+        build: infrastructure/interview-store-db
+        networks:
+            - backend-network
+        restart: unless-stopped
+
+    grading-db:
+        container_name: grading-db
+        build: infrastructure/grading-db
+        networks:
+            - backend-network
+        restart: unless-stopped
+
+    serialization-db:
+        container_name: serialization-db
+        build: infrastructure/serialization-db
+        networks:
+            - backend-network
+        restart: unless-stopped
+
+    rabbitmq:
+        container_name: rabbitmq
+        build: infrastructure/rabbitmq
+        networks:
+            - backend-network
+        restart: unless-stopped
+
+    vault:
+        container_name: vault
+        build: infrastructure/vault
+        networks:
+            - frontend-network
+            - backend-network
+        restart: unless-stopped
 
 networks:
-    backend:
+    frontend-network:
+        driver: bridge
+    backend-network:
         driver: bridge
 
 volumes:
