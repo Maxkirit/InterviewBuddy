@@ -42,6 +42,13 @@ services:
             - backend-network
         restart: unless-stopped
 
+    svc-monitoring:
+        container_name: svc-monitoring
+        build: services/svc-monitoring
+        networks:
+            - backend-network
+        restart: unless-stopped
+
     frontend:
         container_name: frontend
         build: infrastructure/nginx
