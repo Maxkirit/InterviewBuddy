@@ -44,7 +44,7 @@ CREATE TABLE users (
 );
 
 -- En POSTgreSql, pas de check possible pour verifier si candidat =candidat ou recruteur = recruteur, prevoir une fonction lors des insertion.
-CREATE TABLE connection(
+CREATE TABLE connections(
 	recruiter_id	INT							NOT NULL REFERENCES users(user_id),
 	candidate_id	INT							NOT NULL REFERENCES users(user_id),
 	status			conn_status					NOT NULL DEFAULT 'pending',
@@ -62,7 +62,7 @@ CREATE TABLE invite_links(
 	link_id			SERIAL			PRIMARY KEY,
 	recruiter_id	INT				NOT NULL REFERENCES users(user_id),
 	link			TEXT			NOT NULL UNIQUE,
-	expiry_date		TIMESTAMPTZ		NOT NULL,
+	expiry_date		TIMESTAMPTZ		NOT NULL, DEFAULT NOW() + INTERVAL '3 days'
 	created_at		TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
 	updated_at		TIMESTAMPTZ     NOT NULL DEFAULT NOW()
 );
