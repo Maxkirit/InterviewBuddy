@@ -1,8 +1,8 @@
-FROM postgres:18.3
+FROM postgres:16
 
-COPY --chmod=+x ./entrypoint.sh /docker-entrypoint-initdb.d/entrypoint.sh
 
-EXPOSE 8080
+COPY ./init.sql /docker-entrypoint-initdb.d/init.sql
+EXPOSE 5432
 
 RUN ["echo", "'Hello World!!"]
 

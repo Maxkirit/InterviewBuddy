@@ -62,7 +62,7 @@ CREATE TABLE invite_links(
 	link_id			SERIAL			PRIMARY KEY,
 	recruiter_id	INT				NOT NULL REFERENCES users(user_id),
 	link			TEXT			NOT NULL UNIQUE,
-	expiry_date		TIMESTAMPTZ		NOT NULL, DEFAULT NOW() + INTERVAL '3 days'
+	expiry_date		TIMESTAMPTZ		NOT NULL DEFAULT NOW() + INTERVAL '3 days',
 	created_at		TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
 	updated_at		TIMESTAMPTZ     NOT NULL DEFAULT NOW()
 );
