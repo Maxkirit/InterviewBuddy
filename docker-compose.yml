@@ -21,12 +21,15 @@ services:
             - backend-network
         restart: unless-stopped
 
-    # svc-interview-store:
-    #     container_name: svc-interview-store
-    #     build: services/svc-interview-store
-    #     networks:
-    #         - backend-network
-    #     restart: unless-stopped
+    svc-interview-store:
+        container_name: svc-interview-store
+        build: services/svc-interview-store
+        networks:
+            - backend-network
+        restart: unless-stopped
+        depends_on:
+          interview-store-db:
+            condition: service_healthy
 
     # svc-grading:
     #     container_name: svc-grading
