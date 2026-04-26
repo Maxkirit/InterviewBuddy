@@ -1,7 +1,7 @@
 FROM postgres:16
 
 
-COPY ./init.sql /docker-entrypoint-initdb.d/init.sql
+COPY --chmod=+x ./entrypoint.sh /docker-entrypoint-initdb.d/entrypoint.sh
 EXPOSE 5432
 
 RUN ["echo", "'Hello World!!"]
