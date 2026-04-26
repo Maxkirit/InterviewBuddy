@@ -63,7 +63,7 @@ CREATE TYPE conn_status AS ENUM (
     'rejected'
 );
 
-CREATE TABLE $(TABLE_USER) (
+CREATE TABLE $TABLE_USER (
 	user_id			SERIAL			NOT NULL PRIMARY KEY,
 	auth_id			INT				NOT NULL UNIQUE,
 	role			role_type		NOT NULL DEFAULT 'candidate',
@@ -87,7 +87,7 @@ CREATE TABLE $(TABLE_USER) (
 );
 
 -- En POSTgreSql, pas de check possible pour verifier si candidat =candidat ou recruteur = recruteur, prevoir une fonction lors des insertion.
-CREATE TABLE $(TABLE_CONNECTIONS)(
+CREATE TABLE $TABLE_CONNECTIONS(
 	recruiter_id	INT							NOT NULL REFERENCES users(user_id),
 	candidate_id	INT							NOT NULL REFERENCES users(user_id),
 	status			conn_status					NOT NULL DEFAULT 'pending',
@@ -101,7 +101,7 @@ CREATE TABLE $(TABLE_CONNECTIONS)(
 	PRIMARY KEY (recruiter_id, candidate_id)
 );
 
-CREATE TABLE $(TABLE_INVITE_LINK)(
+CREATE TABLE $TABLE_INVITE_LINK(
 	link_id			SERIAL			PRIMARY KEY,
 	recruiter_id	INT				NOT NULL REFERENCES users(user_id),
 	link			TEXT			NOT NULL UNIQUE,
