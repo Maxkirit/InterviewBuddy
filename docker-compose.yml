@@ -73,13 +73,20 @@ services:
 
     user-db:
         container_name: user-db
-        build: infrastructure/databases/auser-db
+        build: infrastructure/databases/user-db
         networks:
             - backend-network
+        ports:
+          - "5433:5432" 
         env_file:
           - infrastructure/databases/user-db/.env_user_db
+        
+        environment:
+          POSTGRES_PASSWORD_FILE: /run/secrets/user_db_superuser_password
         secrets:
-          - user_db_password
+          - user_db_superuser_password
+          - user_db_admin_password
+          - user_db_app_password
         volumes:
           - user_db:/var/lib/postgresql
         restart: unless-stopped
@@ -147,8 +154,12 @@ services:
 secrets:
     auth_db_password:
       file: ./infrastructure/secrets/authdb_superuser_password.txt
-    user_db_password:
-      file: ./infrastructure/secrets/userdb_superuser_password.txt
+    user_db_superuser_password:
+      file: ./infrastructure/secrets/user_db_superuser_password.txt
+    user_db_admin_password:
+      file: ./infrastructure/secrets/user_db_admin_password.txt
+    user_db_app_password:
+      file: ./infrastructure/secrets/user_db_app_password.txt
     interview_store_db_superuser_password:
       file: ./infrastructure/secrets/interview_store_db_superuser_password.txt
     interview_store_db_admin_password:
