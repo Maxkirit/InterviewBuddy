@@ -68,7 +68,7 @@ services:
         secrets:
             - auth_db_password
         volumes:
-            - auth_db:/var/lib/postgres
+          - auth_db:/var/lib/postgresql
         restart: unless-stopped
 
     user-db:
@@ -81,7 +81,7 @@ services:
         secrets:
             - user_db_password
         volumes:
-            - user_db:/var/lib/postgres
+          - user_db:/var/lib/postgresql
         restart: unless-stopped
 
     interview-store-db:
@@ -89,12 +89,18 @@ services:
         build: infrastructure/databases/interview-store-db
         networks:
             - backend-network
+        ports:
+          - "5432:5432"
         env_file:
-            - infrastructure/databases/interview-store-db/.env_interview_store_db
+          - infrastructure/databases/interview-store-db/.env_interview_store_db
+        environment:
+          POSTGRES_PASSWORD_FILE: /run/secrets/interview_store_db_superuser_password
         secrets:
-            - interview_store_db_password
+          - interview_store_db_superuser_password
+          - interview_store_db_admin_password
+          - interview_store_db_app_password
         volumes:
-            - interview_store_db:/var/lib/postgres
+          - interview_store_db:/var/lib/postgresql
         restart: unless-stopped
 
     grading-db:
@@ -107,7 +113,7 @@ services:
         secrets:
             - grading_db_password
         volumes:
-            - grading_db:/var/lib/postgres
+          - grading_db:/var/lib/postgresql
         restart: unless-stopped
 
     serialization-db:
@@ -116,7 +122,7 @@ services:
         env_file:
             - infrastructure/databases/serializaton-db/.env_serialization_db
         volumes:
-            - serialization_db:/var/lib/postgres
+          - serialization_db:/var/lib/postgresql
         secrets:
             - serialization_db_password
         networks:
@@ -142,9 +148,13 @@ secrets:
     auth_db_password:
         file: ./infrastructure/secrets/authdb_superuser_password.txt
     user_db_password:
-        file: ./infrastructure/secrets/userdb_superuser_password.txt
-    interview_store_db_password:
-        file: ./infrastructure/secrets/interview_store_db_superuser_password.txt
+      file: ./infrastructure/secrets/userdb_superuser_password.txt
+    interview_store_db_superuser_password:
+      file: ./infrastructure/secrets/interview_store_db_superuser_password.txt
+    interview_store_db_admin_password:
+      file: ./infrastructure/secrets/interview_store_db_admin_password.txt
+    interview_store_db_app_password:
+      file: ./infrastructure/secrets/interview_store_db_app_password.txt
     serialization_db_password:
         file: ./infrastructure/secrets/serializationdb_superuser_password.txt
     grading_db_password:
