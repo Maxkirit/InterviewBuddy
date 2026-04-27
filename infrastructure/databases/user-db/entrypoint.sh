@@ -64,7 +64,7 @@ CREATE TYPE conn_status AS ENUM (
 );
 
 CREATE TABLE $TABLE_USER (
-	user_id			SERIAL			NOT NULL PRIMARY KEY,
+	user_id			INT				GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 	auth_id			INT				NOT NULL UNIQUE,
 	role			role_type		NOT NULL DEFAULT 'candidate',
 	firstname		VARCHAR(64)		NOT NULL,						-- 64 = convention standard
@@ -88,22 +88,22 @@ CREATE TABLE $TABLE_USER (
 
 -- En POSTgreSql, pas de check possible pour verifier si candidat =candidat ou recruteur = recruteur, prevoir une fonction lors des insertion.
 CREATE TABLE $TABLE_CONNECTIONS(
-	recruiter_id	INT							NOT NULL REFERENCES users(user_id),
-	candidate_id	INT							NOT NULL REFERENCES users(user_id),
-	status			conn_status					NOT NULL DEFAULT 'pending',
-	is_active		BOOLEAN						NOT NULL DEFAULT TRUE,
+	recruiter_id	INT				NOT NULL REFERENCES $TABLE_USER(user_id),
+	candidate_id	INT				NOT NULL REFERENCES $TABLE_USER(user_id),
+	status			conn_status		NOT NULL DEFAULT 'pending',
+	is_active		BOOLEAN			NOT NULL DEFAULT TRUE,
 	accepted_at		TIMESTAMPTZ,
 	rejected_at		TIMESTAMPTZ,
-	created_at		TIMESTAMPTZ					NOT NULL DEFAULT NOW(),
-	updated_at		TIMESTAMPTZ					NOT NULL DEFAULT NOW(),
+	created_at		TIMESTAMPTZ		NOT NULL DEFAULT NOW(),
+	updated_at		TIMESTAMPTZ		NOT NULL DEFAULT NOW(),
 
 -- garantie (recruiter + candidate = unique)
 	PRIMARY KEY (recruiter_id, candidate_id)
 );
 
 CREATE TABLE $TABLE_INVITE_LINK(
-	link_id			SERIAL			PRIMARY KEY,
-	recruiter_id	INT				NOT NULL REFERENCES users(user_id),
+	link_id			INT				GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+	recruiter_id	INT				NOT NULL REFERENCES $TABLE_USER(user_id),
 	link			TEXT			NOT NULL UNIQUE,
 	expiry_date		TIMESTAMPTZ		NOT NULL DEFAULT NOW() + INTERVAL '3 days',
 	created_at		TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
