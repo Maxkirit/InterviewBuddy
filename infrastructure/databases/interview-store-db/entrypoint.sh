@@ -43,37 +43,37 @@ psql -U postgres -c "GRANT CONNECT ON DATABASE $DB_NAME TO $POSTGRES_APP_USER"
 
 psql -U postgres -d $DB_NAME <<EOF
 CREATE TABLE IF NOT EXISTS $TABLE_QUESTIONS (
-    question_id SERIAL PRIMARY KEY,
-    name TEXT NOT NULL,
-    context TEXT,
-    functional_req TEXT NOT NULL,
-    non_functional_req TEXT NOT NULL,
-    created_at TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP NOT NULL
+    question_id			INT				GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name				TEXT			NOT NULL,
+    context				TEXT,
+    functional_req		TEXT			NOT NULL,
+    non_functional_req	TEXT			NOT NULL,
+    created_at 			TIMESTAMPTZ		NOT NULL DEFAULT NOW(),
+    updated_at 			TIMESTAMPTZ		NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE IF NOT EXISTS $TABLE_INTERVIEWS (
-    unique_interview_id SERIAL PRIMARY KEY,
-    recruiter_id INTEGER,
-    candidate_id INTEGER NOT NULL,
-    question_id INTEGER REFERENCES $TABLE_QUESTIONS(question_id) NOT NULL,
-    job_title TEXT NOT NULL,
-    unfinished_diagram JSON,
-    unfinished_text TEXT,
-    status TEXT CHECK (status IN ('scheduled', 'past due date', 'completed')),
-    due_date TIMESTAMP,
-    created_at TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP NOT NULL
+    unique_interview_id	INT				GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    recruiter_id 		INT,
+    candidate_id 		INT				NOT NULL,
+    question_id 		INT				REFERENCES $TABLE_QUESTIONS(question_id) NOT NULL,
+    job_title 			TEXT			NOT NULL,
+    unfinished_diagram	JSON,
+    unfinished_text		TEXT,
+    status				TEXT			CHECK (status IN ('scheduled', 'past due date', 'completed')),
+    due_date			TIMESTAMPTZ,
+    created_at			TIMESTAMPTZ		NOT NULL DEFAULT NOW(),
+    updated_at			TIMESTAMPTZ		NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE IF NOT EXISTS $TABLE_MODEL_ANSWERS (
-    answer_id SERIAL PRIMARY KEY,
-    question_id INTEGER REFERENCES $TABLE_QUESTIONS(question_id) NOT NULL,
-    model_answer_text TEXT NOT NULL,
-    model_answer_graph_url TEXT NOT NULL,
-    rubric TEXT NOT NULL,
-    created_at TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP NOT NULL
+    answer_id				INT				GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    question_id				INT				REFERENCES $TABLE_QUESTIONS(question_id) NOT NULL,
+    model_answer_text		TEXT			NOT NULL,
+    model_answer_graph_url	TEXT			NOT NULL,
+    rubric					TEXT			NOT NULL,
+    created_at				TIMESTAMPTZ		NOT NULL DEFAULT NOW(),
+    updated_at				TIMESTAMPTZ		NOT NULL DEFAULT NOW()
 );
 
 ALTER DEFAULT PRIVILEGES IN SCHEMA public
