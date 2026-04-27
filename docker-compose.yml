@@ -63,10 +63,16 @@ services:
         build: infrastructure/databases/auth-db
         networks:
             - backend-network
+        ports:
+          - "5432:5432"
         env_file:
-            - infrastructure/databases/auth-db/.env_auth_db
+          - infrastructure/databases/auth-db/.env_auth_db
+        environment:
+          POSTGRES_PASSWORD_FILE: /run/secrets/auth_db_superuser_password
         secrets:
-            - auth_db_password
+          - auth_db_superuser_password
+          - auth_db_admin_password
+          - auth_db_app_password
         volumes:
           - auth_db:/var/lib/postgresql
         restart: unless-stopped
@@ -152,8 +158,12 @@ services:
         restart: unless-stopped
 
 secrets:
-    auth_db_password:
-      file: ./infrastructure/secrets/authdb_superuser_password.txt
+    auth_db_superuser_password:
+      file: ./infrastructure/secrets/auth_db_superuser_password.txt
+    auth_db_admin_password:
+      file: ./infrastructure/secrets/auth_db_admin_password.txt
+    auth_db_app_password:
+      file: ./infrastructure/secrets/auth_db_app_password.txt
     user_db_superuser_password:
       file: ./infrastructure/secrets/user_db_superuser_password.txt
     user_db_admin_password:
