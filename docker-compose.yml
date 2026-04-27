@@ -1,18 +1,18 @@
 services:
-    # api-gateway:
-    #     container_name: api-gateway
-    #     build: services/api-gateway
-    #     networks:
-    #         - frontend-network
-    #         - backend-network
-    #     restart: unless-stopped
+    api-gateway:
+        container_name: api-gateway
+        build: services/api-gateway
+        networks:
+            - frontend-network
+            - backend-network
+        restart: unless-stopped
 
-    # svc-auth:
-    #     container_name: svc-auth
-    #     build: services/svc-auth
-    #     networks:
-    #         - backend-network
-    #     restart: unless-stopped
+    svc-auth:
+        container_name: svc-auth
+        build: services/svc-auth
+        networks:
+            - backend-network
+        restart: unless-stopped
 
     svc-user:
         container_name: svc-user
@@ -21,42 +21,42 @@ services:
             - backend-network
         restart: unless-stopped
 
-    # svc-interview-store:
-    #     container_name: svc-interview-store
-    #     build: services/svc-interview-store
-    #     networks:
-    #         - backend-network
-    #     restart: unless-stopped
+    svc-interview-store:
+        container_name: svc-interview-store
+        build: services/svc-interview-store
+        networks:
+            - backend-network
+        restart: unless-stopped
 
-    # svc-grading:
-    #     container_name: svc-grading
-    #     build: services/svc-grading
-    #     networks:
-    #         - backend-network
-    #     restart: unless-stopped
+    svc-grading:
+        container_name: svc-grading
+        build: services/svc-grading
+        networks:
+            - backend-network
+        restart: unless-stopped
 
-    # svc-serialization:
-    #     container_name: svc-serialization
-    #     build: services/svc-serialization
-    #     networks:
-    #         - backend-network
-    #     restart: unless-stopped
+    svc-serialization:
+        container_name: svc-serialization
+        build: services/svc-serialization
+        networks:
+            - backend-network
+        restart: unless-stopped
 
-    # svc-monitoring:
-    #     container_name: svc-monitoring
-    #     build: services/svc-monitoring
-    #     networks:
-    #         - backend-network
-    #     restart: unless-stopped
+    svc-monitoring:
+        container_name: svc-monitoring
+        build: services/svc-monitoring
+        networks:
+            - backend-network
+        restart: unless-stopped
 
-    # frontend:
-    #     container_name: frontend
-    #     build: infrastructure/nginx
-    #     ports:
-    #         - "443:443"
-    #     networks:
-    #         - frontend-network
-    #     restart: unless-stopped
+    frontend:
+        container_name: frontend
+        build: infrastructure/nginx
+        ports:
+            - "443:443"
+        networks:
+            - frontend-network
+        restart: unless-stopped
 
     auth-db:
         container_name: auth-db
@@ -79,13 +79,20 @@ services:
 
     user-db:
         container_name: user-db
-        build: infrastructure/databases/auser-db
+        build: infrastructure/databases/user-db
         networks:
             - backend-network
+        ports:
+          - "5433:5432" 
         env_file:
           - infrastructure/databases/user-db/.env_user_db
+        
+        environment:
+          POSTGRES_PASSWORD_FILE: /run/secrets/user_db_superuser_password
         secrets:
-          - user_db_password
+          - user_db_superuser_password
+          - user_db_admin_password
+          - user_db_app_password
         volumes:
           - user_db:/var/lib/postgresql
         restart: unless-stopped
@@ -113,11 +120,11 @@ services:
         container_name: grading-db
         build: infrastructure/databases/grading-db
         env_file:
-          - infrastructure/databases/grading-db/.env_grading_db
+            - infrastructure/databases/grading-db/.env_grading_db
         networks:
             - backend-network
         secrets:
-          - grading_db_password
+            - grading_db_password
         volumes:
           - grading_db:/var/lib/postgresql
         restart: unless-stopped
@@ -126,11 +133,11 @@ services:
         container_name: serialization-db
         build: infrastructure/databases/serialization-db
         env_file:
-          - infrastructure/databases/serializaton-db/.env_serialization_db
+            - infrastructure/databases/serializaton-db/.env_serialization_db
         volumes:
           - serialization_db:/var/lib/postgresql
         secrets:
-          - serialization_db_password
+            - serialization_db_password
         networks:
             - backend-network
         restart: unless-stopped
@@ -157,8 +164,12 @@ secrets:
       file: ./infrastructure/secrets/auth_db_admin_password.txt
     auth_db_app_password:
       file: ./infrastructure/secrets/auth_db_app_password.txt
-    user_db_password:
-      file: ./infrastructure/secrets/userdb_superuser_password.txt
+    user_db_superuser_password:
+      file: ./infrastructure/secrets/user_db_superuser_password.txt
+    user_db_admin_password:
+      file: ./infrastructure/secrets/user_db_admin_password.txt
+    user_db_app_password:
+      file: ./infrastructure/secrets/user_db_app_password.txt
     interview_store_db_superuser_password:
       file: ./infrastructure/secrets/interview_store_db_superuser_password.txt
     interview_store_db_admin_password:
@@ -166,9 +177,9 @@ secrets:
     interview_store_db_app_password:
       file: ./infrastructure/secrets/interview_store_db_app_password.txt
     serialization_db_password:
-      file: ./infrastructure/secrets/serializationdb_superuser_password.txt
+        file: ./infrastructure/secrets/serializationdb_superuser_password.txt
     grading_db_password:
-      file: ./infrastructure/secrets/gradingdb_superuser_password.txt
+        file: ./infrastructure/secrets/gradingdb_superuser_password.txt
 
 networks:
     frontend-network:
