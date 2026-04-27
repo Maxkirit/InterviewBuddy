@@ -1,4 +1,4 @@
-FROM postgres:18.3
+FROM postgres:17.9
 
 COPY --chmod=+x ./entrypoint.sh /docker-entrypoint-initdb.d/entrypoint.sh
 
