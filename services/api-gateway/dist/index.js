@@ -1,0 +1,36 @@
+import express from 'express';
+import axios from 'axios';
+import { z } from 'zod';
+const Login = z.object({
+    email: z.email(),
+    password: z.string().min(1),
+});
+const app = express();
+const port = 3000;
+// Middleware to parse request body into json
+app.use(express.json());
+app.post('/api/v1/auth/login', async (req, res) => {
+    const result = Login.safeParse(req.body);
+    if (!result.success) {
+        return res.status(400).json({ error: "Bad request" });
+    }
+    try {
+        const response = await axios.post("http://svc-auth:3000/api/v1/request_auth", {
+            email: result.data.email,
+            password: result.data.password,
+        });
+        res.cookie("refresh_token", response.data.refresh_token, { httpOnly: true, secure: true, sameSite: "strict" });
+        res.json({ access_token: response.data.access_token });
+    }
+    catch (error) {
+        if (axios.isAxiosError(error) && error.response?.status) {
+            return res.status(error.response.status).json({ error: error.response.data.message });
+        }
+        else {
+            return res.status(502).json({ error: "Bad gateway" });
+        }
+    }
+});
+app.listen(port, () => {
+    console.log(`Listening on port ${port}`);
+});
