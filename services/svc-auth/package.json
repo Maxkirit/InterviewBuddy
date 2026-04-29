@@ -1,5 +1,5 @@
 {
-  "name": "svc-auth",
+  "name": "api-gateway",
   "version": "1.0.0",
   "type": "module",
   "main": "dist/index.js",
@@ -9,7 +9,9 @@
     "dev": "tsc --watch & node --watch dist/index.js"
   },
   "dependencies": {
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+	"dotenv": "^16.0.0",
+	"jose": "^6.2.3"
   },
   "devDependencies": {
     "@types/express": "^5.0.3",
