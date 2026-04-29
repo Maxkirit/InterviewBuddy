@@ -8,7 +8,7 @@ const port = 3000;
 const secret = process.env.SECRETKEY;
 if (!secret)
     throw new Error('SECRETKEY manquante dans .env');
-app.get('/signing-key', async (req, res) => {
+app.get('/api/v1/signing-key', async (req, res) => {
     const publicKeyPem = createPublicKey(secret).export({ type: 'spki', format: 'pem' });
     const publicKey = await importSPKI(publicKeyPem, 'RS256'); // ← extrait la clé publique en PEM
     const jwk = await exportJWK(publicKey);
