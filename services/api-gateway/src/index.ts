@@ -40,5 +40,5 @@ app.post('/api/v1/auth/login', async (req, res) => {
 })
 
 app.listen(port, () => {
-    console.log(`Listening on port ${port}`)
+    console.log(`Listening on port ${port}`);
 })
