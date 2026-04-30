@@ -4,6 +4,9 @@ import axios from 'axios';
 import { prisma, Prisma } from "./lib/prisma.js";
 import { createAccessToken, createRefreshToken, rotateRefreshToken } from './lib/jwt.js';
 import jwt from 'jsonwebtoken';
+import {exportJWK, importSPKI} from 'jose'
+import dotenv from 'dotenv'
+import { createPublicKey } from 'crypto'
 
 type ApiError = {
   message: string;
@@ -12,10 +15,24 @@ type ApiError = {
 
 const REFRESH_SECRET = "changewhenvaultisup";
 
+
+dotenv.config() // {path: '...'} pour personnailiser ou est la cles
+const secret = process.env.SECRETKEY
+if (!secret) throw new Error('SECRETKEY manquante dans .env')
+
 const app = express();
 const port = 3000;
 
 app.use(express.json())
+
+app.get('/api/v1/signing-key', async (req, res) => {
+  const publicKeyPem = createPublicKey(secret).export({ type: 'spki', format: 'pem' })
+  const publicKey = await importSPKI(publicKeyPem, 'RS256')           // ← extrait la clé publique en PEM
+  const jwk = await exportJWK(publicKey);
+  res.json({ keys: [{ ...jwk, use: 'sig', kid: 'svc-auth-key-1' }] })
+// use: 'sig',                // ← indique que cette clé sert à signer (pas à chiffrer)
+//    kid: 'svc-auth-key-1'    ← identifiant unique de la clé
+})
 
 app.post('/api/v1/request-auth', async (req, res) => {
     const {email, password} = req.body;
@@ -79,6 +96,6 @@ app.post('/api/v1/refresh', async (req, res) => {
     }
 })
 
-app.listen(3000, () => {
-    console.log(`Listening on port ${port}`);
+app.listen(port, () =>{
+	console.log(`listening on port ${port}`)
 })
