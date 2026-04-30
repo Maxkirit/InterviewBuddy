@@ -1,4 +1,4 @@
-import * as jwt from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import { randomBytes } from 'node:crypto';
 import { prisma } from "./prisma.js";
 
@@ -6,8 +6,8 @@ const ACCESS_SECRET = "changewhenvaultisup";
 const REFRESH_SECRET = "changewhenvaultisup";
 
 // will take permissions and userId as a parameter
-export function createAccessToken() {
-    const access_token = jwt.sign({}, ACCESS_SECRET, {expiresIn: "10m"});
+export function createAccessToken(userId: number) {
+    const access_token = jwt.sign({userId: userId}, ACCESS_SECRET, {expiresIn: "10m"});
     return access_token;
 }
 
@@ -15,13 +15,14 @@ function createJti() {
     return randomBytes(16).toString('hex');
 }
 
-export function createRefreshToken(userId: number) {
+export async function createRefreshToken(userId: number) {
     const jti = createJti();
     const refresh_token = jwt.sign({userId: userId, jti: jti}, REFRESH_SECRET, {expiresIn: "7d"});
-    const refresh = prisma.refresh_tokens.create({
+    const refresh = await prisma.refresh_tokens.create({
         data: {
             token: refresh_token,
-            version_control: jti, // change version_control int to jti string
+            jti: jti,
+            user_id: userId,
         },
     });
     return refresh_token;
@@ -29,10 +30,10 @@ export function createRefreshToken(userId: number) {
 
 export async function rotateRefreshToken(oldJti: string, userId: number) {
     const updateUser = await prisma.refresh_tokens.update({
-        where: { version_control: oldJti },
+        where: { jti: oldJti },
         data: {
             updated_at: new Date(),
-            // set revoked at
+            revoked_at: new Date(),
         },
     });
     const newRefresh = createRefreshToken(userId);

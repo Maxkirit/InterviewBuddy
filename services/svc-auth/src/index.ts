@@ -3,9 +3,8 @@ import argon2 from 'argon2';
 import axios from 'axios';
 import { prisma, Prisma } from "./lib/prisma.js";
 import { createAccessToken, createRefreshToken, rotateRefreshToken } from './lib/jwt.js';
-import * as cookieParser from 'cookie-parser';
-import * as jwt from 'jsonwebtoken';
-
+import cookieParser from 'cookie-parser';
+import jwt from 'jsonwebtoken';
 
 type ApiError = {
   message: string;
@@ -19,7 +18,7 @@ const port = 3000;
 
 app.use(express.json())
 
-app.use(cookieParser.default());
+app.use(cookieParser());
 
 app.post('/api/v1/request-auth', async (req, res) => {
     const {email, password} = req.body;
@@ -29,13 +28,14 @@ app.post('/api/v1/request-auth', async (req, res) => {
                 email: email,
             },
         });
-        if (await argon2.verify(userAuth.password , password)) {
-            const response = await axios.get(`http://svc-user:3000/api/v1/userID/${userAuth.auth_id}`);
-            // query auth-db for the users's permissions
-            let userId: number;
-            const access_token = createAccessToken(); //add payload as a parameter
-            const refresh_token = createRefreshToken(userId);
-            res.json({access_token: access_token, refresh_token: refresh_token});
+        if (await argon2.verify(userAuth.hashed_password , password)) {
+            // const response = await axios.get(`http://svc-user:3000/api/v1/userID/${userAuth.auth_id}`);
+            // // query auth-db for the users's permissions
+            // const access_token = createAccessToken(response.data.userId); //add payload as a parameter
+            // const refresh_token = createRefreshToken(response.data.userId);
+            const accessToken = createAccessToken(1);
+            const refreshToken = await createRefreshToken(1);
+            res.json({access_token: accessToken, refresh_token: refreshToken});
         } else {
             return res.status(401).json({error: "Incorrect email or password"});
         }
@@ -50,7 +50,7 @@ app.post('/api/v1/request-auth', async (req, res) => {
     }
 })
 
-app.get('/api/v1/refresh', async (req, res) => {
+app.post('/api/v1/refresh', async (req, res) => {
     try {
         const oldRefresh = req.cookies?.refresh_token;
         if (!oldRefresh) {
@@ -58,27 +58,28 @@ app.get('/api/v1/refresh', async (req, res) => {
         }
         let decoded;
         try {
-            decoded = jwt.verify(oldRefresh, REFRESH_SECRET)
+            decoded = jwt.verify(oldRefresh, REFRESH_SECRET) as jwt.JwtPayload;
         } catch(error) {
             return res.status(401).json({error: "Invalid refresh token"});
         }
         const result = await prisma.refresh_tokens.findUnique({
             where: {
-                token: oldRefresh,
-                // match on jti as well
+                jti: decoded.jti,
             },
         });
         if (!result) {
             return res.status(401).json({error: "Refresh token not found"});
         }
-        // add check for is revoked?
-        if (result.expiresIn < new Date()) {
+        if (result.revoked_at) {
+            return res.status(401).json({error: "Refresh token revoked"});
+        }
+        if (result.token_expiry < new Date()) {
             return res.status(401).json({error: "Refresh token expired"});
         }
-        const newRefresh = rotateRefreshToken(result, decoded.userId);
+        const newRefresh = rotateRefreshToken(result.jti, decoded.userId);
         res.json({refresh_token: newRefresh});
     } catch(error) {
-        return res.status(500).json({error: "Bad gateway"});
+        return res.status(500).json({error: "Internal server error"});
     }
 })
 
