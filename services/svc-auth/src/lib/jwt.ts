@@ -7,6 +7,7 @@ const REFRESH_SECRET = "changewhenvaultisup";
 
 // will take permissions and userId as a parameter
 export function createAccessToken(userId: number) {
+    // query auth-db for the users's permissions
     const access_token = jwt.sign({userId: userId}, ACCESS_SECRET, {expiresIn: "10m"});
     return access_token;
 }
@@ -36,6 +37,7 @@ export async function rotateRefreshToken(oldJti: string, userId: number) {
             revoked_at: new Date(),
         },
     });
-    const newRefresh = createRefreshToken(userId);
-    return newRefresh;
+    const newRefresh = await createRefreshToken(userId);
+    const newAccess = createAccessToken(userId);
+    return {newRefresh: newRefresh, newAccess: newAccess};
 }

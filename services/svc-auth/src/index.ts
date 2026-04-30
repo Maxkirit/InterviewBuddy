@@ -3,7 +3,6 @@ import argon2 from 'argon2';
 import axios from 'axios';
 import { prisma, Prisma } from "./lib/prisma.js";
 import { createAccessToken, createRefreshToken, rotateRefreshToken } from './lib/jwt.js';
-import cookieParser from 'cookie-parser';
 import jwt from 'jsonwebtoken';
 
 type ApiError = {
@@ -18,8 +17,6 @@ const port = 3000;
 
 app.use(express.json())
 
-app.use(cookieParser());
-
 app.post('/api/v1/request-auth', async (req, res) => {
     const {email, password} = req.body;
     try {
@@ -30,7 +27,6 @@ app.post('/api/v1/request-auth', async (req, res) => {
         });
         if (await argon2.verify(userAuth.hashed_password , password)) {
             // const response = await axios.get(`http://svc-user:3000/api/v1/userID/${userAuth.auth_id}`);
-            // // query auth-db for the users's permissions
             // const access_token = createAccessToken(response.data.userId); //add payload as a parameter
             // const refresh_token = createRefreshToken(response.data.userId);
             const accessToken = createAccessToken(1);
@@ -52,7 +48,7 @@ app.post('/api/v1/request-auth', async (req, res) => {
 
 app.post('/api/v1/refresh', async (req, res) => {
     try {
-        const oldRefresh = req.cookies?.refresh_token;
+        const oldRefresh = req.body?.refresh_token;
         if (!oldRefresh) {
             return res.status(401).json({error: "No refresh token"});
         }
@@ -76,8 +72,8 @@ app.post('/api/v1/refresh', async (req, res) => {
         if (result.token_expiry < new Date()) {
             return res.status(401).json({error: "Refresh token expired"});
         }
-        const newRefresh = rotateRefreshToken(result.jti, decoded.userId);
-        res.json({refresh_token: newRefresh});
+        const newTokens = await rotateRefreshToken(result.jti, decoded.userId);
+        res.json({refresh_token: newTokens.newRefresh, access_token: newTokens.newAccess});
     } catch(error) {
         return res.status(500).json({error: "Internal server error"});
     }
