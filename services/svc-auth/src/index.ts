@@ -25,7 +25,7 @@ const port = 3000;
 
 app.use(express.json())
 
-app.get('/api/v1/signing-key', async (req, res) => {
+app.get('/api/v1/jwks', async (req, res) => {
   const publicKeyPem = createPublicKey(secret).export({ type: 'spki', format: 'pem' })
   const publicKey = await importSPKI(publicKeyPem, 'RS256')           // ← extrait la clé publique en PEM
   const jwk = await exportJWK(publicKey);
