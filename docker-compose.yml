@@ -17,7 +17,7 @@ services:
         #     - svc_auth_secret_id
         restart: unless-stopped
         secrets:
-        - auth_db_superuser_password
+          - auth_db_superuser_password
 
     svc-user:
         container_name: svc-user
