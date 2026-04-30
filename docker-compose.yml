@@ -76,7 +76,7 @@ services:
         networks:
             - backend-network
         ports:
-          - "5432:5432"
+          - "5434:5432"
         env_file:
           - infrastructure/databases/auth-db/.env_auth_db
         environment:
