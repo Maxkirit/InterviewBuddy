@@ -11,4 +11,8 @@ COPY . .
 
 EXPOSE 3000
 
+RUN npx prisma db pull
+RUN npx prisma generate
+RUN npm run build
+
 CMD ["node", "svc-user.ts"]

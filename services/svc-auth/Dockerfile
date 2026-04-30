@@ -9,6 +9,8 @@ RUN npm ci --no-audit --no-fund && \
 
 COPY . .
 
+RUN npx prisma db pull
+RUN npx prisma generate
 RUN npm run build
 
 EXPOSE 3000
