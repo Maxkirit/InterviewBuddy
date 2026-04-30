@@ -26,7 +26,7 @@ services:
             - backend-network
         restart: unless-stopped
         secrets:
-        - user_db_superuser_password
+          - user_db_superuser_password
 
     svc-interview-store:
         container_name: svc-interview-store
