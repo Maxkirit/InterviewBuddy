@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model interviews {
+  unique_interview_id Int              @id @default(autoincrement())
+  recruiter_id        Int?
+  candidate_id        Int
+  question_id         Int
+  job_title           String
+  unfinished_diagram  Json?            @db.Json
+  unfinished_text     String?
+  status              interview_status
+  due_date            DateTime?        @db.Timestamptz(6)
+  created_at          DateTime         @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime         @default(now()) @db.Timestamptz(6)
+  questions           questions        @relation(fields: [question_id], references: [question_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model model_answers {
+  answer_id              Int       @id @default(autoincrement())
+  question_id            Int
+  model_answer_text      String
+  model_answer_graph_url String
+  rubric                 String
+  created_at             DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at             DateTime  @default(now()) @db.Timestamptz(6)
+  questions              questions @relation(fields: [question_id], references: [question_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model questions {
+  question_id        Int             @id @default(autoincrement())
+  name               String
+  context            String?
+  functional_req     String
+  non_functional_req String
+  created_at         DateTime        @default(now()) @db.Timestamptz(6)
+  updated_at         DateTime        @default(now()) @db.Timestamptz(6)
+  interviews         interviews[]
+  model_answers      model_answers[]
+}
+
+enum interview_status {
+  scheduled
+  past_due_date
+  completed
+}

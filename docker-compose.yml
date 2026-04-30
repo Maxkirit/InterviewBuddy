@@ -16,6 +16,8 @@ services:
         #     - svc_auth_role_id
         #     - svc_auth_secret_id
         restart: unless-stopped
+        secrets:
+          - auth_db_superuser_password
 
     svc-user:
         container_name: svc-user
@@ -23,6 +25,8 @@ services:
         networks:
             - backend-network
         restart: unless-stopped
+        secrets:
+          - user_db_superuser_password
 
     svc-interview-store:
         container_name: svc-interview-store
@@ -33,6 +37,8 @@ services:
         depends_on:
           interview-store-db:
             condition: service_healthy
+        secrets:
+            - interview_store_db_superuser_password
 
     svc-grading:
         container_name: svc-grading
