@@ -11,4 +11,7 @@ COPY . .
 
 EXPOSE 3000
 
+RUN npx prisma db pull
+RUN npx prisma generate
+
 CMD ["node", "svc-interview-store.ts"]

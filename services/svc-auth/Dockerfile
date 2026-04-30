@@ -10,6 +10,7 @@ RUN npm ci --no-audit --no-fund && \
 COPY . .
 
 RUN npm run build
+RUN npx prisma generate
 
 EXPOSE 3000
 

@@ -13,6 +13,8 @@ services:
         networks:
             - backend-network
         restart: unless-stopped
+        secrets:
+        - auth_db_superuser_password
 
     svc-user:
         container_name: svc-user
@@ -20,6 +22,8 @@ services:
         networks:
             - backend-network
         restart: unless-stopped
+        secrets:
+        - user_db_superuser_password
 
     svc-interview-store:
         container_name: svc-interview-store
@@ -30,6 +34,8 @@ services:
         depends_on:
           interview-store-db:
             condition: service_healthy
+        secrets:
+            - interview_store_db_superuser_password
 
     svc-grading:
         container_name: svc-grading
@@ -119,46 +125,46 @@ services:
           - interview_store_db:/var/lib/postgresql
         restart: unless-stopped
 
-    grading-db:
-        container_name: grading-db
-        build: infrastructure/databases/grading-db
-        env_file:
-            - infrastructure/databases/grading-db/.env_grading_db
-        networks:
-            - backend-network
-        secrets:
-            - grading_db_password
-        volumes:
-          - grading_db:/var/lib/postgresql
-        restart: unless-stopped
+    # grading-db:
+    #     container_name: grading-db
+    #     build: infrastructure/databases/grading-db
+    #     env_file:
+    #         - infrastructure/databases/grading-db/.env_grading_db
+    #     networks:
+    #         - backend-network
+    #     secrets:
+    #         - grading_db_password
+    #     volumes:
+    #       - grading_db:/var/lib/postgresql
+    #     restart: unless-stopped
 
-    serialization-db:
-        container_name: serialization-db
-        build: infrastructure/databases/serialization-db
-        env_file:
-            - infrastructure/databases/serializaton-db/.env_serialization_db
-        volumes:
-          - serialization_db:/var/lib/postgresql
-        secrets:
-            - serialization_db_password
-        networks:
-            - backend-network
-        restart: unless-stopped
+    # serialization-db:
+    #     container_name: serialization-db
+    #     build: infrastructure/databases/serialization-db
+    #     env_file:
+    #         - infrastructure/databases/serializaton-db/.env_serialization_db
+    #     volumes:
+    #       - serialization_db:/var/lib/postgresql
+    #     secrets:
+    #         - serialization_db_password
+    #     networks:
+    #         - backend-network
+    #     restart: unless-stopped
 
-    rabbitmq:
-        container_name: rabbitmq
-        build: infrastructure/rabbitmq
-        networks:
-            - backend-network
-        restart: unless-stopped
+    # rabbitmq:
+    #     container_name: rabbitmq
+    #     build: infrastructure/rabbitmq
+    #     networks:
+    #         - backend-network
+    #     restart: unless-stopped
 
-    vault:
-        container_name: vault
-        build: infrastructure/vault
-        networks:
-            - frontend-network
-            - backend-network
-        restart: unless-stopped
+    # vault:
+    #     container_name: vault
+    #     build: infrastructure/vault
+    #     networks:
+    #         - frontend-network
+    #         - backend-network
+    #     restart: unless-stopped
 
 secrets:
     auth_db_superuser_password:
