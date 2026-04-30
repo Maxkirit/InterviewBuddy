@@ -1,0 +1,48 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model auths {
+  auth_id               Int                    @id @default(autoincrement())
+  email                 String                 @unique @db.VarChar(255)
+  hashed_password       String
+  sub                   String?
+  created_at            DateTime               @default(now()) @db.Timestamptz(6)
+  updated_at            DateTime               @default(now()) @db.Timestamptz(6)
+  failed_logins         failed_logins[]
+  password_reset_tokens password_reset_tokens?
+}
+
+model failed_logins {
+  attempt_id    Int      @id @default(autoincrement())
+  auth_id       Int?
+  attempt_count Int
+  ip_address    String
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime @default(now()) @db.Timestamptz(6)
+  auths         auths?   @relation(fields: [auth_id], references: [auth_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model password_reset_tokens {
+  auth_id      Int      @id
+  reset_token  String   @unique
+  token_expiry DateTime @db.Timestamptz(6)
+  created_at   DateTime @default(now()) @db.Timestamptz(6)
+  updated_at   DateTime @default(now()) @db.Timestamptz(6)
+  auths        auths    @relation(fields: [auth_id], references: [auth_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model refresh_tokens {
+  jti          String    @id
+  token        String
+  user_id      Int
+  token_expiry DateTime  @default(dbgenerated("(now() + '7 days'::interval)")) @db.Timestamptz(6)
+  created_at   DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at   DateTime  @default(now()) @db.Timestamptz(6)
+  revoked_at   DateTime? @db.Timestamptz(6)
+}

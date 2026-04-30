@@ -24,7 +24,7 @@ app.post('/api/v1/auth/login', async (req, res) => {
         return res.status(400).json({error: "Bad request"});
     }
     try {
-        const response = await axios.post("http://svc-auth:3000/api/v1/request_auth", {
+        const response = await axios.post("http://svc-auth:3000/api/v1/request-auth", {
             email: result.data.email,
             password: result.data.password,
         })
@@ -40,5 +40,5 @@ app.post('/api/v1/auth/login', async (req, res) => {
 })
 
 app.listen(port, () => {
-    console.log(`Listening on port ${port}`)
+    console.log(`Listening on port ${port}`);
 })
