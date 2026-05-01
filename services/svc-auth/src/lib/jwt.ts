@@ -6,9 +6,33 @@ const ACCESS_SECRET = "changewhenvaultisup";
 const REFRESH_SECRET = "changewhenvaultisup";
 
 // will take permissions and userId as a parameter
-export function createAccessToken(userId: number) {
+export async function createAccessToken(userId: number) {
     // query auth-db for the users's permissions
-    const access_token = jwt.sign({userId: userId}, ACCESS_SECRET, {expiresIn: "10m"});
+    const userPerms = await prisma.user_roles.findUniqueOrThrow({
+        where: {
+            user_id: userId,
+        },
+        select: {
+            roles: {
+                select: {
+                    role_permissions: {
+                        where: {
+                            is_active: true,
+                        },
+                        select: {
+                            permissions: {
+                                select: {
+                                    name: true,
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    });
+    const perms =  userPerms.roles.role_permissions.map(rp => rp.permissions.name);
+    const access_token = jwt.sign({userId: userId, permissions: perms}, ACCESS_SECRET, {expiresIn: "10m"});
     return access_token;
 }
 

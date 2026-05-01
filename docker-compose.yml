@@ -222,23 +222,23 @@ services:
 
 secrets:
     auth_db_superuser_password:
-      file: ./infrastructure/secrets/auth_db_superuser_password.txt
+        file: ./infrastructure/secrets/auth_db_superuser_password.txt
     auth_db_admin_password:
-      file: ./infrastructure/secrets/auth_db_admin_password.txt
+        file: ./infrastructure/secrets/auth_db_admin_password.txt
     auth_db_app_password:
-      file: ./infrastructure/secrets/auth_db_app_password.txt
+        file: ./infrastructure/secrets/auth_db_app_password.txt
     user_db_superuser_password:
-      file: ./infrastructure/secrets/user_db_superuser_password.txt
+        file: ./infrastructure/secrets/user_db_superuser_password.txt
     user_db_admin_password:
-      file: ./infrastructure/secrets/user_db_admin_password.txt
+        file: ./infrastructure/secrets/user_db_admin_password.txt
     user_db_app_password:
-      file: ./infrastructure/secrets/user_db_app_password.txt
+        file: ./infrastructure/secrets/user_db_app_password.txt
     interview_store_db_superuser_password:
-      file: ./infrastructure/secrets/interview_store_db_superuser_password.txt
+        file: ./infrastructure/secrets/interview_store_db_superuser_password.txt
     interview_store_db_admin_password:
-      file: ./infrastructure/secrets/interview_store_db_admin_password.txt
+        file: ./infrastructure/secrets/interview_store_db_admin_password.txt
     interview_store_db_app_password:
-      file: ./infrastructure/secrets/interview_store_db_app_password.txt
+        file: ./infrastructure/secrets/interview_store_db_app_password.txt
     serialization_db_password:
         file: ./infrastructure/secrets/serializationdb_superuser_password.txt
     grading_db_password:
