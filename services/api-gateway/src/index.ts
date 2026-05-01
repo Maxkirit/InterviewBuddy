@@ -39,6 +39,10 @@ app.post('/api/v1/auth/login', async (req, res) => {
     }
 })
 
+app.get("/api/v1/auth/refresh", async(req, res) => {
+    res.send("hi!\n");
+})
+
 app.listen(port, () => {
     console.log(`Listening on port ${port}`);
 })
