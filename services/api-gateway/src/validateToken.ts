@@ -1,0 +1,57 @@
+import jwt, { TokenExpiredError, JsonWebTokenError } from "jsonwebtoken";
+import axios from 'axios';
+
+async function getKey(): Promise<string> {
+	const res = await axios.get("http://svc-auth:3000/api/v1/signing-key");
+	return res.data.keys[0];
+}
+
+async function getRefreshData(old_refresh_token: string) {
+	const res = await axios.post("http://svc-auth:3000/api/v1/refresh", { refresh_token: old_refresh_token });
+	return res.data;
+}
+export async function validateAcccessToken(req, res, next) {
+	const authHeader = req.headers.authorization;
+	if (!authHeader)
+        return res.status(401).json({error: "Missing header"});
+
+	const [bearer, access_token] = authHeader.split(" ");
+	if (bearer !== "Bearer")
+        return res.status(401).json({error: "Missing bearer"});
+
+	//get key from auth-serv
+	//this should/will be cached at start up to avoid getting it at every call
+	let key : string;
+	try { 
+		key = await getKey();
+	} catch(error) {
+		return res.status(500).json({ error: "Auth-svc error" });
+	}
+
+	//checking signature of access_token
+	try {
+		req.user = jwt.verify(access_token, key);
+		return next(); //valid access_token
+	} catch (error) {
+		if (error instanceof JsonWebTokenError && !(error instanceof TokenExpiredError))
+			return res.status(401).json({error: "Invalid token"});
+		else if (!(error instanceof JsonWebTokenError))
+			return res.status(500).json({error: "Auth-serv error"});
+	}
+
+	//Token is Expired
+	const old_refresh_token = req.cookies.refresh_token;
+	if (!old_refresh_token)
+		return res.status(401).json({ error: "No refresh token" });
+
+	try {
+		const refresh_data = await getRefreshData(old_refresh_token)
+		res.cookie("refresh_token", refresh_data.refresh_token, { httpOnly: true, secure: true, sameSite: "strict"});
+		req.user = jwt.verify(refresh_data.access_token, key);
+		res.setHeader("Authorization", `Bearer ${refresh_data.access_token}`);
+		return next();
+	} catch {
+		// TODO: if refresh is invalid, revoke all sessions
+		return res.status(401).json({ error: "Refresh failed" });
+	}
+};
