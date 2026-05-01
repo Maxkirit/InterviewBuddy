@@ -46,3 +46,44 @@ model refresh_tokens {
   updated_at   DateTime  @default(now()) @db.Timestamptz(6)
   revoked_at   DateTime? @db.Timestamptz(6)
 }
+
+model permissions {
+  permission_id    Int                @id @default(autoincrement())
+  name             String
+  created_at       DateTime           @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime           @default(now()) @db.Timestamptz(6)
+  role_permissions role_permissions[] @ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model role_permissions {
+  role_id       Int?
+  permission_id Int?
+  is_active     Boolean?     @default(true)
+  created_at    DateTime     @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime     @default(now()) @db.Timestamptz(6)
+  permissions   permissions? @relation(fields: [permission_id], references: [permission_id], onDelete: NoAction, onUpdate: NoAction)
+  roles         roles?       @relation(fields: [role_id], references: [role_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([role_id, permission_id])
+  @@ignore
+}
+
+model roles {
+  role_id          Int                @id @default(autoincrement())
+  name             String             @unique
+  is_active        Boolean?           @default(true)
+  created_at       DateTime           @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime           @default(now()) @db.Timestamptz(6)
+  role_permissions role_permissions[] @ignore
+  user_roles       user_roles[]
+}
+
+model user_roles {
+  user_id       Int       @unique
+  role_id       Int?
+  assigned_date DateTime? @default(now()) @db.Timestamptz(6)
+  created_at    DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime  @default(now()) @db.Timestamptz(6)
+  roles         roles?    @relation(fields: [role_id], references: [role_id], onDelete: NoAction, onUpdate: NoAction)
+}

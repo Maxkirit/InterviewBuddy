@@ -103,11 +103,12 @@ CREATE TABLE IF NOT EXISTS $TABLE_PERMISSIONS (
 );
 
 CREATE TABLE IF NOT EXISTS $TABLE_ROLE_PERMISSIONS (
-    role_id         INT             REFERENCES $TABLE_ROLES(role_id),
-    permission_id   INT             REFERENCES $TABLE_PERMISSIONS(permission_id),
-    is_active       BOOLEAN         DEFAULT TRUE,
-    created_at		TIMESTAMPTZ		NOT NULL DEFAULT NOW(),
-	updated_at		TIMESTAMPTZ		NOT NULL DEFAULT NOW(),
+    role_permission_id  INT             GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    role_id             INT             REFERENCES $TABLE_ROLES(role_id),
+    permission_id       INT             REFERENCES $TABLE_PERMISSIONS(permission_id),
+    is_active           BOOLEAN         DEFAULT TRUE,
+    created_at		    TIMESTAMPTZ		NOT NULL DEFAULT NOW(),
+	updated_at		    TIMESTAMPTZ		NOT NULL DEFAULT NOW(),
     UNIQUE (role_id, permission_id)
 );
 

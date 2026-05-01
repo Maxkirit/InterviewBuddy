@@ -6,3 +6,73 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model connections {
+  recruiter_id                          Int
+  candidate_id                          Int
+  status                                conn_status @default(pending)
+  is_active                             Boolean     @default(true)
+  accepted_at                           DateTime?   @db.Timestamptz(6)
+  rejected_at                           DateTime?   @db.Timestamptz(6)
+  created_at                            DateTime    @default(now()) @db.Timestamptz(6)
+  updated_at                            DateTime    @default(now()) @db.Timestamptz(6)
+  users_connections_candidate_idTousers users       @relation("connections_candidate_idTousers", fields: [candidate_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  users_connections_recruiter_idTousers users       @relation("connections_recruiter_idTousers", fields: [recruiter_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([recruiter_id, candidate_id])
+}
+
+model invite_link {
+  link_id      Int      @id @default(autoincrement())
+  recruiter_id Int
+  link         String   @unique
+  expiry_date  DateTime @default(dbgenerated("(now() + '3 days'::interval)")) @db.Timestamptz(6)
+  created_at   DateTime @default(now()) @db.Timestamptz(6)
+  updated_at   DateTime @default(now()) @db.Timestamptz(6)
+  users        users    @relation(fields: [recruiter_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model users {
+  user_id                                     Int           @id @default(autoincrement())
+  auth_id                                     Int           @unique
+  role                                        role_type     @default(candidate)
+  firstname                                   String        @db.VarChar(64)
+  lastname                                    String        @db.VarChar(64)
+  profile_pic_url                             String?
+  gender                                      gender_type?
+  date_of_birth                               DateTime?     @db.Date
+  country                                     String?       @db.VarChar(64)
+  job_title                                   String?
+  organization                                String?
+  bio                                         String?
+  linkedin_link                               String?
+  email                                       String        @unique @db.VarChar(255)
+  phone_number                                String?       @db.VarChar(32)
+  is_active                                   Boolean       @default(true)
+  last_login                                  DateTime?     @db.Timestamptz(6)
+  created_at                                  DateTime      @default(now()) @db.Timestamptz(6)
+  updated_at                                  DateTime      @default(now()) @db.Timestamptz(6)
+  deleted_at                                  DateTime?     @db.Timestamptz(6)
+  connections_connections_candidate_idTousers connections[] @relation("connections_candidate_idTousers")
+  connections_connections_recruiter_idTousers connections[] @relation("connections_recruiter_idTousers")
+  invite_link                                 invite_link[]
+}
+
+enum conn_status {
+  pending
+  accepted
+  rejected
+}
+
+enum gender_type {
+  male
+  female
+  non_binary
+  prefer_not_to_say
+}
+
+enum role_type {
+  admin
+  recruiter
+  candidate
+}
