@@ -7,18 +7,20 @@ services:
             - backend-network
         restart: unless-stopped
 
-    svc-auth:
-        container_name: svc-auth
-        build: services/svc-auth
-        networks:
-            - backend-network
-        secrets:
-            - auth_db_superuser_password
-            - auth_db_admin_password
-            - auth_db_app_password
-            # - svc_auth_role_id
-            # - svc_auth_secret_id
-        restart: unless-stopped
+    # svc-auth:
+    #     container_name: svc-auth
+    #     build: services/svc-auth
+    #     networks:
+    #         - backend-network
+    #     # secrets:
+    #     #     - svc_auth_role_id
+    #     #     - svc_auth_secret_id
+    #     restart: unless-stopped
+    #     secrets:
+    #       - auth_db_superuser_password
+    #     depends_on:
+    #       auth-db:
+    #         condition: service_healthy
 
     svc-user:
         container_name: svc-user
@@ -27,76 +29,75 @@ services:
             - backend-network
         restart: unless-stopped
         secrets:
-            - user_db_superuser_password
-
-    svc-interview-store:
-        container_name: svc-interview-store
-        build: services/svc-interview-store
-        networks:
-            - backend-network
-        restart: unless-stopped
+          - user_db_superuser_password
         depends_on:
-            interview-store-db:
-                condition: service_healthy
-        secrets:
-            - interview_store_db_superuser_password
+          user-db:
+            condition: service_healthy
 
-    svc-grading:
-        container_name: svc-grading
-        build: services/svc-grading
-        networks:
-            - backend-network
-        restart: unless-stopped
+    # svc-interview-store:
+    #     container_name: svc-interview-store
+    #     build: services/svc-interview-store
+    #     networks:
+    #         - backend-network
+    #     restart: unless-stopped
+    #     depends_on:
+    #       interview-store-db:
+    #         condition: service_healthy
+    #     secrets:
+    #         - interview_store_db_superuser_password
 
-    svc-serialization:
-        container_name: svc-serialization
-        build: services/svc-serialization
-        networks:
-            - backend-network
-        restart: unless-stopped
+    # svc-grading:
+    #     container_name: svc-grading
+    #     build: services/svc-grading
+    #     networks:
+    #         - backend-network
+    #     restart: unless-stopped
 
-    svc-monitoring:
-        container_name: svc-monitoring
-        build: services/svc-monitoring
-        networks:
-            - backend-network
-        restart: unless-stopped
+    # svc-serialization:
+    #     container_name: svc-serialization
+    #     build: services/svc-serialization
+    #     networks:
+    #         - backend-network
+    #     restart: unless-stopped
 
-    frontend:
-        container_name: frontend
-        build: infrastructure/nginx
-        ports:
-            - "443:443"
-        networks:
-            - frontend-network
-        restart: unless-stopped
+    # svc-monitoring:
+    #     container_name: svc-monitoring
+    #     build: services/svc-monitoring
+    #     networks:
+    #         - backend-network
+    #     restart: unless-stopped
 
-    auth-db:
-        container_name: auth-db
-        build: infrastructure/databases/auth-db
-        networks:
-            - backend-network
-        ports:
-            - "5434:5432"
-        env_file:
-            - infrastructure/databases/auth-db/.env_auth_db
-        environment:
-            POSTGRES_PASSWORD_FILE: /run/secrets/auth_db_superuser_password
-        secrets:
-            - auth_db_superuser_password
-            - auth_db_admin_password
-            - auth_db_app_password
-        volumes:
-            - auth_db:/var/lib/postgresql
-        restart: unless-stopped
+    # frontend:
+    #     container_name: frontend
+    #     build: infrastructure/nginx
+    #     ports:
+    #         - "443:443"
+    #     networks:
+    #         - frontend-network
+    #     restart: unless-stopped
+
+    # auth-db:
+    #     container_name: auth-db
+    #     build: infrastructure/databases/auth-db
+    #     networks:
+    #         - backend-network
+    #     env_file:
+    #       - infrastructure/databases/auth-db/.env_auth_db
+    #     environment:
+    #       POSTGRES_PASSWORD_FILE: /run/secrets/auth_db_superuser_password
+    #     secrets:
+    #       - auth_db_superuser_password
+    #       - auth_db_admin_password
+    #       - auth_db_app_password
+    #     volumes:
+    #       - auth_db:/var/lib/postgresql
+    #     restart: unless-stopped
 
     user-db:
         container_name: user-db
         build: infrastructure/databases/user-db
         networks:
             - backend-network
-        ports:
-            - "5433:5432"
         env_file:
             - infrastructure/databases/user-db/.env_user_db
 
@@ -110,120 +111,114 @@ services:
             - user_db:/var/lib/postgresql
         restart: unless-stopped
 
-    interview-store-db:
-        container_name: interview-store-db
-        build: infrastructure/databases/interview-store-db
-        networks:
-            - backend-network
-        ports:
-            - "5432:5432"
-        env_file:
-            - infrastructure/databases/interview-store-db/.env_interview_store_db
-        environment:
-            POSTGRES_PASSWORD_FILE: /run/secrets/interview_store_db_superuser_password
-        secrets:
-            - interview_store_db_superuser_password
-            - interview_store_db_admin_password
-            - interview_store_db_app_password
-        volumes:
-            - interview_store_db:/var/lib/postgresql
-        restart: unless-stopped
+    # interview-store-db:
+    #     container_name: interview-store-db
+    #     build: infrastructure/databases/interview-store-db
+    #     networks:
+    #         - backend-network
+    #     env_file:
+    #       - infrastructure/databases/interview-store-db/.env_interview_store_db
+    #     environment:
+    #       POSTGRES_PASSWORD_FILE: /run/secrets/interview_store_db_superuser_password
+    #     secrets:
+    #       - interview_store_db_superuser_password
+    #       - interview_store_db_admin_password
+    #       - interview_store_db_app_password
+    #     volumes:
+    #       - interview_store_db:/var/lib/postgresql
+    #     restart: unless-stopped
 
-    grading-db:
-        container_name: grading-db
-        build: infrastructure/databases/grading-db
-        env_file:
-            - infrastructure/databases/grading-db/.env_grading_db
-        networks:
-            - backend-network
-        secrets:
-            - grading_db_password
-        volumes:
-            - grading_db:/var/lib/postgresql
-        restart: unless-stopped
+    # grading-db:
+    #     container_name: grading-db
+    #     build: infrastructure/databases/grading-db
+    #     env_file:
+    #         - infrastructure/databases/grading-db/.env_grading_db
+    #     networks:
+    #         - backend-network
+    #     secrets:
+    #         - grading_db_password
+    #     volumes:
+    #       - grading_db:/var/lib/postgresql
+    #     restart: unless-stopped
 
-    serialization-db:
-        container_name: serialization-db
-        build: infrastructure/databases/serialization-db
-        env_file:
-            - infrastructure/databases/serialization-db/.env_serialization_db
-        volumes:
-            - serialization_db:/var/lib/postgresql
-        secrets:
-            - serialization_db_password
-        networks:
-            - backend-network
-        restart: unless-stopped
+    # serialization-db:
+    #     container_name: serialization-db
+    #     build: infrastructure/databases/serialization-db
+    #     env_file:
+    #         - infrastructure/databases/serialization-db/.env_serialization_db
+    #     volumes:
+    #       - serialization_db:/var/lib/postgresql
+    #     secrets:
+    #         - serialization_db_password
+    #     networks:
+    #         - backend-network
+    #     restart: unless-stopped
 
-    rabbitmq:
-        container_name: rabbitmq
-        build: infrastructure/rabbitmq
-        networks:
-            - backend-network
-        restart: unless-stopped
+    # rabbitmq:
+    #     container_name: rabbitmq
+    #     build: infrastructure/rabbitmq
+    #     networks:
+    #         - backend-network
+    #     restart: unless-stopped
 
-    vault-certgen:
-        container_name: vault_certgen
-        image: alpine:3.20
-        entrypoint: ["/bin/sh", "-lc"]
-        command: ["sh /certgen.sh"]
-        environment:
-            VAULT_UID: "100"
-            VAULT_GID: "1000"
-        volumes:
-            - vault_tls:/tls
-            - ./infrastructure/vault/tools/certgen.sh:/certgen.sh:ro
-        networks:
-            - backend-network
-        restart: "no"
+    # vault-certgen:
+    #   container_name: vault_certgen
+    #   image: alpine:3.20
+    #   entrypoint: ["/bin/sh", "-lc"]
+    #   command: ["sh /certgen.sh"]
+    #   environment:
+    #     VAULT_UID: "100"
+    #     VAULT_GID: "1000"
+    #   volumes: 
+    #       - vault_tls:/tls
+    #       - ./infrastructure/vault/tools/certgen.sh:/certgen.sh:ro
+    #   networks:
+    #       - backend-network
+    #   restart: "no"
 
-    vault:
-        container_name: vault
-        build: infrastructure/vault
-        entrypoint: ["/bin/sh", "-lc"]
-        command: ["sh /vault/tools/wait_tls.sh"]
-        networks:
-            - backend-network
-        ports:
-            - "127.0.0.1:8200:8200"
-        volumes:
-            - vault_data:/vault/file
-            - vault_tls:/vault/tls:ro
-        depends_on:
-            - vault-certgen
-        restart: unless-stopped
+    # vault:
+    #     container_name: vault
+    #     build: infrastructure/vault
+    #     entrypoint: ["/bin/sh", "-lc"]
+    #     command: ["sh /vault/tools/wait_tls.sh"]
+    #     networks:
+    #       - backend-network
+    #     ports:
+    #       - "127.0.0.1:8200:8200"
+    #     volumes:
+    #       - vault_data:/vault/file
+    #       - vault_tls:/vault/tls:ro
+    #     depends_on: 
+    #       - vault-certgen
+    #     restart: unless-stopped
 
-        healthcheck:
-            test:
-                [
-                    "CMD-SHELL",
-                    "export VAULT_ADDR=https://127.0.0.1:8200 VAULT_CACERT=/vault/tls/ca.crt; vault status -format=json | jq -e '.initialized==true and .sealed==false' >/dev/null",
-                ]
-            interval: 10s
-            timeout: 5s
-            retries: 5
+    #     healthcheck:
+    #       test: ["CMD-SHELL", "export VAULT_ADDR=https://127.0.0.1:8200 VAULT_CACERT=/vault/tls/ca.crt; vault status -format=json | jq -e '.initialized==true and .sealed==false' >/dev/null"]
+    #       interval: 10s
+    #       timeout: 5s
+    #       retries: 5
 
-    vault-bootstrap:
-        container_name: vault-bootstrap
-        image: hashicorp/vault:2.0.0
-        entrypoint: ["/bin/sh", "-lc"]
-        command: ["sh /bootstrap/tools/bootstrap.sh"]
-        environment:
-            VAULT_ADDR: "https://vault:8200"
-            VAULT_CACERT: "/vault/tls/ca.crt"
-        volumes:
-            - vault_tls:/vault/tls:ro
-            - vault_bootstrap_secrets:/bootstrap/secrets
-            - ./infrastructure/secrets/vault:/bootstrap/creds-out
-            - ./infrastructure/vault/tools:/bootstrap/tools:ro
-            - ./infrastructure/vault/tools/policies:/bootstrap/policies:ro
-        networks:
-            - backend-network
-        user: "0:0"
-        depends_on:
-            - vault
-            - vault-certgen
-        restart: "no"
+    # vault-bootstrap:
+    #     container_name: vault-bootstrap
+    #     image: hashicorp/vault:2.0.0
+    #     entrypoint: ["/bin/sh", "-lc"]
+    #     command: ["sh /bootstrap/tools/bootstrap.sh"]
+    #     environment:
+    #         VAULT_ADDR: "https://vault:8200"
+    #         VAULT_CACERT: "/vault/tls/ca.crt"
+    #     volumes:
+    #         - vault_tls:/vault/tls:ro
+    #         - vault_bootstrap_secrets:/bootstrap/secrets
+    #         - ./infrastructure/secrets/vault:/bootstrap/creds-out
+    #         - ./infrastructure/vault/tools:/bootstrap/tools:ro
+    #         - ./infrastructure/vault/tools/policies:/bootstrap/policies:ro
+    #     networks:
+    #         - backend-network
+    #     user: "0:0"
+    #     depends_on:
+    #         - vault
+    #         - vault-certgen
+    #     restart: "no"
 
 secrets:
     auth_db_superuser_password:

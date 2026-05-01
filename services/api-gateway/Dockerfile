@@ -11,4 +11,6 @@ COPY . .
 
 EXPOSE 3000
 
-CMD ["node", "api-gateway.ts"]
+RUN npm run build
+
+CMD ["npm", "run", "start"]
