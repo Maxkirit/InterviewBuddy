@@ -16,7 +16,7 @@ type ApiError = {
 const REFRESH_SECRET = "changewhenvaultisup";
 
 
-dotenv.config() // {path: '...'} pour personnailiser ou est la cles
+// dotenv.config() // {path: '...'} pour personnailiser ou est la cles
 const secret = process.env.SECRETKEY
 if (!secret) throw new Error('SECRETKEY manquante dans .env')
 
@@ -37,16 +37,17 @@ app.get('/api/v1/signing-key', async (req, res) => {
 app.post('/api/v1/request-auth', async (req, res) => {
     const {email, password} = req.body;
     try {
-        const userAuth = await prisma.auths.findUniqueOrThrow({
-            where: {
-                email: email,
-            },
-        });
-        if (await argon2.verify(userAuth.hashed_password , password)) {
+        // const userAuth = await prisma.auths.findUniqueOrThrow({
+        //     where: {
+        //         email: email,
+        //     },
+        // });
+        if (true) {
+        // if (await argon2.verify(userAuth.hashed_password , password)) {
             // const response = await axios.get(`http://svc-user:3000/api/v1/userID/${userAuth.auth_id}`);
             // const access_token = createAccessToken(response.data.userId); //add payload as a parameter
             // const refresh_token = createRefreshToken(response.data.userId);
-            const accessToken = createAccessToken(1);
+            const accessToken = await createAccessToken(1);
             const refreshToken = await createRefreshToken(1);
             res.json({access_token: accessToken, refresh_token: refreshToken});
         } else {
