@@ -92,7 +92,8 @@ CREATE TABLE IF NOT EXISTS $TABLE_USER_ROLES (
     role_id         INT             REFERENCES $TABLE_ROLES(role_id),
     assigned_date   TIMESTAMPTZ     DEFAULT NOW(),
 	created_at		TIMESTAMPTZ		NOT NULL DEFAULT NOW(),
-	updated_at		TIMESTAMPTZ		NOT NULL DEFAULT NOW()
+	updated_at		TIMESTAMPTZ		NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (user_id, role_id)
 );
 
 CREATE TABLE IF NOT EXISTS $TABLE_PERMISSIONS (
@@ -108,7 +109,7 @@ CREATE TABLE IF NOT EXISTS $TABLE_ROLE_PERMISSIONS (
     is_active       BOOLEAN         DEFAULT TRUE,
     created_at		TIMESTAMPTZ		NOT NULL DEFAULT NOW(),
 	updated_at		TIMESTAMPTZ		NOT NULL DEFAULT NOW(),
-    UNIQUE (role_id, permission_id)
+    PRIMARY KEY (role_id, permission_id)
 );
 
 INSERT INTO $TABLE_ROLES (name)
