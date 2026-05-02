@@ -7,32 +7,32 @@ services:
             - backend-network
         restart: unless-stopped
 
-    # svc-auth:
-    #     container_name: svc-auth
-    #     build: services/svc-auth
-    #     networks:
-    #         - backend-network
-    #     # secrets:
-    #     #     - svc_auth_role_id
-    #     #     - svc_auth_secret_id
-    #     restart: unless-stopped
-    #     secrets:
-    #       - auth_db_superuser_password
-    #     depends_on:
-    #       auth-db:
-    #         condition: service_healthy
-
-    svc-user:
-        container_name: svc-user
-        build: services/svc-user
+    svc-auth:
+        container_name: svc-auth
+        build: services/svc-auth
         networks:
             - backend-network
+        # secrets:
+        #     - svc_auth_role_id
+        #     - svc_auth_secret_id
         restart: unless-stopped
         secrets:
-          - user_db_superuser_password
+          - auth_db_superuser_password
         depends_on:
-          user-db:
+          auth-db:
             condition: service_healthy
+
+    # svc-user:
+    #     container_name: svc-user
+    #     build: services/svc-user
+    #     networks:
+    #         - backend-network
+    #     restart: unless-stopped
+    #     secrets:
+    #       - user_db_superuser_password
+    #     depends_on:
+    #       user-db:
+    #         condition: service_healthy
 
     # svc-interview-store:
     #     container_name: svc-interview-store
@@ -76,40 +76,40 @@ services:
     #         - frontend-network
     #     restart: unless-stopped
 
-    # auth-db:
-    #     container_name: auth-db
-    #     build: infrastructure/databases/auth-db
-    #     networks:
-    #         - backend-network
-    #     env_file:
-    #       - infrastructure/databases/auth-db/.env_auth_db
-    #     environment:
-    #       POSTGRES_PASSWORD_FILE: /run/secrets/auth_db_superuser_password
-    #     secrets:
-    #       - auth_db_superuser_password
-    #       - auth_db_admin_password
-    #       - auth_db_app_password
-    #     volumes:
-    #       - auth_db:/var/lib/postgresql
-    #     restart: unless-stopped
-
-    user-db:
-        container_name: user-db
-        build: infrastructure/databases/user-db
+    auth-db:
+        container_name: auth-db
+        build: infrastructure/databases/auth-db
         networks:
             - backend-network
         env_file:
-            - infrastructure/databases/user-db/.env_user_db
-
+          - infrastructure/databases/auth-db/.env_auth_db
         environment:
-            POSTGRES_PASSWORD_FILE: /run/secrets/user_db_superuser_password
+          POSTGRES_PASSWORD_FILE: /run/secrets/auth_db_superuser_password
         secrets:
-            - user_db_superuser_password
-            - user_db_admin_password
-            - user_db_app_password
+          - auth_db_superuser_password
+          - auth_db_admin_password
+          - auth_db_app_password
         volumes:
-            - user_db:/var/lib/postgresql
+          - auth_db:/var/lib/postgresql
         restart: unless-stopped
+
+    # user-db:
+    #     container_name: user-db
+    #     build: infrastructure/databases/user-db
+    #     networks:
+    #         - backend-network
+    #     env_file:
+    #       - infrastructure/databases/user-db/.env_user_db
+        
+    #     environment:
+    #       POSTGRES_PASSWORD_FILE: /run/secrets/user_db_superuser_password
+    #     secrets:
+    #       - user_db_superuser_password
+    #       - user_db_admin_password
+    #       - user_db_app_password
+    #     volumes:
+    #       - user_db:/var/lib/postgresql
+    #     restart: unless-stopped
 
     # interview-store-db:
     #     container_name: interview-store-db
