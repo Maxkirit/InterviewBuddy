@@ -27,4 +27,4 @@ services:
 
 secrets:
   interview_store_db_superuser_password:
-      file: infrastructure/secrets/interview_store_db_superuser_password.txt
+      file: infrastructure/secrets/user_db_superuser_password.txt
