@@ -1,0 +1,12 @@
+FROM node:25-bookworm-slim
+
+WORKDIR /workdir
+
+RUN apt update && apt install -y \
+    git \
+    curl \
+    bash \
+    && rm -rf /var/lib/apt/lists/*
+
+# Default port for Vite dev servers
+EXPOSE 5173
