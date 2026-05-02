@@ -45,11 +45,11 @@ app.post('/api/v1/request-auth', async (req, res) => {
         if (true) {
         // if (await argon2.verify(userAuth.hashed_password , password)) {
             // const response = await axios.get(`http://svc-user:3000/api/v1/userID/${userAuth.auth_id}`);
-            // const access_token = createAccessToken(response.data.userId); //add payload as a parameter
-            // const refresh_token = createRefreshToken(response.data.userId);
+            // const accessToken = createAccessToken(response.data.userId); //add payload as a parameter
+            // const refreshToken = createRefreshToken(response.data.userId);
             const accessToken = await createAccessToken(1);
             const refreshToken = await createRefreshToken(1);
-            res.json({access_token: accessToken, refresh_token: refreshToken});
+            res.json({accessToken: accessToken, refreshToken: refreshToken});
         } else {
             return res.status(401).json({error: "Incorrect email or password"});
         }
@@ -64,11 +64,11 @@ app.post('/api/v1/request-auth', async (req, res) => {
     }
 })
 
-app.post('/api/v1/refresh', async (req, res) => {
+app.post('/api/v1/svc-auth/refresh-token', async (req, res) => {
     try {
-        const oldRefresh = req.body?.refresh_token;
+        const oldRefresh = req.body?.refreshToken;
         if (!oldRefresh) {
-            return res.status(401).json({error: "No refresh token"});
+            return res.status(404).json({error: "No refresh token"});
         }
         let decoded;
         try {
@@ -76,7 +76,7 @@ app.post('/api/v1/refresh', async (req, res) => {
         } catch(error) {
             return res.status(401).json({error: "Invalid refresh token"});
         }
-        const result = await prisma.refresh_tokens.findUnique({
+        const result = await prisma.refreshTokens.findUnique({
             where: {
                 jti: decoded.jti,
             },
@@ -91,10 +91,14 @@ app.post('/api/v1/refresh', async (req, res) => {
             return res.status(401).json({error: "Refresh token expired"});
         }
         const newTokens = await rotateRefreshToken(result.jti, decoded.userId);
-        res.json({refresh_token: newTokens.newRefresh, access_token: newTokens.newAccess});
+        res.json({refreshToken: newTokens.newRefresh, accessToken: newTokens.newAccess, refreshMaxAge: newTokens.refreshMaxAge});
     } catch(error) {
         return res.status(500).json({error: "Internal server error"});
     }
+})
+
+app.post("/api/v1/svc-auth/logout", async (res, req) =>{
+    
 })
 
 app.listen(port, () =>{
