@@ -2,25 +2,24 @@ import "./styles/Auth.css";
 import { useState, useContext, type SubmitEvent } from "react";
 import axios from "axios";
 import { AuthContext } from "./AuthProvider";
-import { useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
 
 export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const authContext = useContext(AuthContext);
-    const navigate = useNavigate();
+
 
     if (authContext?.accessToken != null) {
-        navigate("/profile");
-        return;
+        return <Navigate to="/profile" />;
     }
 
 
     async function handleSubmit(event: SubmitEvent) {
         event.preventDefault();
         try {
-            const result = await axios.post('https://localhost/api/v1/auth/login', {
+            const result = await axios.post('http://localhost:3000/api/v1/auth/login', {
                 email: email,
                 password: password,
             });

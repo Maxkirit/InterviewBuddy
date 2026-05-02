@@ -3,6 +3,7 @@ import axios from 'axios';
 import { string, z } from 'zod';
 import { validateAcccessToken } from './validateToken.js'
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
 
 type ApiError = {
   message: string;
@@ -16,6 +17,11 @@ const Login = z.object({
 
 const app = express();
 const port = 3000;
+
+app.use(cors({
+    origin: 'http://localhost:5173',
+    credentials: true,
+}));
 
 // Middleware to parse request body into json
 app.use(express.json());

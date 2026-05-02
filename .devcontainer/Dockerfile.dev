@@ -10,3 +10,6 @@ RUN apt update && apt install -y \
 
 # Default port for NodeJS Express servers
 EXPOSE 3000
+
+# Default port for Vite dev servers
+EXPOSE 5173

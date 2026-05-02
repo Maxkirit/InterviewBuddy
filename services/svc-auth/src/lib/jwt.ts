@@ -1,10 +1,10 @@
-import jwt from 'jsonwebtoken';
-import { randomBytes } from 'node:crypto';
+import jwt from "jsonwebtoken";
+import { randomBytes } from "node:crypto";
 import { prisma } from "./prisma.js";
 
 const ACCESS_SECRET = "changewhenvaultisup";
 const REFRESH_SECRET = "changewhenvaultisup";
-const REFRESH_MAX_AGE = 604800 //7 days in seconds === 604800
+const REFRESH_MAX_AGE = 604800; //7 days in seconds === 604800
 
 // will take permissions and userId as a parameter
 export async function createAccessToken(userId: number) {
@@ -32,19 +32,32 @@ export async function createAccessToken(userId: number) {
             },
         },
     });
-    const perms = userPerms.roles.role_permissions.map(rp => rp.permissions ? [rp.permissions.name]: []);
-    const access_token = jwt.sign({userId: userId, permissions: perms}, ACCESS_SECRET, {expiresIn: "10m"});
+    if (!userPerms) {
+        return;
+    }
+    const perms = userPerms.roles.role_permissions.flatMap((rp) =>
+        rp.permissions ? [rp.permissions.name] : [],
+    );
+    const access_token = jwt.sign(
+        { userId: userId, permissions: perms },
+        ACCESS_SECRET,
+        { expiresIn: "10m" },
+    );
     return access_token;
 }
 
 function createJti() {
     //shouldn't this be unique ????
-    return randomBytes(16).toString('hex');
+    return randomBytes(16).toString("hex");
 }
 
 export async function createRefreshToken(userId: number) {
     const jti = createJti();
-    const refresh_token = jwt.sign({userId: userId, jti: jti}, REFRESH_SECRET, {expiresIn: "7d"}); //still possible to have a non unique key
+    const refresh_token = jwt.sign(
+        { userId: userId, jti: jti },
+        REFRESH_SECRET,
+        { expiresIn: "7d" },
+    ); //still possible to have a non unique key
     const refresh = await prisma.refresh_tokens.create({
         data: {
             token: refresh_token,
@@ -65,5 +78,9 @@ export async function rotateRefreshToken(oldJti: string, userId: number) {
     });
     const newRefresh = await createRefreshToken(userId);
     const newAccess = createAccessToken(userId);
-    return {newRefresh: newRefresh, newAccess: newAccess, refreshMaxAge: REFRESH_MAX_AGE};
+    return {
+        newRefresh: newRefresh,
+        newAccess: newAccess,
+        refreshMaxAge: REFRESH_MAX_AGE,
+    };
 }
