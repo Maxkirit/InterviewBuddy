@@ -76,7 +76,7 @@ app.post('/api/v1/svc-auth/refresh-token', async (req, res) => {
         } catch(error) {
             return res.status(401).json({error: "Invalid refresh token"});
         }
-        const result = await prisma.refreshTokens.findUnique({
+        const result = await prisma.refresh_tokens.findUnique({
             where: {
                 jti: decoded.jti,
             },
@@ -97,8 +97,35 @@ app.post('/api/v1/svc-auth/refresh-token', async (req, res) => {
     }
 })
 
-app.post("/api/v1/svc-auth/logout", async (res, req) =>{
-    
+app.post("/api/v1/svc-auth/revoke-token", async (req, res) =>{
+    const oldRefreshToken = req.body?.refreshToken;
+    if (!oldRefreshToken) {
+        return res.status(404).json({error: "No refresh token"});
+    }
+    let decoded;
+    try {
+        decoded = jwt.verify(oldRefreshToken, REFRESH_SECRET, {ignoreExpiration: true}) as jwt.JwtPayload;
+    } catch(error) {
+        return res.status(401).json({error: "Invalid refresh token"});
+    }
+    const result = await prisma.refresh_tokens.findUnique({
+        where: {
+            jti: decoded.jti,
+        },
+    });
+    if (!result) {
+        return res.status(401).json({error: "Refresh token not found"});
+    }
+    const revoke = await prisma.refresh_token.update({
+        where: {
+            jti: decoded.jti,
+        },
+        data: {
+            updated_at: new Date(),
+            revoked_at: new Date(),
+        },
+    });
+    return res.status(200).json({message: "refresh token revoked"});
 })
 
 app.listen(port, () =>{

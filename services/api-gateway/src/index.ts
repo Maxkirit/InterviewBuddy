@@ -67,6 +67,7 @@ app.get("/api/v1/auth/refresh", async(req, res) => {
     }
 })
 
+//close SSE connections, propagate logout state after refresh token validation
 app.get("/api/v1/auth/logout", async(req, res) => {
     // use expired refresh token for identity. That's why we should only send a maxAge == -1 AFTER logout or with another refresh token.
     if (Object.keys(req.cookies).length === 0 || !req.cookies['refreshToken']){ 
@@ -74,12 +75,12 @@ app.get("/api/v1/auth/logout", async(req, res) => {
     }
     const refreshToken = req.cookies['refreshToken'];
     try{
-        const response = await axios.post("http://svc-auth:3000/api/v1/svc-auth/logout", {
+        const response = await axios.post("http://svc-auth:3000/api/v1/svc-auth/revoke-token", {
             refreshToken: refreshToken,
         });
+        //post message to RabbitMQ
         res.cookie("refreshToken", refreshToken, {httpOnly: true, secure: true, sameSite: "strict", maxAge: -1});
-        res.json({message: 'Logout successful'});
-        return res.status(200);
+        return res.status(200).json({message: 'Logout successful'});
     } catch (error) {
         if (axios.isAxiosError<ApiError>(error) && error.response?.status){
             return res.status(error.response.status).json({error: error.response.data.message});
