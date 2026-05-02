@@ -1,6 +1,8 @@
 import express from 'express';
 import axios from 'axios';
 import { z } from 'zod';
+import { validateAcccessToken } from './validateToken.js'
+import cookieParser from 'cookie-parser';
 
 type ApiError = {
   message: string;
@@ -17,6 +19,8 @@ const port = 3000;
 
 // Middleware to parse request body into json
 app.use(express.json())
+app.use(cookieParser());
+
 
 app.post('/api/v1/auth/login', async (req, res) => {
     const result = Login.safeParse(req.body);
@@ -38,6 +42,10 @@ app.post('/api/v1/auth/login', async (req, res) => {
         }
     }
 })
+
+// signup before validateAcccessToken
+app.use(validateAcccessToken);
+// other routes after (needs verification) 
 
 app.listen(port, () => {
     console.log(`Listening on port ${port}`);
