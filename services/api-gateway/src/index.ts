@@ -56,8 +56,7 @@ app.get("/api/v1/auth/refresh", async(req, res) => {
             refreshToken: oldRefreshToken,
         });
         res.json({accessToken: result.data.accessToken, message: 'Refresh successful'});
-        res.cookie("refreshToken", result.data.refreshToken, {httpOnly: true, secure:  true, sameSite: "strict", maxAge: result.data.refreshMaxAge});
-        return res.cookie("refreshToken", oldRefreshToken, {httpOnly: true, secure:  true, sameSite: "strict", maxAge: -1}); //invalidates old token
+        return res.cookie("refreshToken", result.data.refreshToken, {httpOnly: true, secure:  true, sameSite: "strict", maxAge: result.data.refreshMaxAge});
     } catch (error){
         if (axios.isAxiosError<ApiError>(error) && error.response?.status){
             return res.status(error.response.status).json({error: error.response.data.message});
@@ -75,7 +74,7 @@ app.get("/api/v1/auth/logout", async(req, res) => {
     }
     const refreshToken = req.cookies['refreshToken'];
     try{
-        const response = await axios.post("http://svc-auth:3000/api/v1/svc-auth/revoke-token", {
+        const response = await axios.post("http://svc-auth:3000/api/v1/svc-auth/revoke-token", { //returns userId
             refreshToken: refreshToken,
         });
         //post message to RabbitMQ

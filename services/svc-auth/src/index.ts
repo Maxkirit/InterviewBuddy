@@ -116,7 +116,7 @@ app.post("/api/v1/svc-auth/revoke-token", async (req, res) =>{
     if (!result) {
         return res.status(401).json({error: "Refresh token not found"});
     }
-    const revoke = await prisma.refresh_token.update({
+    const revoke = await prisma.refresh_tokens.update({
         where: {
             jti: decoded.jti,
         },
@@ -125,7 +125,7 @@ app.post("/api/v1/svc-auth/revoke-token", async (req, res) =>{
             revoked_at: new Date(),
         },
     });
-    return res.status(200).json({message: "refresh token revoked"});
+    return res.status(200).json({message: "refresh token revoked", userId: decoded.userId});
 })
 
 app.listen(port, () =>{

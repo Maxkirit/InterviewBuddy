@@ -11,7 +11,7 @@ async function getRefreshData(old_refresh_token: string) {
 	return res.data;
 }
 
-export async function validateAcccessToken(req, res, next) {
+export async function validateAcccessToken(req:any, res:any, next:any) {
 	const authHeader = req.headers.authorization;
 	if (!authHeader)
         return res.status(401).json({error: "Missing header"});
