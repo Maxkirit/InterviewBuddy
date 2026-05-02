@@ -1,6 +1,7 @@
 import express from 'express';
 import axios from 'axios';
 import { string, z } from 'zod';
+import { validateAcccessToken } from './validateToken.js'
 import cookieParser from 'cookie-parser';
 
 type ApiError = {
@@ -87,6 +88,9 @@ app.get("/api/v1/auth/logout", async(req, res) => {
         } 
     }
 })
+// signup before validateAcccessToken
+app.use(validateAcccessToken);
+// other routes after (needs verification) 
 
 app.listen(port, () => {
     console.log(`Listening on port ${port}`);
