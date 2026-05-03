@@ -37,13 +37,12 @@ app.get('/api/v1/signing-key', async (req, res) => {
 app.post('/api/v1/request-auth', async (req, res) => {
     const {email, password} = req.body;
     try {
-        // const userAuth = await prisma.auths.findUniqueOrThrow({
-        //     where: {
-        //         email: email,
-        //     },
-        // });
-        if (true) {
-        // if (await argon2.verify(userAuth.hashed_password , password)) {
+        const userAuth = await prisma.auths.findUniqueOrThrow({
+            where: {
+                email: email,
+            },
+        });
+        if (await argon2.verify(userAuth.hashed_password , password)) {
             // const response = await axios.get(`http://svc-user:3000/api/v1/userID/${userAuth.auth_id}`);
             // const accessToken = createAccessToken(response.data.userId); //add payload as a parameter
             // const refreshToken = createRefreshToken(response.data.userId);
