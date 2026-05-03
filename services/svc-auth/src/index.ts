@@ -108,15 +108,8 @@ app.post("/api/v1/svc-auth/revoke-token", async (req, res) =>{
     } catch(error) {
         return res.status(401).json({error: "Invalid refresh token"});
     }
-    const result = await prisma.refresh_tokens.findUnique({
-        where: {
-            jti: decoded.jti,
-        },
-    });
-    if (!result) {
-        return res.status(401).json({error: "Refresh token not found"});
-    }
-    const revoke = await prisma.refresh_tokens.update({
+try {
+        const revoke = await prisma.refresh_tokens.update({
         where: {
             jti: decoded.jti,
         },
@@ -125,6 +118,9 @@ app.post("/api/v1/svc-auth/revoke-token", async (req, res) =>{
             revoked_at: new Date(),
         },
     });
+    } catch (error) {
+        return res.status(404).json({error: "Refresh Token non existent in database"});
+    }
     return res.status(200).json({message: "refresh token revoked", userId: decoded.userId});
 })
 
