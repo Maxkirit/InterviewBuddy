@@ -28,7 +28,7 @@ app.post('/api/v1/auth/login', async (req, res) => {
         return res.status(400).json({error: "Bad request"});
     }
     try {
-        const response = await axios.post("http://svc-auth:3000/api/v1/request-auth", {
+        const response = await axios.post("http://svc-auth:3000/auth/auth-request", {
             email: result.data.email,
             password: result.data.password,
         })
@@ -52,7 +52,7 @@ app.get("/api/v1/auth/refresh", async(req, res) => {
     }
     const oldRefreshToken = req.cookies['refreshToken']; //store so we can send back with max_age==-1 to invalidate old ones in browser
     try {
-        const result = await axios.post("http://svc-auth:3000/api/v1/svc-auth/refresh-token", {
+        const result = await axios.post("http://svc-auth:3000/auth/refresh-token", {
             refreshToken: oldRefreshToken,
         });
         res.json({accessToken: result.data.accessToken, message: 'Refresh successful'});
@@ -74,7 +74,7 @@ app.get("/api/v1/auth/logout", async(req, res) => {
     }
     const refreshToken = req.cookies['refreshToken'];
     try{
-        const response = await axios.post("http://svc-auth:3000/api/v1/svc-auth/revoke-token", { //returns userId
+        const response = await axios.patch("http://svc-auth:3000/auth/refresh-token", { //returns userId
             refreshToken: refreshToken,
         });
         //post message to RabbitMQ
@@ -94,13 +94,20 @@ app.post("/api/v1/auth/registration", async(req, res) => {
     if (Object.keys(req.body).length == 0 || !req.body['email'] || !req.body['password'] || !req.body['name'] || !req.body['surname']){
         return res.status(400).json({error: 'Missing signup info'});
     }
+    //password and email validation logic here. only utf-8, max length for password for the hashing not to crash, password max length 1024
     try {
-        const response = await axios.post("http://svc-auth:3000/api/v1/svc-auth/create-user", {
+        //auth will call svc-user to create user and return userid baked in access and refresh token
+        //auth then creates access token and returns it here
+        const response = await axios.post("http://svc-auth:3000/auth/user", {
             email: req.body['email'],
             password: req.body['password'],
             name: req.body['name'],
             surname: req.body['surname'],
+            userType: req.body['user_type'], //'recruiter' or 'candidate'
         });
+        res.cookie('refreshToken', response.data.refreshToken, {httpOnly: true, secure: true, sameSite: 'strict', maxAge: response.data.refreshMaxAge }); 
+        //return 201 to client and client queries updateProfile()
+        return res.status(201).json({accessToken: response.data.accessToken, message: "User created"});
     } catch (error) {
         if (axios.isAxiosError<ApiError>(error) && error.response?.status){
             if (error.response.status === 409){

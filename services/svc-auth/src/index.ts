@@ -25,7 +25,7 @@ const port = 3000;
 
 app.use(express.json())
 
-app.get('/api/v1/signing-key', async (req, res) => {
+app.get('/auth/signing-key', async (req, res) => {
   const publicKeyPem = createPublicKey(secret).export({ type: 'spki', format: 'pem' })
   const publicKey = await importSPKI(publicKeyPem, 'RS256')           // ← extrait la clé publique en PEM
   const jwk = await exportJWK(publicKey);
@@ -34,7 +34,7 @@ app.get('/api/v1/signing-key', async (req, res) => {
 //    kid: 'svc-auth-key-1'    ← identifiant unique de la clé
 })
 
-app.post('/api/v1/request-auth', async (req, res) => {
+app.post('/auth/auth-request', async (req, res) => {
     const {email, password} = req.body;
     try {
         // const userAuth = await prisma.auths.findUniqueOrThrow({
@@ -54,6 +54,7 @@ app.post('/api/v1/request-auth', async (req, res) => {
             return res.status(401).json({error: "Incorrect email or password"});
         }
     } catch(error) {
+        //increment failed login
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
             return res.status(401).json({error: "Incorrect email or password"});
         } else if (axios.isAxiosError<ApiError>(error) && error.response?.status) {
@@ -64,7 +65,7 @@ app.post('/api/v1/request-auth', async (req, res) => {
     }
 })
 
-app.post('/api/v1/svc-auth/refresh-token', async (req, res) => {
+app.post('/auth/refresh-token', async (req, res) => {
     try {
         const oldRefresh = req.body?.refreshToken;
         if (!oldRefresh) {
@@ -97,7 +98,7 @@ app.post('/api/v1/svc-auth/refresh-token', async (req, res) => {
     }
 })
 
-app.post("/api/v1/svc-auth/revoke-token", async (req, res) =>{
+app.patch("/auth/refresh-token", async (req, res) =>{
     const oldRefreshToken = req.body?.refreshToken;
     if (!oldRefreshToken) {
         return res.status(404).json({error: "No refresh token"});
@@ -122,6 +123,31 @@ try {
         return res.status(404).json({error: "Refresh Token non existent in database"});
     }
     return res.status(200).json({message: "refresh token revoked", userId: decoded.userId});
+})
+
+//for hashing not to crash, we should enforce a max password length, only UTF-8 chars
+app.post("/auth/user", async (req, res) => {
+    let user = await prisma.auths.findUnique({
+        where: { email: req.body.email },
+    });
+    if (user === null) {
+        return res.status(409).json({error: "User already exists"});
+    }
+    let hashedPwd;
+    try{
+        hashedPwd = await argon2.hash(req.body.password);
+    } catch (error) {
+        return res.status(400).json({error: 'Hashing failed'});
+    }
+    user =  prisma.auths.create({
+        data: {
+            email: req.body.email,
+            hashed_password: hashedPwd,
+        },
+    });
+    try {
+        const response = await axios.post("http://svc-user:3000/api/v1/svc-user/create-profile")
+    }
 })
 
 app.listen(port, () =>{

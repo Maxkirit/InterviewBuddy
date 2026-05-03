@@ -2,12 +2,12 @@ import jwt, { TokenExpiredError, JsonWebTokenError } from "jsonwebtoken";
 import axios from 'axios';
 
 async function getKey(): Promise<string> {
-	const res = await axios.get("http://svc-auth:3000/api/v1/signing-key");
+	const res = await axios.get("http://svc-auth:3000/auth/signing-key");
 	return res.data.keys[0];
 }
 
 async function getRefreshData(old_refresh_token: string) {
-	const res = await axios.post("http://svc-auth:3000/api/v1/refresh", { refresh_token: old_refresh_token });
+	const res = await axios.post("http://svc-auth:3000/auth/refresh", { refresh_token: old_refresh_token });
 	return res.data;
 }
 
