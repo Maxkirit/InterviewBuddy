@@ -1,0 +1,146 @@
+/* ── Profile page (edit + view) ── */
+.profile-layout {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 40px;
+    align-items: start;
+}
+
+.profile-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.profile-avatar-wrap {
+    position: relative;
+    width: 100px;
+    height: 100px;
+}
+
+.profile-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4f6ef7, #7c3aed);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.profile-avatar-edit {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #fff;
+    border: 1px solid #e4e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    cursor: pointer;
+    color: #6b7280;
+    transition:
+        border-color 0.15s,
+        color 0.15s;
+}
+
+.profile-avatar-edit:hover {
+    border-color: #4f6ef7;
+    color: #4f6ef7;
+}
+
+.profile-identity {
+    text-align: center;
+}
+
+.profile-identity .name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1a1d2e;
+}
+
+.profile-identity .meta {
+    font-size: 0.825rem;
+    color: #6b7280;
+    margin-top: 3px;
+}
+
+.profile-right {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.profile-page-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1a1d2e;
+    margin-bottom: 4px;
+}
+
+.profile-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+/* Read-only profile fields (profile-view page) */
+.profile-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.profile-field-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.profile-field-value {
+    font-size: 0.925rem;
+    color: #1a1d2e;
+    line-height: 1.5;
+}
+
+.profile-field-value a {
+    color: #4f6ef7;
+    text-decoration: none;
+}
+
+.profile-field-value a:hover {
+    text-decoration: underline;
+}
+
+.profile-field-value.bio {
+    color: #374151;
+    line-height: 1.65;
+}
+
+.profile-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.profile-save {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 4px;
+}
+
+.profile-save .btn-primary {
+    width: auto;
+    padding: 10px 28px;
+    margin-top: 0;
+}

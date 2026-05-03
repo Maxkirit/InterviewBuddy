@@ -1,0 +1,134 @@
+/* ── Interview list (recruiter-interviews, candidate-interviews, admin-interviews) ── */
+.interview-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.interview-entry {
+    background: #fff;
+    border: 1px solid #e4e8f0;
+    border-radius: 14px;
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.interview-entry-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex: 0 0 240px;
+}
+
+.interview-entry-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.interview-entry-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #1a1d2e;
+}
+
+.interview-entry-pos {
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+.interview-entry-question {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    margin-top: 1px;
+}
+
+.interview-entry-due {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    white-space: nowrap;
+}
+
+.interview-entry-due.overdue {
+    color: #ef4444;
+    font-weight: 600;
+}
+
+.interview-entry-right {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    justify-content: flex-end;
+}
+
+.interview-entry-right--stacked {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+}
+
+.interview-entry-right-top {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* ── Mini report preview (completed rows) ── */
+.interview-mini-report {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.interview-mini-score {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #4f6ef7;
+    min-width: 44px;
+    text-align: center;
+}
+
+.interview-mini-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 180px;
+}
+
+.mini-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.7rem;
+    color: #6b7280;
+}
+
+.mini-bar-label {
+    width: 80px;
+    flex-shrink: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mini-bar-wrap {
+    flex: 1;
+    height: 4px;
+    background: #f0f3ff;
+    border-radius: 2px;
+}
+
+.mini-bar {
+    height: 100%;
+    background: #4f6ef7;
+    border-radius: 2px;
+}
+
+.mini-bar-score {
+    width: 24px;
+    text-align: right;
+    flex-shrink: 0;
+}
