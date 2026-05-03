@@ -8,17 +8,22 @@ set -eu
 apk add --no-cache curl jq >/dev/null
 
 # Init material: persistent, NOT on repo/host
-SECRETS_DIR="/bootstrap/secrets"
-INIT_JSON="$SECRETS_DIR/vault-init.json"
+VAULT_INIT_DIR="/vault/bootstrap/vault_init"
+INIT_JSON="$VAULT_INIT_DIR/vault-init.json"
 
-# Per-service creds export (host gitignored)
-CREDS_OUT_DIR="/bootstrap/creds-out"
+# Per-service creds volume 
+CREDS_OUT_DIR="/vault/bootstrap/creds-out"
 
 # Inputs (mounted read-only)
-POLICY_DIR="/bootstrap/policies"
-SERVICES_FILE="/bootstrap/tools/services.txt"
+POLICY_DIR="/vault/bootstrap/policies"
+UPDATES_DIR="/vault/bootstrap/services_updates"
 
-mkdir -p "$SECRETS_DIR" "$CREDS_OUT_DIR"
+mkdir -p "$VAULT_INIT_DIR"
+mkdir -p "$CREDS_OUT_DIR" 
+mkdir -p "$POLICY_DIR" 
+mkdir -p "$UPDATES_DIR"
+
+SERVICES_FILE="$UPDATES_DIR/services.txt"
 
 echo "[bootstrap] VAULT_ADDR=$VAULT_ADDR"
 echo "[bootstrap] waiting for Vault API..."
@@ -106,7 +111,7 @@ while IFS= read -r svc || [ -n "$svc" ]; do
   [ -z "$svc" ] && continue
   echo "$svc" | grep -q '^[#]' && continue
 
-  ROLE="svc-$svc"
+  ROLE="$svc"
   POLICY_NAME="svc-$svc-read"
   POLICY_FILE="$POLICY_DIR/$POLICY_NAME.hcl"
 
@@ -129,8 +134,8 @@ while IFS= read -r svc || [ -n "$svc" ]; do
   SECRET_ID="$(vault write -f -field=secret_id "auth/approle/role/$ROLE/secret-id")"
 
   umask 077
-  echo "$ROLE_ID" > "$CREDS_OUT_DIR/$ROLE.role_id"
-  echo "$SECRET_ID" > "$CREDS_OUT_DIR/$ROLE.secret_id"
+  echo "$ROLE_ID" > "$CREDS_OUT_DIR/$ROLE/$ROLE.role_id"
+  echo "$SECRET_ID" > "$CREDS_OUT_DIR/$ROLE/$ROLE.secret_id"
 
   echo "[bootstrap] wrote $CREDS_OUT_DIR/$ROLE.role_id and $CREDS_OUT_DIR/$ROLE.secret_id"
 done < "$SERVICES_FILE"
