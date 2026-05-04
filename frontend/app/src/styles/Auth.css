@@ -1,0 +1,151 @@
+/* ── Auth pages (login + register) ── */
+.auth-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.auth-card {
+    background: #fff;
+    border: 1px solid #e4e8f0;
+    border-radius: 16px;
+    padding: 40px 44px;
+    width: 100%;
+    max-width: 420px;
+}
+
+.auth-logo {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #4f6ef7;
+    letter-spacing: -0.3px;
+    margin-bottom: 28px;
+    display: block;
+    cursor: default;
+}
+
+.auth-card h1 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #1a1d2e;
+    margin-bottom: 6px;
+}
+
+.auth-subtitle {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-bottom: 28px;
+}
+
+.auth-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 20px 0;
+    color: #d1d5db;
+    font-size: 0.8rem;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #e4e8f0;
+}
+
+.btn-google {
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #e4e8f0;
+    background: #fff;
+    color: #374151;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition:
+        background 0.15s,
+        border-color 0.15s;
+}
+
+.btn-google:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+}
+
+.google-icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 0.825rem;
+    color: #6b7280;
+}
+
+.auth-footer a {
+    color: #4f6ef7;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.auth-footer a:hover {
+    text-decoration: underline;
+}
+
+/* ── Role picker (register page only) ── */
+.role-picker {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 24px;
+}
+
+.role-option {
+    flex: 1;
+    border: 2px solid #e4e8f0;
+    border-radius: 12px;
+    padding: 16px 12px;
+    text-align: center;
+    cursor: pointer;
+    transition:
+        border-color 0.15s,
+        background 0.15s;
+}
+
+.role-option input[type="radio"] {
+    display: none;
+}
+
+.role-option:has(input:checked) {
+    border-color: #4f6ef7;
+    background: #f0f3ff;
+}
+
+.role-icon {
+    font-size: 1.5rem;
+    margin-bottom: 6px;
+}
+
+.role-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #1a1d2e;
+}
+
+.role-desc {
+    display: block;
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-top: 2px;
+}

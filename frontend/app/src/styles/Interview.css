@@ -1,0 +1,125 @@
+/* ── Interview session page ── */
+.interview-page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 32px 24px 60px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.interview-card {
+    background: #fff;
+    border: 1px solid #e4e8f0;
+    border-radius: 14px;
+    padding: 24px 28px;
+}
+
+.interview-card h2 {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #9ca3af;
+    margin-bottom: 10px;
+}
+
+.question-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #1a1d2e;
+    margin-bottom: 8px;
+}
+
+.question-body {
+    font-size: 0.9rem;
+    color: #4b5563;
+    line-height: 1.6;
+}
+
+.requirements-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+.req-group h3 {
+    font-size: 0.825rem;
+    font-weight: 700;
+    color: #374151;
+    margin-bottom: 10px;
+}
+
+.req-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.req-list li {
+    font-size: 0.875rem;
+    color: #4b5563;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.req-list li::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #4f6ef7;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.canvas-wrap {
+    display: flex;
+    gap: 12px;
+}
+
+.canvas-toolbar {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.canvas-tool {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: 1px solid #e4e8f0;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #6b7280;
+    font-size: 0.9rem;
+    transition:
+        border-color 0.15s,
+        color 0.15s,
+        background 0.15s;
+}
+
+.canvas-tool:hover {
+    border-color: #4f6ef7;
+    color: #4f6ef7;
+    background: #f0f3ff;
+}
+
+.canvas-area {
+    flex: 1;
+    min-height: 320px;
+    border: 2px dashed #d1d5db;
+    border-radius: 10px;
+    background: #fafafa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #b0b7c3;
+    font-size: 0.875rem;
+}
