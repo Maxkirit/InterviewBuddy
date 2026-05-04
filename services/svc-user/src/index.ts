@@ -5,8 +5,8 @@ import { prisma } from "./lib/prisma.js";
 const app = express();
 const port = 3000;
 
-app.get('/api/v1/matchUserId', async (req, res) => {
-	const { auth_id } = req.query as { auth_id: string };
+app.get('/api/v1/userid/:auth_id', async (req, res) => {
+	const { auth_id } = req.params as { auth_id: string };
 	try {
 		const user = await prisma.users.findUnique({
 			where: { auth_id: parseInt(auth_id, 10) },
