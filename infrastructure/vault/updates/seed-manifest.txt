@@ -1,0 +1,5 @@
+# FORMAT:
+# <service> <vault_kv_path> <field_name> <docker_secret_name>
+
+vault-test kv/svc/vault-test/demo msg vault_test_msg
+vault-test kv/svc/vault-test/demo foo vault_test_foo
