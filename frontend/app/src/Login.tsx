@@ -1,8 +1,9 @@
 import "./styles/Auth.css";
 import { useState, useContext, type SubmitEvent } from "react";
+import { z, ZodError } from 'zod';
 import axios from "axios";
 import { AuthContext } from "./AuthProvider";
-import { Navigate } from "react-router-dom";
+import { Navigate, Link } from "react-router-dom";
 
 
 export default function Login() {
@@ -10,22 +11,34 @@ export default function Login() {
     const [password, setPassword] = useState("");
     const authContext = useContext(AuthContext);
 
+    const Login = z.object({
+        email: z.email(),
+        password: z.string().min(1),
+    });
 
     if (authContext?.accessToken != null) {
-        return <Navigate to="/profile" />;
+        return <Navigate to="/" />;
     }
-
 
     async function handleSubmit(event: SubmitEvent) {
         event.preventDefault();
         try {
+            const input = {
+                email: email,
+                password: password,
+            }
+            Login.parse(input);
             const result = await axios.post('http://localhost:3000/api/v1/auth/login', {
                 email: email,
                 password: password,
             });
             authContext?.login(result.data.access_token);
         } catch (error) {
-            // add try again banner to form
+            if (error instanceof ZodError) {
+                // error banner
+            } else {
+                // add try again banner to form
+            }
         }
     }
 
@@ -97,7 +110,7 @@ export default function Login() {
                 </button>
 
                 <p className="auth-footer">
-                    Don't have an account? <a href="register.html">Sign up</a>
+                    Don't have an account? <Link to="/register">Sign up</Link>
                 </p>
             </div>
         </div>
