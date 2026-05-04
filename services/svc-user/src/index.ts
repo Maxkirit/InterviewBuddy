@@ -1,16 +1,23 @@
-import { prisma, Prisma } from "./lib/prisma.js";
-import express from 'express';
 
-const express = require('express');
+import express from 'express';
+import { prisma } from "./lib/prisma.js";
+
 const app = express();
 const port = 3000;
 
-// Define a route for GET requests to the root URL
-app.get('/', (req, res) => {
-  res.send('Hello World from Express!');
+app.get('/api/v1/matchUserId', async (req, res) => {
+	const { auth_id } = req.query as { auth_id: string };
+	try {
+		const user = await prisma.users.findUnique({
+			where: { auth_id: parseInt(auth_id, 10) },
+		});
+		if (!user) return res.status(401).json({ error: "not find" });
+		res.json({ user_id: user.user_id });
+	} catch (e) {
+		res.status(500).json({ error: "internal error" });
+	}
 });
 
-// Start the server
 app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
-}); 
+	console.log(`listening on port ${port}`);
+});
