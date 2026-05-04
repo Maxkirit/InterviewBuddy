@@ -48,7 +48,7 @@ app.post('/auth/auth-request', async (req, res) => {
             // const refreshToken = createRefreshToken(response.data.userId);
             const accessToken = await createAccessToken(1);
             const refreshToken = await createRefreshToken(1);
-            res.json({accessToken: accessToken, refreshToken: refreshToken});
+            res.json({accessToken: accessToken, refreshToken: refreshToken.refreshToken, maxAge: refreshToken.maxAge});
         } else {
             return res.status(401).json({error: "Incorrect email or password"});
         }
@@ -124,28 +124,68 @@ try {
     return res.status(200).json({message: "refresh token revoked", userId: decoded.userId});
 })
 
-//for hashing not to crash, we should enforce a max password length, only UTF-8 chars
 app.post("/auth/user", async (req, res) => {
+    //validate request body ?
     let user = await prisma.auths.findUnique({
         where: { email: req.body.email },
     });
-    if (user === null) {
+    if (user !== null) {
         return res.status(409).json({error: "User already exists"});
     }
-    let hashedPwd;
-    try{
-        hashedPwd = await argon2.hash(req.body.password);
-    } catch (error) {
-        return res.status(400).json({error: 'Hashing failed'});
-    }
-    user =  prisma.auths.create({
-        data: {
-            email: req.body.email,
-            hashed_password: hashedPwd,
-        },
-    });
     try {
-        const response = await axios.post("http://svc-user:3000/api/v1/svc-user/create-profile")
+        console.log("creating new user...\nHashing password...\n");
+        const hashedPwd = await argon2.hash(req.body.password);
+        console.log("hashed password...\n");
+        const newUser = await prisma.auths.create({
+            data: {
+                sub: null,
+                email: req.body.email,
+                hashed_password: hashedPwd,
+                created_at: new Date(),
+                updated_at: new Date(),
+            },
+        });
+        console.log("user created in db\n");
+        //will return user_id
+        const response = await axios.post(`http://svc-user:3000/svc-user/profile/${newUser.auth_id}`, {
+            email: req.body.email,
+            name: req.body.name,
+            surname: req.body.surname,
+            role_type: req.body.role_type,
+        });
+        console.log("user created in auth\n");
+        const permission = await prisma.roles.findUniqueOrThrow({
+                where: {name: req.body.role_type},
+            });
+        const registerPermissions = await prisma.user_roles.create({
+            data: {
+                user_id: response.data.userId,
+                role_id: permission.role_id,
+                assigned_date: new Date(),
+                created_at: new Date (),
+                updated_at: new Date(),
+            },
+        });
+        const accessToken = await createAccessToken(response.data.userId);
+        const refreshToken = await createRefreshToken(response.data.userId);
+        return res.status(200).json({accessToken: accessToken,
+                                    refreshToken: refreshToken.refreshToken, 
+                                    maxAge: refreshToken.maxAge,
+                                    message: "User succesfully registered"});
+    } catch (error) {
+        console.log("error path\n");
+        //remove table entry here if error happens after it succeeded?
+        if (error instanceof Error && error.message.includes("Hashing failed")) {
+            return res.status(500).json({error: "Hashing failed"});
+        }
+        if (axios.isAxiosError<ApiError>(error) && error.response?.status) {
+            return res.status(error.response.status).json({error: error.response.data.message});
+        } else if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            if (error.code === 'P2001')
+                return res.status(401).json({error: "Incorrect role type"});
+        } else {
+            return res.status(502).json({error: "Bad gateway"});
+        }
     }
 })
 

@@ -65,7 +65,7 @@ export async function createRefreshToken(userId: number) {
             user_id: userId,
         },
     });
-    return refresh_token;
+    return {refreshToken: refresh_token, maxAge: REFRESH_MAX_AGE};
 }
 
 export async function rotateRefreshToken(oldJti: string, userId: number) {
