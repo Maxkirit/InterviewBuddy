@@ -7,11 +7,24 @@ import jwt from 'jsonwebtoken';
 import {exportJWK, importSPKI} from 'jose'
 import dotenv from 'dotenv'
 import { createPublicKey } from 'crypto'
+import { string, z } from 'zod';
 
 type ApiError = {
   message: string;
   code: number;
 };
+
+const passwordSchema = z.string()
+                        .min(8, {error: "Password too short", abort: true})
+                        .max(128, {error: "Password too long", abort: true})
+                        .refine((password) => /[A-Z]/.test(password), {error: "Missing at least 1 uppercase letter", abort: true})
+                        .refine((password) => /[a-z]/.test(password), {error: "Missing at least 1 lowercase letter", abort: true})
+                        .refine((password) => /[!@#$%^&*()+\-=[\]{};':"\\|,.<>/?~`]/.test(password), {error: "Missing at least 1 special character", abort: true});
+
+const Login = z.object({
+    email: z.email({error: "Wrong email format", abort: true}),
+    password: passwordSchema,
+});
 
 const REFRESH_SECRET = "changewhenvaultisup";
 
@@ -35,6 +48,10 @@ app.get('/auth/signing-key', async (req, res) => {
 })
 
 app.post('/auth/auth-request', async (req, res) => {
+    const result = Login.safeParse(req.body);
+    if (!result.success) {
+        return res.status(400).json({error: result.error});
+    }
     const {email, password} = req.body;
     try {
         const userAuth = await prisma.auths.findUniqueOrThrow({
@@ -125,7 +142,10 @@ try {
 })
 
 app.post("/auth/user", async (req, res) => {
-    //validate request body ?
+    const loginParse = Login.safeParse({email: req.body.email, password: req.body.password}); //email and password validation
+    if (!loginParse.success) {
+        return res.status(400).json({error: loginParse.error});
+    }
     let user = await prisma.auths.findUnique({
         where: { email: req.body.email },
     });
@@ -142,8 +162,6 @@ app.post("/auth/user", async (req, res) => {
                 sub: null,
                 email: req.body.email,
                 hashed_password: hashedPwd,
-                created_at: new Date(),
-                updated_at: new Date(),
             },
         });
         console.log("user created in db\n");
@@ -163,8 +181,6 @@ app.post("/auth/user", async (req, res) => {
                 user_id: response.data.userId,
                 role_id: permission.role_id,
                 assigned_date: new Date(),
-                created_at: new Date (),
-                updated_at: new Date(),
             },
         });
         const accessToken = await createAccessToken(response.data.userId);
