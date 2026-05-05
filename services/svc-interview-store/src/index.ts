@@ -17,17 +17,17 @@ const app = express();
 const port = 3000;
 
 const MockInterviewSchema = z.object({
-    recruiter_id: z.null(),
-    candidate_id: z.int(),
-    question_id: z.int(),
-    job_title: z.null(),
-    due_date: z.null(),
+    recruiter_id: z.null({error: "Expected no recruiter_id"}),
+    candidate_id: z.int().min(1),
+    question_id: z.int().min(1),
+    job_title: z.null({error: "Expected no job_title"}),
+    due_date: z.null({error: "Expected no due_date"}),
 });
 
 const RealInterviewSchema = z.object({
-    recruiter_id: z.int(),
-    candidate_id: z.int(),
-    question_id: z.int(),
+    recruiter_id: z.int().min(1),
+    candidate_id: z.int().min(1),
+    question_id: z.int().min(1),
     job_title: z.string(),
     due_date: z.date(),
 });
@@ -74,7 +74,7 @@ app.post('/interview/real-interview', async (req, res) => {
         res.status(201).json({message: "Interview created successfully"});
     } catch (error) {
         if (axios.isAxiosError<ApiError>(error) && error.response?.status) {
-            return res.status(error.response.status).json({ error: error.message });
+            return res.status(error.response.status).json({ error: "Candidate not a connection" });
         }
         return res.status(502).json({error: "Bad gateway"});
     }
