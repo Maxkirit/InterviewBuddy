@@ -1,14 +1,14 @@
 services:
-    # api-gateway:
-    #     # profiles: ["app"]
-    #     container_name: api-gateway
-    #     build: services/api-gateway
-    #     ports:
-    #         - "3000:3000"
-    #     networks:
-    #         - frontend-network
-    #         - backend-network
-    #     restart: unless-stopped
+    api-gateway:
+        # profiles: ["app"]
+        container_name: api-gateway
+        build: services/api-gateway
+        ports:
+            - "3000:3000"
+        networks:
+            - frontend-network
+            - backend-network
+        restart: unless-stopped
 
     # svc-auth:
     #     container_name: svc-auth
@@ -31,6 +31,8 @@ services:
         networks:
             - backend-network
         restart: unless-stopped
+        environment:
+          DATABASE_URL: "postgresql://superuser:superPassword123@user-db:5432/user_db"
         secrets:
           - user_db_superuser_password
         depends_on:
