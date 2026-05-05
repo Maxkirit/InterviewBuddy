@@ -4,7 +4,8 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm ci --no-audit --no-fund && \
+RUN apt-get update -y && apt-get install -y openssl
+RUN npm install && npm ci --no-audit --no-fund && \
     npm cache clean --force
 
 COPY . .
