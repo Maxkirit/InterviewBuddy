@@ -2,7 +2,20 @@
 import express from 'express';
 import { prisma, Prisma } from "./lib/prisma.js";
 import { role_type } from './generated/prisma/enums.js';
-import { json } from 'node:stream/consumers';
+import { string, z } from 'zod';
+
+const nameSurnameSchema = z.string()
+                        .min(1, {error: "Name or surname field too short", abort: true})
+                        .max(64, {error: "Name or surname too long", abort: true});
+
+const NewUser = z.object({
+    email: z.email({error: "Wrong email format", abort: true}),
+    password: z.string(),
+    name: nameSurnameSchema,
+    surname: nameSurnameSchema,
+    role_type: z.string(),
+})
+
 
 const app = express();
 const port = 3000;
@@ -23,7 +36,9 @@ app.get('/api/v1/matchUserId', async (req, res) => {
 
 app.post('/svc-user/profile/:auth_id', async (req, res) => {
     console.log("in post new user\n");
-    //validate permissions ? technically no access tokens in the request
+    const newUserParse = NewUser.safeParse(req.body)
+    if (!newUserParse.success)
+        return res.status(400).json({error: newUserParse.error})
     try {
         console.log("create new user in db\n");
         const authId = parseInt(req.params.auth_id as string);

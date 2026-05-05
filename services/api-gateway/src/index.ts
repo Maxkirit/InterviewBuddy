@@ -10,30 +10,6 @@ type ApiError = {
   code: number;
 };
 
-const passwordSchema = z.string()
-                        .min(8, {error: "Password too short", abort: true})
-                        .max(128, {error: "Password too long", abort: true})
-                        .refine((password) => /[A-Z]/.test(password), {error: "Missing at least 1 uppercase letter", abort: true})
-                        .refine((password) => /[a-z]/.test(password), {error: "Missing at least 1 lowercase letter", abort: true})
-                        .refine((password) => /[!@#$%^&*()+\-=[\]{};':"\\|,.<>/?~`]/.test(password), {error: "Missing at least 1 special character", abort: true});
-
-const nameSurnameSchema = z.string()
-                        .min(1, {error: "Name or surname field too short", abort: true})
-                        .max(64, {error: "Name or surname too long", abort: true});
-
-const Login = z.object({
-    email: z.email({error: "Wrong email format", abort: true}),
-    password: passwordSchema,
-});
-
-
-const NewUser = z.object({
-    email: z.email({error: "Wrong email format", abort: true}),
-    password: passwordSchema,
-    name: nameSurnameSchema,
-    surname: nameSurnameSchema,
-    role_type: z.string(),
-})
 
 const app = express();
 const port = 3000;
@@ -48,19 +24,14 @@ app.use(express.json());
 // middleware for cookie parsing
 app.use(cookieParser());
 
-app.get('/test', async(req, res) =>{
-    res.status(200).send("it works");
-})
-
 app.post('/api/v1/auth/login', async (req, res) => {
-    const result = Login.safeParse(req.body);
-    if (!result.success) {
-        return res.status(400).json({error: result.error});
+    if (Object.keys(req.body).length == 0 || !req.body['email'] || !req.body['password']){
+        return res.status(400).json({error: 'Missing login info'});
     }
     try {
         const response = await axios.post("http://svc-auth:3000/auth/auth-request", {
-            email: result.data.email,
-            password: result.data.password,
+            email: req.body.email,
+            password: req.body.password,
         })
         res.status(200);
         res.cookie("refreshToken", response.data.refreshToken, {httpOnly: true, secure:  true, sameSite: "strict", maxAge: response.data.max_age}); //validity as cookie header, must be controlled by auth
@@ -78,10 +49,6 @@ app.post('/api/v1/auth/login', async (req, res) => {
 app.post("/api/v1/auth/registration", async(req, res) => {
     if (Object.keys(req.body).length == 0 || !req.body['email'] || !req.body['password'] || !req.body['name'] || !req.body['surname']){
         return res.status(400).json({error: 'Missing signup info'});
-    }
-    const newUser = NewUser.safeParse(req.body); //name, surname, email and password validation
-    if (!newUser.success) {
-        return res.status(400).json({error: newUser.error});
     }
     try {
         //auth will call svc-user to create user and return userid baked in access and refresh token
