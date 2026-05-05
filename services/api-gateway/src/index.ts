@@ -3,6 +3,7 @@ import { validateAcccessToken } from './validateToken.js'
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import authRoute from './router/auth.route.js';
+import userRoute from './router/user.route.js'
 
 type ApiError = {
   message: string;
@@ -26,6 +27,8 @@ app.use('/api/v1/auth',authRoute)
 // signup before validateAcccessToken
 app.use(validateAcccessToken);
 // other routes after (needs verification) 
+
+app.use('api/v1/user', userRoute)
 
 app.listen(port, () => {
     console.log(`Listening on port ${port}`);
