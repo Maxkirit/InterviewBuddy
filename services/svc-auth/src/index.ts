@@ -132,11 +132,12 @@ app.post("/auth/user", async (req, res) => {
     if (user !== null) {
         return res.status(409).json({error: "User already exists"});
     }
+    let newUser;
     try {
         console.log("creating new user...\nHashing password...\n");
         const hashedPwd = await argon2.hash(req.body.password);
         console.log("hashed password...\n");
-        const newUser = await prisma.auths.create({
+        newUser = await prisma.auths.create({
             data: {
                 sub: null,
                 email: req.body.email,
@@ -174,9 +175,18 @@ app.post("/auth/user", async (req, res) => {
                                     message: "User succesfully registered"});
     } catch (error) {
         console.log("error path\n");
-        //remove table entry here if error happens after it succeeded?
         if (error instanceof Error && error.message.includes("Hashing failed")) {
             return res.status(500).json({error: "Hashing failed"});
+        }
+        if (newUser?.auth_id)
+        {
+            try {
+                const deletedUser = await prisma.auths.delete({
+                    where: {auth_id: newUser.auth_id},
+                });
+            } catch (error) {
+                return res.status(500).json({error: "Failed deletion of failed user creation"});
+            }
         }
         if (axios.isAxiosError<ApiError>(error) && error.response?.status) {
             return res.status(error.response.status).json({error: error.response.data.message});
