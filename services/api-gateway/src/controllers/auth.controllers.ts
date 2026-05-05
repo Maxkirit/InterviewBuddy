@@ -1,14 +1,10 @@
 import { Request, Response } from 'express';
 import axios from 'axios';
 import { z } from 'zod';
-
-type ApiError = {
-  message: string;
-  code: number;
-};
+import { ApiError } from '../index.js';
 
 const LoginSchema = z.object({
-  email: z.string().email(),
+  email: z.email(),
   password: z.string().min(1),
 });
 

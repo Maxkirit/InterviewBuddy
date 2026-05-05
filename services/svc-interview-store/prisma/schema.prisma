@@ -12,7 +12,7 @@ model interviews {
   recruiter_id        Int?
   candidate_id        Int
   question_id         Int
-  job_title           String
+  job_title           String?
   unfinished_diagram  Json?            @db.Json
   unfinished_text     String?
   status              interview_status
@@ -49,4 +49,5 @@ enum interview_status {
   scheduled
   past_due_date
   completed
+  mock
 }
