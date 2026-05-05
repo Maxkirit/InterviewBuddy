@@ -32,7 +32,8 @@ app.post('/api/v1/interview', async (req, res) => {
         const status = interview.recruiter_id === null ? "mock" : "scheduled";
         if ((!(req as ReqWithUser).permissions.includes("createMockInterview") && !(req as ReqWithUser).permissions.includes("createRealInterview")) 
             || (!(req as ReqWithUser).permissions.includes("createMockInterview") && status === "mock") 
-            || (!(req as ReqWithUser).permissions.includes("createRealInterview") && status === "scheduled")) {
+            || (!(req as ReqWithUser).permissions.includes("createRealInterview") && status === "scheduled") 
+            || ((req as ReqWithUser).userId != interview.candidate_id && (req as ReqWithUser).userId != interview.recruiter_id)) {
             return res.status(403).json({error: "No permissions for this actions"});
         }
         const result = await prisma.interviews.create({
