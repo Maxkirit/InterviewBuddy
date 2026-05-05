@@ -2,13 +2,13 @@ import { Request, Response } from 'express';
 import axios from 'axios';
 import { z } from 'zod';
 
-type ApiError = {
+export type ApiError = {
   message: string;
   code: number;
 };
 
 const LoginSchema = z.object({
-  email: z.string().email(),
+  email: z.email(),
   password: z.string().min(1),
 });
 
@@ -18,7 +18,7 @@ export const login = async (req: Request, res: Response) => {
     return res.status(400).json({ error: 'Bad request' });
   }
   try {
-    const response = await axios.post('http://svc-auth:3000/api/v1/request-auth', {
+    const response = await axios.post('http://svc-auth:3000/auth/auth-request', {
       email: result.data.email,
       password: result.data.password,
     });
@@ -45,7 +45,7 @@ export const refresh = async (req: Request, res: Response) =>{
 	}
 	const oldRefreshToken = req.cookies['refreshToken']; //store so we can send back with max_age==-1 to invalidate old ones in browser
 	try {
-		const result = await axios.post("http://svc-auth:3000/api/v1/svc-auth/refresh-token", {
+		const result = await axios.post("http://svc-auth:3000/auth/refresh-token", {
 			refreshToken: oldRefreshToken,
 		});
 		res.json({accessToken: result.data.accessToken, message: 'Refresh successful'});
@@ -66,7 +66,7 @@ export const logout = async (req: Request, res: Response) =>{
 	}
 	const refreshToken = req.cookies['refreshToken'];
 	try{
-		const response = await axios.post("http://svc-auth:3000/api/v1/svc-auth/revoke-token", { //returns userId
+		const response = await axios.patch("http://svc-auth:3000/auth/revoke/refresh-token", { //returns userId
 			refreshToken: refreshToken,
 		});
 		//post message to RabbitMQ
@@ -82,15 +82,20 @@ export const logout = async (req: Request, res: Response) =>{
 }
 
 export const registrationFlow = async (req: Request, res: Response) => {
-    if (Object.keys(req.body).length == 0 || !req.body['email'] || !req.body['password'] || !req.body['name'] || !req.body['surname']){
-        return res.status(400).json({error: 'Missing signup info'});
+    const REQUIRED_FIELDS = [
+        'email', 'password', 'name', 'surname', 'role_type'
+    ] as const;
+    const missingFields = REQUIRED_FIELDS.filter(field => !req.body[field]);
+    if (missingFields.length > 0){
+        return res.status(400).json({error: 'Missing fields in request', missing: missingFields});
     }
     try {
-        const response = await axios.post("http://svc-auth:3000/api/v1/svc-auth/create-user", {
+        const response = await axios.post("http://svc-auth:3000/api/v1/auth/user", {
             email: req.body['email'],
             password: req.body['password'],
             name: req.body['name'],
             surname: req.body['surname'],
+            role_type: req.body.role_type,
         });
     } catch (error) {
         if (axios.isAxiosError<ApiError>(error) && error.response?.status){

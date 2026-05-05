@@ -60,7 +60,7 @@ app.post('/auth/auth-request', async (req, res) => {
             },
         });
         if (await argon2.verify(userAuth.hashed_password , password)) {
-            const response = await axios.get(`http://svc-user:3000/api/v1/userid/${userAuth.auth_id}`);
+            const response = await axios.get(`http://svc-user:3000/user/userid/${userAuth.auth_id}`);
             const accessToken = createAccessToken(response.data.user_id);
             const refreshToken = createRefreshToken(response.data.user_id);
             // const accessToken = await createAccessToken(1);
@@ -114,7 +114,7 @@ app.post('/auth/refresh-token', async (req, res) => {
     }
 })
 
-app.patch("/auth/refresh-token", async (req, res) =>{
+app.patch("/auth/revoke/refresh-token", async (req, res) =>{
     const oldRefreshToken = req.body?.refreshToken;
     if (!oldRefreshToken) {
         return res.status(404).json({error: "No refresh token"});
@@ -166,7 +166,7 @@ app.post("/auth/user", async (req, res) => {
         });
         console.log("user created in db\n");
         //will return user_id
-        const response = await axios.post(`http://svc-user:3000/svc-user/profile/${newUser.auth_id}`, {
+        const response = await axios.post(`http://svc-user:3000/user/profile/${newUser.auth_id}`, {
             email: req.body.email,
             name: req.body.name,
             surname: req.body.surname,
