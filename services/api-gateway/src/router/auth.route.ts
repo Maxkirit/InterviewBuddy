@@ -1,10 +1,8 @@
 import { Router } from 'express';
-import { login, refresh, logout } from '../controllers/auth.controllers.js';
+import { login, refresh, logout, registrationFlow } from '../controllers/auth.controllers.js';
 
 const router = Router()
 
 router.post('/login', login)
-router.get('/refresh', refresh)
-//close SSE connections, propagate logout state after refresh token validation
-router.get('/logout', logout)
+router.post('/registration', registrationFlow)
 export default router

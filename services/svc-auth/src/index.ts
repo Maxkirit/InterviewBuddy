@@ -7,11 +7,24 @@ import jwt from 'jsonwebtoken';
 import {exportJWK, importSPKI} from 'jose'
 import dotenv from 'dotenv'
 import { createPublicKey } from 'crypto'
+import { string, z } from 'zod';
 
 type ApiError = {
   message: string;
   code: number;
 };
+
+const passwordSchema = z.string()
+                        .min(8, {error: "Password too short", abort: true})
+                        .max(128, {error: "Password too long", abort: true})
+                        .refine((password) => /[A-Z]/.test(password), {error: "Missing at least 1 uppercase letter", abort: true})
+                        .refine((password) => /[a-z]/.test(password), {error: "Missing at least 1 lowercase letter", abort: true})
+                        .refine((password) => /[!@#$%^&*()+\-=[\]{};':"\\|,.<>/?~`]/.test(password), {error: "Missing at least 1 special character", abort: true});
+
+const Login = z.object({
+    email: z.email({error: "Wrong email format", abort: true}),
+    password: passwordSchema,
+});
 
 const REFRESH_SECRET = "changewhenvaultisup";
 
@@ -25,7 +38,7 @@ const port = 3000;
 
 app.use(express.json())
 
-app.get('/api/v1/signing-key', async (req, res) => {
+app.get('/auth/signing-key', async (req, res) => {
   const publicKeyPem = createPublicKey(secret).export({ type: 'spki', format: 'pem' })
   const publicKey = await importSPKI(publicKeyPem, 'RS256')           // ← extrait la clé publique en PEM
   const jwk = await exportJWK(publicKey);
@@ -34,7 +47,11 @@ app.get('/api/v1/signing-key', async (req, res) => {
 //    kid: 'svc-auth-key-1'    ← identifiant unique de la clé
 })
 
-app.post('/api/v1/request-auth', async (req, res) => {
+app.post('/auth/auth-request', async (req, res) => {
+    const result = Login.safeParse(req.body);
+    if (!result.success) {
+        return res.status(400).json({error: result.error});
+    }
     const {email, password} = req.body;
     try {
         const userAuth = await prisma.auths.findUniqueOrThrow({
@@ -53,6 +70,7 @@ app.post('/api/v1/request-auth', async (req, res) => {
             return res.status(401).json({error: "Incorrect email or password"});
         }
     } catch(error) {
+        //increment failed login
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
             return res.status(401).json({error: "Incorrect email or password"});
         } else if (axios.isAxiosError<ApiError>(error) && error.response?.status) {
@@ -63,7 +81,7 @@ app.post('/api/v1/request-auth', async (req, res) => {
     }
 })
 
-app.post('/api/v1/svc-auth/refresh-token', async (req, res) => {
+app.post('/auth/refresh-token', async (req, res) => {
     try {
         const oldRefresh = req.body?.refreshToken;
         if (!oldRefresh) {
@@ -96,7 +114,7 @@ app.post('/api/v1/svc-auth/refresh-token', async (req, res) => {
     }
 })
 
-app.post("/api/v1/svc-auth/revoke-token", async (req, res) =>{
+app.patch("/auth/refresh-token", async (req, res) =>{
     const oldRefreshToken = req.body?.refreshToken;
     if (!oldRefreshToken) {
         return res.status(404).json({error: "No refresh token"});
@@ -107,15 +125,8 @@ app.post("/api/v1/svc-auth/revoke-token", async (req, res) =>{
     } catch(error) {
         return res.status(401).json({error: "Invalid refresh token"});
     }
-    const result = await prisma.refresh_tokens.findUnique({
-        where: {
-            jti: decoded.jti,
-        },
-    });
-    if (!result) {
-        return res.status(401).json({error: "Refresh token not found"});
-    }
-    const revoke = await prisma.refresh_tokens.update({
+try {
+        const revoke = await prisma.refresh_tokens.update({
         where: {
             jti: decoded.jti,
         },
@@ -124,7 +135,84 @@ app.post("/api/v1/svc-auth/revoke-token", async (req, res) =>{
             revoked_at: new Date(),
         },
     });
+    } catch (error) {
+        return res.status(404).json({error: "Refresh Token non existent in database"});
+    }
     return res.status(200).json({message: "refresh token revoked", userId: decoded.userId});
+})
+
+app.post("/auth/user", async (req, res) => {
+    const loginParse = Login.safeParse({email: req.body.email, password: req.body.password}); //email and password validation
+    if (!loginParse.success) {
+        return res.status(400).json({error: loginParse.error});
+    }
+    let user = await prisma.auths.findUnique({
+        where: { email: req.body.email },
+    });
+    if (user !== null) {
+        return res.status(409).json({error: "User already exists"});
+    }
+    let newUser;
+    try {
+        console.log("creating new user...\nHashing password...\n");
+        const hashedPwd = await argon2.hash(req.body.password);
+        console.log("hashed password...\n");
+        newUser = await prisma.auths.create({
+            data: {
+                sub: null,
+                email: req.body.email,
+                hashed_password: hashedPwd,
+            },
+        });
+        console.log("user created in db\n");
+        //will return user_id
+        const response = await axios.post(`http://svc-user:3000/svc-user/profile/${newUser.auth_id}`, {
+            email: req.body.email,
+            name: req.body.name,
+            surname: req.body.surname,
+            role_type: req.body.role_type,
+        });
+        console.log("user created in auth\n");
+        const permission = await prisma.roles.findUniqueOrThrow({
+                where: {name: req.body.role_type},
+            });
+        const registerPermissions = await prisma.user_roles.create({
+            data: {
+                user_id: response.data.userId,
+                role_id: permission.role_id,
+                assigned_date: new Date(),
+            },
+        });
+        const accessToken = await createAccessToken(response.data.userId);
+        const refreshToken = await createRefreshToken(response.data.userId);
+        return res.status(200).json({accessToken: accessToken,
+                                    refreshToken: refreshToken.refreshToken, 
+                                    maxAge: refreshToken.maxAge,
+                                    message: "User succesfully registered"});
+    } catch (error) {
+        console.log("error path\n");
+        if (error instanceof Error && error.message.includes("Hashing failed")) {
+            return res.status(500).json({error: "Hashing failed"});
+        }
+        if (newUser?.auth_id)
+        {
+            try {
+                const deletedUser = await prisma.auths.delete({
+                    where: {auth_id: newUser.auth_id},
+                });
+            } catch (error) {
+                return res.status(500).json({error: "Failed deletion of failed user creation"});
+            }
+        }
+        if (axios.isAxiosError<ApiError>(error) && error.response?.status) {
+            return res.status(error.response.status).json({error: error.response.data.message});
+        } else if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            if (error.code === 'P2001')
+                return res.status(401).json({error: "Incorrect role type"});
+        } else {
+            return res.status(502).json({error: "Bad gateway"});
+        }
+    }
 })
 
 app.listen(port, () =>{
