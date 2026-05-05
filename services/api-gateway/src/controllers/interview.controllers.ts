@@ -5,7 +5,7 @@ import { ApiError } from '../index.js';
 
 export const createInterview = async (req: Request, res: Response) => {
     try {
-        const result = await axios.post("http://svc-interview-store:3000/api/v1/interview", {
+        const result = await axios.post("http://svc-interview-store:3000/interview/interview", {
             body: req.body,
             userId: (req as ReqWithUser).userId,
             permissions: (req as ReqWithUser).permissions,
