@@ -47,7 +47,8 @@ psql -U postgres -d $DB_NAME <<EOF
 CREATE TYPE interview_status AS ENUM (
     'scheduled',
     'past_due_date',
-    'completed'
+    'completed',
+    'mock'
 );
 
 CREATE TABLE IF NOT EXISTS $TABLE_QUESTIONS (
@@ -65,7 +66,7 @@ CREATE TABLE IF NOT EXISTS $TABLE_INTERVIEWS (
     recruiter_id 		INT,
     candidate_id 		INT				NOT NULL,
     question_id 		INT				REFERENCES $TABLE_QUESTIONS(question_id) NOT NULL,
-    job_title 			TEXT			NOT NULL,
+    job_title 			TEXT,
     unfinished_diagram	JSON,
     unfinished_text		TEXT,
     status				interview_status NOT NULL,

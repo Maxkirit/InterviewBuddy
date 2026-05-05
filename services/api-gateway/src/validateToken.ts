@@ -2,6 +2,11 @@ import jwt, { TokenExpiredError, JsonWebTokenError } from "jsonwebtoken";
 import axios from "axios";
 import { Request, Response, NextFunction } from "express";
 
+export interface ReqWithUser extends Request {
+    userId: number;
+    permissions: string[];
+}
+
 async function getKey(): Promise<string> {
 	const res = await axios.get("http://svc-auth:3000/auth/signing-key");
 	return res.data.keys[0];
@@ -35,7 +40,9 @@ export async function validateAcccessToken(
 
     //checking signature of access_token
     try {
-        req.body.user = jwt.verify(access_token, key); // not sure what is up here
+        const decoded = jwt.verify(access_token, key) as jwt.JwtPayload; // not sure what is up here
+        (req as ReqWithUser).userId = decoded.userId;
+        (req as ReqWithUser).permissions = decoded.permissions;
         return next(); //valid access_token
     } catch (error) {
         if (error instanceof jwt.TokenExpiredError)

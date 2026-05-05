@@ -1,14 +1,10 @@
 import { Request, Response } from 'express';
 import axios from 'axios';
 import { z } from 'zod';
-
-type ApiError = {
-  message: string;
-  code: number;
-};
+import { ApiError } from '../index.js';
 
 const LoginSchema = z.object({
-  email: z.string().email(),
+  email: z.email(),
   password: z.string().min(1),
 });
 
@@ -18,7 +14,7 @@ export const login = async (req: Request, res: Response) => {
     return res.status(400).json({ error: 'Bad request' });
   }
   try {
-    const response = await axios.post('http://svc-auth:3000/api/v1/request-auth', {
+    const response = await axios.post('http://svc-auth:3000/auth/auth-request', {
       email: result.data.email,
       password: result.data.password,
     });
@@ -31,7 +27,7 @@ export const login = async (req: Request, res: Response) => {
     return res.status(200).json({ accessToken: response.data.accessToken, message: 'Login successful' });
   } catch (error) {
     if (axios.isAxiosError<ApiError>(error) && error.response?.status) {
-      return res.status(error.response.status).json({ error: error.response.data.message });
+      return res.status(error.response.status).json({ error: error.message });
     }
     return res.status(502).json({ error: 'Bad gateway' });
   }
@@ -52,7 +48,7 @@ export const refresh = async (req: Request, res: Response) =>{
 		return res.cookie("refreshToken", result.data.refreshToken, {httpOnly: true, secure:  true, sameSite: "strict", maxAge: result.data.refreshMaxAge});
 	} catch (error){
 		if (axios.isAxiosError<ApiError>(error) && error.response?.status){
-			return res.status(error.response.status).json({error: error.response.data.message});
+			return res.status(error.response.status).json({error: error.message});
 		} else {
 			return res.status(502).json({error: "Bad gateway"});
 		}
@@ -74,7 +70,7 @@ export const logout = async (req: Request, res: Response) =>{
 		return res.status(200).json({message: 'Logout successful'});
 	} catch (error) {
 		if (axios.isAxiosError<ApiError>(error) && error.response?.status){
-			return res.status(error.response.status).json({error: error.response.data.message});
+			return res.status(error.response.status).json({error: error.message});
 		} else {
 			return res.status(502).json({error: "Bad gateway"});
 		} 
@@ -86,18 +82,26 @@ export const registrationFlow = async (req: Request, res: Response) => {
         return res.status(400).json({error: 'Missing signup info'});
     }
     try {
-        const response = await axios.post("http://svc-auth:3000/api/v1/svc-auth/create-user", {
+        const response = await axios.post("http://svc-auth:3000/auth/user", {
             email: req.body['email'],
             password: req.body['password'],
             name: req.body['name'],
             surname: req.body['surname'],
+            role_type: req.body['role_type'],
         });
+        res.cookie('refreshToken', response.data.refreshToken, {
+          httpOnly: true,
+          secure: true,
+          sameSite: 'strict',
+          maxAge: response.data.max_age,
+        });
+        return res.status(203).json({message: "User created"});
     } catch (error) {
         if (axios.isAxiosError<ApiError>(error) && error.response?.status){
             if (error.response.status === 409){
                 return res.status(error.response.status).json({error: 'User already registered'});
             }
-            return res.status(error.response.status).json({error: error.response.data.message});
+            return res.status(error.response.status).json({error: error.message});
         }
         return res.status(502).json({error: "Bad gateway"});
     }

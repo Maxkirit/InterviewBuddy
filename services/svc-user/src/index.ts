@@ -10,7 +10,6 @@ const nameSurnameSchema = z.string()
 
 const NewUser = z.object({
     email: z.email({error: "Wrong email format", abort: true}),
-    password: z.string(),
     name: nameSurnameSchema,
     surname: nameSurnameSchema,
     role_type: z.string(),
@@ -49,6 +48,7 @@ app.get('/api/v1/user/:user_id', async (req, res) => {
 
 app.post('/svc-user/profile/:auth_id', async (req, res) => {
     console.log("in post new user\n");
+    console.log(req.body);
     const newUserParse = NewUser.safeParse(req.body)
     if (!newUserParse.success)
         return res.status(400).json({error: newUserParse.error})
