@@ -1,14 +1,10 @@
 import express from 'express';
 import { validateAcccessToken } from './validateToken.js'
 import cookieParser from 'cookie-parser';
-import cors from 'cors';
+import cors from 'cors'; //used to add a header to response so frontend is happy
 import authRoute from './router/auth.route.js';
 import userRoute from './router/user.route.js'
-
-type ApiError = {
-  message: string;
-  code: number;
-};
+import protectedAuthRoute from './router/protected-auth.route.js';
 
 const app = express();
 const port = 3000;
@@ -23,11 +19,14 @@ app.use(express.json());
 // middleware for cookie parsing
 app.use(cookieParser());
 
-// app.use('/api/v1/auth',authRoute)
-// // signup before validateAcccessToken
-// app.use(validateAcccessToken);
+
+app.use('/api/v1/auth', authRoute)
+
+// signup before validateAcccessToken
+app.use(validateAcccessToken);
 // other routes after (needs verification) 
 
+app.use('/api/v1/auth', protectedAuthRoute)
 app.use('/api/v1/user', userRoute)
 
 app.listen(port, () => {

@@ -80,3 +80,25 @@ export const logout = async (req: Request, res: Response) =>{
 		} 
 	}
 }
+
+export const registrationFlow = async (req: Request, res: Response) => {
+    if (Object.keys(req.body).length == 0 || !req.body['email'] || !req.body['password'] || !req.body['name'] || !req.body['surname']){
+        return res.status(400).json({error: 'Missing signup info'});
+    }
+    try {
+        const response = await axios.post("http://svc-auth:3000/api/v1/svc-auth/create-user", {
+            email: req.body['email'],
+            password: req.body['password'],
+            name: req.body['name'],
+            surname: req.body['surname'],
+        });
+    } catch (error) {
+        if (axios.isAxiosError<ApiError>(error) && error.response?.status){
+            if (error.response.status === 409){
+                return res.status(error.response.status).json({error: 'User already registered'});
+            }
+            return res.status(error.response.status).json({error: error.response.data.message});
+        }
+        return res.status(502).json({error: "Bad gateway"});
+    }
+}
