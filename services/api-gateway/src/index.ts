@@ -34,7 +34,6 @@ app.use(validateAcccessToken);
 app.use('/api/v1/auth', protectedAuthRoute);
 app.use('/api/v1/user', userRoute);
 app.use('/api/v1/interview', interviewRoute);
-app.use('/api/v1/connections', connectionsRoute);
 
 app.listen(port, () => {
     console.log(`Listening on port ${port}`);

@@ -101,7 +101,7 @@ app.post('/svc-user/profile/:auth_id', async (req, res) => {
     }
 })
 
-app.post('/api/v1/connections/:link_id', addConnection);
+app.post('/user/:user_id/connections/:link_id', addConnection);
 
 app.listen(port, () => {
 	console.log(`listening on port ${port}`);
