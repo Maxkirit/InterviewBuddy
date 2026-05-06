@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import { randomBytes } from "node:crypto";
 import { prisma } from "./prisma.js";
 
-const ACCESS_SECRET = "changewhenvaultisup";
+export const ACCESS_SECRET = "changewhenvaultisup";
 const REFRESH_SECRET = "changewhenvaultisup";
 const REFRESH_MAX_AGE = 604800; //7 days in seconds === 604800
 

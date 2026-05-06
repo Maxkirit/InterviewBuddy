@@ -9,6 +9,9 @@ services:
             - frontend-network
             - backend-network
         restart: unless-stopped
+        # depends_on:
+        #   minio:
+        #     condition: service_healthy
 
     svc-auth:
         container_name: svc-auth
@@ -279,6 +282,20 @@ services:
     #     command: ["node /app/read_vault_test.js; sleep infinity"]
     #     restart: unless-stopped
 
+    # minio:
+    #   container_name: minio
+    #   build: infrastructure/minio
+    #   networks: 
+    #     - backend-network
+    #   volumes:
+    #     - minio:/data
+    #   secrets:
+    #     - minio_app_password
+    #     - minio_root_password
+    #   env_file: ./infrastructure/minio/.env
+    #   restart: unless-stopped
+    
+
 secrets:
     auth_db_superuser_password:
         file: ./infrastructure/secrets/auth_db_superuser_password.txt
@@ -302,19 +319,20 @@ secrets:
         file: ./infrastructure/secrets/serializationdb_superuser_password.txt
     grading_db_password:
         file: ./infrastructure/secrets/gradingdb_superuser_password.txt
-
     vault_test_msg:
         file: ./infrastructure/secrets/vault_test_msg.txt
-
     vault_test_foo:
         file: ./infrastructure/secrets/vault_test_foo.txt
+    minio_root_password:
+        file: ./infrastructure/secrets/minio_root_password.txt
+    minio_app_password:
+        file: ./infrastructure/secrets/minio_app_password.txt
 
 networks:
     frontend-network:
         driver: bridge
     backend-network:
         driver: bridge
-
 volumes:
     auth_db:
         name: auth_db_volume
@@ -330,6 +348,8 @@ volumes:
         name: monitoring_volume
     ingress:
         name: ingress_volume
+    minio:
+        name: minio_volume
     
     vault_data:
         name: vault_data_volume
