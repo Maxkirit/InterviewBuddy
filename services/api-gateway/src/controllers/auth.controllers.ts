@@ -18,11 +18,12 @@ export const login = async (req: Request, res: Response) => {
       email: result.data.email,
       password: result.data.password,
     });
+    console.log(response.data.refreshToken);
     res.cookie('refreshToken', response.data.refreshToken, {
       httpOnly: true,
       secure: true,
       sameSite: 'strict',
-      maxAge: response.data.max_age,
+      maxAge: response.data.maxAge,
     });
     return res.status(200).json({ accessToken: response.data.accessToken, message: 'Login successful' });
   } catch (error) {
@@ -34,18 +35,19 @@ export const login = async (req: Request, res: Response) => {
 };
 
 export const refresh = async (req: Request, res: Response) =>{
-	console.log(req.cookies);
+  console.log(req);
+	console.log(req.cookies.refreshToken);
 	if (Object.keys(req.cookies).length === 0 || !req.cookies['refreshToken']){ //used to be JSON.stringify(req.cookies) === '{}' but checking if object has keys is cleaner
 		console.log("no refresh cookie header\n"); //res.send() closes the HTTP connection but without return code keeps gind --> error
 		return res.status(404).json({error: "refresh token not found"});
 	}
-	const oldRefreshToken = req.cookies['refreshToken']; //store so we can send back with max_age==-1 to invalidate old ones in browser
+	const oldRefreshToken = req.cookies.refreshToken; //store so we can send back with max_age==-1 to invalidate old ones in browser
 	try {
-		const result = await axios.post("http://svc-auth:3000/api/v1/svc-auth/refresh-token", {
+		const result = await axios.post("http://svc-auth:3000/auth/refresh-token", {
 			refreshToken: oldRefreshToken,
 		});
-		res.json({accessToken: result.data.accessToken, message: 'Refresh successful'});
-		return res.cookie("refreshToken", result.data.refreshToken, {httpOnly: true, secure:  true, sameSite: "strict", maxAge: result.data.refreshMaxAge});
+    res.cookie("refreshToken", result.data.refreshToken, {httpOnly: true, secure:  true, sameSite: "strict", maxAge: result.data.refreshMaxAge});
+		return res.json({accessToken: result.data.accessToken, message: 'Refresh successful'});
 	} catch (error){
 		if (axios.isAxiosError<ApiError>(error) && error.response?.status){
 			return res.status(error.response.status).json({error: error.message});
@@ -93,9 +95,9 @@ export const registrationFlow = async (req: Request, res: Response) => {
           httpOnly: true,
           secure: true,
           sameSite: 'strict',
-          maxAge: response.data.max_age,
+          maxAge: response.data.maxAge,
         });
-        return res.status(203).json({message: "User created"});
+        return res.status(203).json({accessToken: response.data.accessToken, message: "User created"});
     } catch (error) {
         if (axios.isAxiosError<ApiError>(error) && error.response?.status){
             if (error.response.status === 409){

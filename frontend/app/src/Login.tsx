@@ -3,21 +3,28 @@ import { useState, useContext, type SubmitEvent } from "react";
 import { z, ZodError } from 'zod';
 import axios from "axios";
 import { AuthContext } from "./AuthProvider";
-import { Navigate, Link } from "react-router-dom";
+import { Navigate, Link, useNavigate } from "react-router-dom";
 
+const LoginSchema = z.object({
+    email: z.email(),
+    password: z.string().min(1),
+});
 
 export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const authContext = useContext(AuthContext);
+    const navigate = useNavigate();
 
-    const Login = z.object({
-        email: z.email(),
-        password: z.string().min(1),
-    });
+    if (authContext?.isLoading === true) {
+        return (
+            <div><p>Loading...</p></div>
+        );
+    }
 
     if (authContext?.accessToken != null) {
-        return <Navigate to="/" />;
+        console.log("Already have an access token");
+        return <Navigate to="/" replace />;
     }
 
     async function handleSubmit(event: SubmitEvent) {
@@ -27,12 +34,13 @@ export default function Login() {
                 email: email,
                 password: password,
             }
-            Login.parse(input);
+            LoginSchema.parse(input);
             const result = await axios.post('http://localhost:3000/api/v1/auth/login', {
                 email: email,
                 password: password,
             });
-            authContext?.login(result.data.access_token);
+            authContext?.login(result.data.accessToken);
+            navigate("/");
         } catch (error) {
             if (error instanceof ZodError) {
                 // error banner

@@ -1,9 +1,17 @@
 import './styles/Auth.css';
 import { useState, useContext, type SubmitEvent } from 'react';
 import { AuthContext } from './AuthProvider';
-import { Navigate, Link } from 'react-router-dom';
+import { Navigate, Link, useNavigate } from 'react-router-dom';
 import { z, ZodError } from 'zod';
 import axios from 'axios';
+
+const RegisterSchema = z.object({
+    first_name: z.string().min(1),
+    last_name: z.string().min(1),
+    email: z.email(),
+    password: z.string().min(1),
+    role_type: z.literal(["candidate", "recruiter"]),
+});
 
 export default function Register() {
     const [firstname, setFirstname] = useState("");
@@ -12,17 +20,16 @@ export default function Register() {
     const [password, setPassword] = useState("");
     const [selectedRole, setSelectedRole] = useState("candidate");
     const authContext = useContext(AuthContext);
+    const navigate = useNavigate();
 
-    const Register = z.object({
-        first_name: z.string().min(1),
-        last_name: z.string().min(1),
-        email: z.email(),
-        password: z.string().min(1),
-        role_type: z.literal(["candidate", "recruiter"]),
-    });
+    if (authContext?.isLoading === true) {
+        return (
+            <div><p>Loading...</p></div>
+        );
+    }
 
     if (authContext?.accessToken != null) {
-        return <Navigate to="/" />;
+        return <Navigate to="/" replace />;
     }
 
     async function handleSubmit(event: SubmitEvent) {
@@ -35,7 +42,7 @@ export default function Register() {
                 password: password,
                 role_type: selectedRole as "candidate" | "recruiter",
             }
-            Register.parse(input);
+            RegisterSchema.parse(input);
             const result = await axios.post('http://localhost:3000/api/v1/auth/register', {
                 name: firstname,
                 surname: lastname,
@@ -43,7 +50,8 @@ export default function Register() {
                 password: password,
                 role_type: selectedRole,
             });
-            authContext?.login(result.data.access_token);
+            authContext?.login(result.data.accessToken);
+            navigate("/")
         } catch (error) {
             if (error instanceof ZodError) {
                 // error banner

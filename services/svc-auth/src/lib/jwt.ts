@@ -77,10 +77,10 @@ export async function rotateRefreshToken(oldJti: string, userId: number) {
         },
     });
     const newRefresh = await createRefreshToken(userId);
-    const newAccess = createAccessToken(userId);
+    const newAccess = await createAccessToken(userId);
     return {
-        newRefresh: newRefresh,
+        newRefresh: newRefresh.refreshToken,
         newAccess: newAccess,
-        refreshMaxAge: REFRESH_MAX_AGE,
+        refreshMaxAge: newRefresh.maxAge,
     };
 }
