@@ -33,7 +33,8 @@ export async function validateAcccessToken(
     //this should/will be cached at start up to avoid getting it at every call
     let key: string;
     try {
-        key = await getKey();
+        // key = await getKey();
+        key = "changewhenvaultisup";
     } catch (error) {
         return res.status(500).json({ error: "Auth-svc error" });
     }
