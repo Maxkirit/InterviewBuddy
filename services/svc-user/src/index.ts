@@ -17,40 +17,52 @@ const NewUser = z.object({
     role_type: z.enum(['candidate', 'recruiter', 'admin']),
 })
 
-const GenderTypeSchema = z.enum(['male', 'female', 'non_binary', 'prefer_not_to_say']);
+const GenderTypeSchema = z.union([
+                    z.enum(['male', 'female', 'non_binary', 'prefer_not_to_say']),
+                    z.string().max(0),
+                    ]);
 
 const DateOfBirthSchema = z.union([
                     z.string().max(0), 
                     z.string()
-                    .length(10, {error: "Date not right length", abort: true})
+                    .length(10, {error: "Date not right length"})
                     .pipe(z.coerce.date({error: "Invalid date format"}))]);
 
-const CountryJobOrgSchema = z.string()
-                .min(1, {error: "Field too short", abort: true})
-                .max(64, {error: "Field too long", abort: true});
+const CountryJobOrgSchema = z.union([
+                            z.string()
+                            .min(1, {error: "Field too short"})
+                            .max(64, {error: "Field too long"}),
+                            z.string().max(0)
+            ]);
 
-const BioSchema = z.string()
-            .min(1, {error: "Bio too short", abort: true})
-            .max(1000, {error: "Bio too long", abort: true});
+const BioSchema = z.union([
+                    z.string()
+                    .min(1, {error: "Bio too short"})
+                    .max(1000, {error: "Bio too long"}),
+                    z.string().max(0)
+                ]);
 
-const LinkedinLinkSchema = z
-  .string()
-  .refine(
-    (url) => /^https?:\/\/(www\.)?linkedin\.com\//i.test(url),
-    { message: "Not a LinkedIn link" }
-  );
+const LinkedinLinkSchema = z.union([
+                            z.string()
+                            .refine((url) => /^https?:\/\/(www\.)?linkedin\.com\//i.test(url),
+                                    { message: "Not a LinkedIn link" }),
+                            z.string().max(0)
+                        ]);
 
-const PhoneSchema = z.e164({error: "Invalid phone number", abort: true});
+const PhoneSchema = z.union([
+                    z.e164({error: "Invalid phone number"}),
+                    z.string().max(0)
+                ]);
 
 const ProfileUpdateSchema = z.object({
     gender: GenderTypeSchema,
-    dateOfBirth: DateOfBirthSchema,
+    date_of_birth: DateOfBirthSchema,
     country: CountryJobOrgSchema,
-    jobTitle: CountryJobOrgSchema,
+    job_title: CountryJobOrgSchema,
     organization: CountryJobOrgSchema,
     bio: BioSchema,
-    linkedinLink: LinkedinLinkSchema,
-    phoneNumber: PhoneSchema,
+    linkedin_link: LinkedinLinkSchema,
+    phone_number: PhoneSchema,
 })
 
 const app = express();
@@ -147,15 +159,25 @@ app.patch('/user/profile/:user_id', async (req, res) => {
             return res.status(403).json({error: "Wrong permissions for route"});
         }
         console.log("permissions validated\n");
+        console.log(req.body.body);
         //validate input
         const userUpdate = ProfileUpdateSchema.safeParse(req.body.body);
         if (!userUpdate.success)
-            return res.status(400).json({error: userUpdate.error});
+            return res.status(400).json({error: userUpdate.error}); //propgate wrong field properly
         console.log("parsing validated\n");
         //update db
         const updatedUser = await prisma.users.update({
             where: {user_id: userId},
-            data: userUpdate,
+            data: {
+                gender: req.body.body.gender === "" ? null : req.body.body.gender,
+                date_of_birth: req.body.body.date_of_birth === "" ? null : req.body.body.date_of_birth,
+                country: req.body.body.country === "" ? null : req.body.body.country,
+                job_title: req.body.body.job_title === "" ? null : req.body.body.job_title,
+                organization: req.body.body.organization === "" ? null : req.body.body.organization,
+                bio: req.body.body.bio === "" ? null : req.body.body.bio,
+                linkedin_link: req.body.body.linkedin_link === "" ? null : req.body.body.linkedin_link,
+                phone_number: req.body.body.phone_number === "" ? null : req.body.body.phone_number,
+            },
         });
         console.log("db updated\n");
         return res.status(201).json({error: "User succesfully updated"});
@@ -169,6 +191,7 @@ app.patch('/user/profile/:user_id', async (req, res) => {
             }
             return res.status(502).json({error: error.message});
         }
+        console.log(error);
         return res.status(502).json({error: "Bad gateway (svc-user)"});
     }
 })

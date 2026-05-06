@@ -103,10 +103,12 @@ export const registrationFlow = async (req: Request, res: Response) => {
         });
         return res.status(203).json({accessToken: response.data.accessToken, message: "User created"});
     } catch (error) {
+        console.log("registration flow error path\n");
         if (axios.isAxiosError<ApiError>(error) && error.response?.status){
             if (error.response.status === 409){
                 return res.status(error.response.status).json({error: 'User already registered'});
             }
+            console.log("different axios error\n");
             return res.status(error.response.status).json({error: error.message});
         }
         return res.status(502).json({error: "Bad gateway"});

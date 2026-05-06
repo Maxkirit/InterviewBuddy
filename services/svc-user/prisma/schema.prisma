@@ -40,7 +40,7 @@ model users {
   lastname                                    String        @db.VarChar(64)
   profile_pic_url                             String?
   gender                                      gender_type?
-  date_of_birth                               DateTime?     @db.Date
+  date_of_birth                               String?
   country                                     String?       @db.VarChar(64)
   job_title                                   String?
   organization                                String?

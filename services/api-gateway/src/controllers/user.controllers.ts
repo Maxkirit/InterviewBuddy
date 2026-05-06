@@ -24,7 +24,7 @@ export const updateOwnUserInfo = async (req: Request, res: Response) => {
         'gender', 'date_of_birth', 'country', 'job_title',
         'organization', 'bio', 'linkedin_link', 'phone_number'
     ] as const; //as const makes the array type readonly['gender', 'email', etc] instead of string[]. Easy to derive a type from it later
-    const missingFields = REQUIRED_FIELDS.filter(field => !req.body[field]);
+    const missingFields = REQUIRED_FIELDS.filter(field => req.body[field] === undefined || req.body[field] === null);
     if (missingFields.length > 0)
         return res.status(400).json({error: "Missing fields in request", missing: missingFields});
     console.log("validated fields\n");
@@ -39,7 +39,7 @@ export const updateOwnUserInfo = async (req: Request, res: Response) => {
     } catch (error) {
         console.log("in error path\n");
         if (axios.isAxiosError<ApiError>(error) && error.response?.status)
-            return res.status(error.response.status).json({error: error.response.data.message});
+            return res.status(error.response.status).json({error: error.response});
         return res.status(502).json({error: "Bad gateway (api gateway)"});
     }
 }

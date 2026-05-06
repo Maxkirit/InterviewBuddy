@@ -76,7 +76,7 @@ CREATE TABLE $TABLE_USER (
 	lastname		VARCHAR(64)		NOT NULL,
 	profile_pic_url	TEXT,
 	gender			gender_type,
-	date_of_birth	DATE,
+	date_of_birth	TEXT,
 	country			VARCHAR(64),
 	job_title		TEXT,
 	organization	TEXT,

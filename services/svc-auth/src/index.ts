@@ -36,16 +36,39 @@ if (!secret) throw new Error('SECRETKEY manquante dans .env')
 const app = express();
 const port = 3000;
 
-app.use(express.json())
+app.use(express.json());
 
 app.get('/auth/signing-key', async (req, res) => {
-  const publicKeyPem = createPublicKey(secret).export({ type: 'spki', format: 'pem' })
-  const publicKey = await importSPKI(publicKeyPem, 'RS256')           // ← extrait la clé publique en PEM
-  const jwk = await exportJWK(publicKey);
-  res.json({ keys: [{ ...jwk, use: 'sig', kid: 'svc-auth-key-1' }] })
-// use: 'sig',                // ← indique que cette clé sert à signer (pas à chiffrer)
-//    kid: 'svc-auth-key-1'    ← identifiant unique de la clé
-})
+    try {
+        const publicKeyPem = createPublicKey(secret).export({ type: 'spki', format: 'pem' })
+        console.log("pub key created\n");
+        const publicKey = await importSPKI(publicKeyPem, 'RS256')           // ← extrait la clé publique en PEM
+        console.log("pub key extracted\n");
+        const jwk = await exportJWK(publicKey);
+        console.log("pub key extracted\n");
+        return res.json({ keys: [{ ...jwk, use: 'sig', kid: 'svc-auth-key-1' }] })
+        // use: 'sig',                // ← indique que cette clé sert à signer (pas à chiffrer)
+        //    kid: 'svc-auth-key-1'    ← identifiant unique de la clé
+    } catch (error) {
+        if (error instanceof Error) {
+            // Now TypeScript knows `error` has `name` and `message` properties
+            if (error.name === 'JWKSInvalidKeyError' || error.name === 'JWKSNoMatchingKeyError') {
+                return res.status(400).json({ error: 'Invalid or missing key' });
+            } else if (error.name === 'TypeError' || (error as NodeJS.ErrnoException).code === 'ERR_INVALID_ARG_TYPE') {
+                return res.status(400).json({ error: 'Invalid key format or input' });
+            } else if (error.message.includes('invalid signature')) {
+                return res.status(401).json({ error: 'Unauthorized: Invalid signature' });
+            } else {
+                console.error('Server error:', error);
+                return res.status(500).json({ error: 'Internal server error' });
+            }
+        } else {
+            // Handle cases where `error` is not an instance of `Error` (e.g., a string or custom object)
+            console.error('Unknown error:', error);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+    }
+});
 
 app.post('/auth/auth-request', async (req, res) => {
     const result = Login.safeParse(req.body);
@@ -61,8 +84,8 @@ app.post('/auth/auth-request', async (req, res) => {
         });
         if (await argon2.verify(userAuth.hashed_password , password)) {
             const response = await axios.get(`http://svc-user:3000/user/userid/${userAuth.auth_id}`);
-            const accessToken = createAccessToken(response.data.user_id);
-            const refreshToken = createRefreshToken(response.data.user_id);
+            const accessToken = await createAccessToken(response.data.user_id);
+            const refreshToken = await createRefreshToken(response.data.user_id);
             // const accessToken = await createAccessToken(1);
             // const refreshToken = await createRefreshToken(1);
             res.json({accessToken: accessToken, refreshToken: refreshToken.refreshToken, maxAge: refreshToken.maxAge});
