@@ -80,7 +80,7 @@ app.post('/interview/real-interview', async (req, res) => {
     }
 });
 
-app.get('/interview/real-interview/interviewList/:user_id', async (req, res) => {
+app.get('/interview/interviewList/:user_id', async (req, res) => {
 	const {user_id} = req.params;
 	const{token_id, perm} = req.query;
 	const permission = JSON.parse(perm as string);
@@ -97,4 +97,8 @@ app.get('/interview/real-interview/interviewList/:user_id', async (req, res) => 
 	catch(e){
 		return res.status(500).json({error:"internal error"});
 	}
+});
+
+app.listen(port, () => {
+	console.log(`listening on port ${port}`);
 });

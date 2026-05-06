@@ -53,33 +53,33 @@ services:
     #     secrets:
     #         - interview_store_db_superuser_password
 
-    # svc-serialization:
-    #     container_name: svc-serialization
-    #     build: services/svc-serialization
-    #     networks:
-    #         - backend-network
-    #     restart: unless-stopped
+    # # svc-serialization:
+    # #     container_name: svc-serialization
+    # #     build: services/svc-serialization
+    # #     networks:
+    # #         - backend-network
+    # #     restart: unless-stopped
 
-    # svc-monitoring:
-    #     container_name: svc-monitoring
-    #     build: services/svc-monitoring
-    #     networks:
-    #         - backend-network
-    #     restart: unless-stopped
+    # # svc-monitoring:
+    # #     container_name: svc-monitoring
+    # #     build: services/svc-monitoring
+    # #     networks:
+    # #         - backend-network
+    # #     restart: unless-stopped
 
-    # dev-front:
-    #     container_name: dev-front
-    #     ports:
-    #         - "5173:5173"
+    # # dev-front:
+    # #     container_name: dev-front
+    # #     ports:
+    # #         - "5173:5173"
 
-    # frontend:
-    #     container_name: frontend
-    #     build: infrastructure/nginx
-    #     ports:
-    #         - "443:443"
-    #     networks:
-    #         - frontend-network
-    #     restart: unless-stopped
+    # # frontend:
+    # #     container_name: frontend
+    # #     build: infrastructure/nginx
+    # #     ports:
+    # #         - "443:443"
+    # #     networks:
+    # #         - frontend-network
+    # #     restart: unless-stopped
 
     auth-db:
         container_name: auth-db

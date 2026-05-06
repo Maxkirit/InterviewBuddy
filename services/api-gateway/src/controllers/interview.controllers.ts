@@ -34,3 +34,12 @@ export const createMockInterview = async (req: Request, res: Response) => {
         return res.status(502).json({ error: 'Bad gateway' });
     }
 }
+
+export const getInterviewList = async (req :Request, res: Response) =>{
+	try{
+		const result = await axios.post("http://svc-interview-store:3000/interview/interviewList/:user_id", {
+            userId: (req as ReqWithUser).userId,
+            permissions: (req as ReqWithUser).permissions,
+        });
+	}
+}
