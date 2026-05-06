@@ -1,8 +1,8 @@
-
 import express from 'express';
 import { prisma, Prisma } from "./lib/prisma.js";
 import { role_type } from './generated/prisma/enums.js';
 import { string, z } from 'zod';
+import { addConnection } from './connections/addConnection.js';
 
 const nameSurnameSchema = z.string()
                         .min(1, {error: "Name or surname field too short", abort: true})
@@ -18,7 +18,7 @@ const NewUser = z.object({
 
 const app = express();
 const port = 3000;
- app.use(express.json());
+app.use(express.json());
 
 app.get('/api/v1/userid/:auth_id', async (req, res) => {
 	const { auth_id } = req.params;
@@ -100,6 +100,8 @@ app.post('/svc-user/profile/:auth_id', async (req, res) => {
     return res.status(500).json({ error: "Internal server error" });
     }
 })
+
+app.post('/api/v1/connections/:link_id', addConnection);
 
 app.listen(port, () => {
 	console.log(`listening on port ${port}`);
