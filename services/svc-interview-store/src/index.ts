@@ -79,3 +79,11 @@ app.post('/interview/real-interview', async (req, res) => {
         return res.status(502).json({error: "Bad gateway"});
     }
 });
+
+app.post('/interview/real-interview', async (req, res) => {
+    try {
+	}
+	catch(e){
+		
+	}
+});
