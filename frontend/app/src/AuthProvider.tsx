@@ -5,6 +5,7 @@ type AuthContextType = {
     accessToken: string | null,
     login: (token: string) => void;
     logout: () => void;
+    isLoading: boolean,
 };
 
 export const AuthContext = createContext<AuthContextType | null>(null);
@@ -17,26 +18,35 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
         // hit /refresh to get new access token (with refresh token in cookie)
         // if success setToken and pass it in context
         // if not fail (no or expired refresh token) redirect to login
+        const controller = new AbortController();
         axios.defaults.withCredentials = true
         async function restoreSession() {
             try {
-                const result = await axios.post("https://localhost/api/v1/refresh", null, { timeout: 2000 });
-                setToken(result.data.access_token);
-            } catch(error) {
-                // not logged in
+                const result = await axios.post(
+                    "http://localhost:3000/api/v1/auth/refresh",
+                    null,
+                    { withCredentials: true, signal: controller.signal }
+                );
+                setToken(result.data.accessToken);
+            } catch (error) {
+                if (axios.isCancel(error)) return;
+                // genuinely not logged in
             } finally {
-                setIsLoading(false);
+                if (!controller.signal.aborted) {
+                    setIsLoading(false);
+                }
             }
         }
 
         restoreSession();
+        return () => controller.abort();
     }, []);
 
-    if (isLoading === true) {
-        return (
-            <div><p>Loading...</p></div>
-        );
-    }
+    // if (isLoading === true) {
+    //     return (
+    //         <div><p>Loading...</p></div>
+    //     );
+    // }
 
     function login(token: string) {
         setToken(token);
@@ -47,7 +57,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     return (
-        <AuthContext.Provider value={{ accessToken: token, login: login, logout: logout }}>
+        <AuthContext.Provider value={{ accessToken: token, login: login, logout: logout, isLoading: isLoading }}>
             {children}
         </AuthContext.Provider>
     );

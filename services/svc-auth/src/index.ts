@@ -65,7 +65,7 @@ app.post('/auth/auth-request', async (req, res) => {
             const refreshToken = createRefreshToken(response.data.user_id);
             // const accessToken = await createAccessToken(1);
             // const refreshToken = await createRefreshToken(1);
-            res.json({accessToken: accessToken, refreshToken: refreshToken});
+            res.json({accessToken: accessToken, refreshToken: refreshToken.refreshToken, maxAge: refreshToken.maxAge});
         } else {
             return res.status(401).json({error: "Incorrect email or password"});
         }
