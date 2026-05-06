@@ -85,6 +85,10 @@ app.get('/user/userid/:auth_id', async (req, res) => {
 
 app.get('/api/v1/user/:user_id', async (req, res) => {
 	const { user_id } = req.params;
+	const{token_id, perm} = req.query;
+	const permission = JSON.parse(perm as string);
+	if (user_id !== token_id || !permission.readUserInfo)
+		return res.status(403).json({error: "forbiden"})
 	try {
 		const user = await prisma.users.findUnique({
 			where: { user_id: parseInt(user_id, 10) },

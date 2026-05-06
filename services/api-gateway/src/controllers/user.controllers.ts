@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
-import { ApiError } from '../index.js';
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 import { ReqWithUser } from '../validateToken.js';
 
 export const getUser = async(req: Request, res: Response) =>{
 	const { user_id } = req.params; 
+	const reqtoken = req as ReqWithUser
 	try{
 		const user = await axios.get(`http://svc-user:3000/user/${user_id}`)
 		return(res.status(200).json(user.data))

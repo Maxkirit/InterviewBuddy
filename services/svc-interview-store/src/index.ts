@@ -80,10 +80,21 @@ app.post('/interview/real-interview', async (req, res) => {
     }
 });
 
-app.post('/interview/real-interview', async (req, res) => {
-    try {
+app.get('/interview/real-interview/interviewList/:user_id', async (req, res) => {
+	const {user_id} = req.params;
+	const{token_id, perm} = req.query;
+	const permission = JSON.parse(perm as string);
+	if (user_id !== token_id || !permission.readInterview){
+		return res.status(403).json({error : "forbiden"})
+	}
+	try {
+		const interview = await prisma.interviews.findMany({
+			where: {recruiter_id: parseInt(user_id, 10)}
+		})
+		if (!interview.length) return res.status(404).json({error:"no interview find"});
+		res.status(200).json(interview);
 	}
 	catch(e){
-		
+		return res.status(500).json({error:"internal error"});
 	}
 });
