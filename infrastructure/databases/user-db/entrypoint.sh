@@ -42,6 +42,10 @@ psql -U postgres -c "GRANT ALL PRIVILEGES ON DATABASE $DB_NAME TO $POSTGRES_ADMI
 psql -U postgres -c "CREATE USER $POSTGRES_APP_USER WITH PASSWORD '$(cat /run/secrets/user_db_app_password)'"
 psql -U postgres -c "GRANT CONNECT ON DATABASE $DB_NAME TO $POSTGRES_APP_USER"
 
+# add an avatars DB which ID is a foreign key in users
+# fields can have confirm_uploads, past_links, etc
+# allows idempotent upload confirmations
+
 psql -U postgres -d $DB_NAME <<EOF
 CREATE TYPE role_type AS ENUM (
     'admin',

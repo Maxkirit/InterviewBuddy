@@ -14,29 +14,44 @@ const NewUser = z.object({
     email: z.email({error: "Wrong email format", abort: true}),
     name: nameSurnameSchema,
     surname: nameSurnameSchema,
-    role_type: z.enum('candidate', 'recruiter', 'admin'),
+    role_type: z.enum(['candidate', 'recruiter', 'admin']),
 })
 
-const GenderType = z.enum('male', 'female', 'non_binary', 'prefer_not_to_say');
+const GenderTypeSchema = z.enum(['male', 'female', 'non_binary', 'prefer_not_to_say']);
 
-const DateOfBirth = z.string()
+const DateOfBirthSchema = z.union([
+                    z.string().max(0), 
+                    z.string()
                     .length(10, {error: "Date not right length", abort: true})
-                    .z.coerce.date({error: "Invalid date format", abort: true});
+                    .pipe(z.coerce.date({error: "Invalid date format"}))]);
 
-const CountryJobOrg = z.string()
+const CountryJobOrgSchema = z.string()
                 .min(1, {error: "Field too short", abort: true})
                 .max(64, {error: "Field too long", abort: true});
 
-const Bio = z.string()
+const BioSchema = z.string()
             .min(1, {error: "Bio too short", abort: true})
             .max(1000, {error: "Bio too long", abort: true});
 
-const LinkedinLink = z.url({
-    protocol: /^https?$/,
-    hostname: /^linkedin\.com$/
-}, {error: "Not a linkedin link", abort: true});
+const LinkedinLinkSchema = z
+  .string()
+  .refine(
+    (url) => /^https?:\/\/(www\.)?linkedin\.com\//i.test(url),
+    { message: "Not a LinkedIn link" }
+  );
 
-const Phone = z.e164({error: "Invalid phone number", abort: true});
+const PhoneSchema = z.e164({error: "Invalid phone number", abort: true});
+
+const ProfileUpdateSchema = z.object({
+    gender: GenderTypeSchema,
+    dateOfBirth: DateOfBirthSchema,
+    country: CountryJobOrgSchema,
+    jobTitle: CountryJobOrgSchema,
+    organization: CountryJobOrgSchema,
+    bio: BioSchema,
+    linkedinLink: LinkedinLinkSchema,
+    phoneNumber: PhoneSchema,
+})
 
 const app = express();
 const port = 3000;
@@ -123,33 +138,29 @@ app.post('/user/profile/:auth_id', async (req, res) => {
 })
 
 app.patch('/user/profile/:user_id', async (req, res) => {
-    const FIELDS = [
-        'gender', 'date_of_birth', 'country', 'job_title',
-        'organization', 'bio', 'linkedin_link', 'phone_number'
-    ] as const;
-
-    const validators = new Map<string, any>([['gender', GenderType], ['date_of_birth', DateOfBirth],
-                            ['bio', Bio], ['linkedin_link', LinkedinLink], ['organization', CountryJobOrg],
-                            ['job_title', CountryJobOrg], ['organisation', CountryJobOrg]]);
-    
-    let userUpdate: any;
-    for (let field in FIELDS) {
-        if (req.body[field] !== "") {
-            const parsedField = validators.get(field).safeParse(req.body[field]);
-            if (!parsedField.success)
-                return res.status(400).json({error: parsedField.error});
-        }
-        userUpdate.field = req.body[field];
-    }
-
-    const userId = parseInt(req.params.user_id);
+    console.log("in update user profile route\n");
     try {
+        //validate perms
+        const userId = parseInt(req.params.user_id);
+        if ((!req.body.permissions.includes("modifyOwnUser") && !req.body.permissions.includes("manageUserInfo")) || 
+                (req.body.permissions.includes("modifyOwnUser") && req.body.userId !== userId)){
+            return res.status(403).json({error: "Wrong permissions for route"});
+        }
+        console.log("permissions validated\n");
+        //validate input
+        const userUpdate = ProfileUpdateSchema.safeParse(req.body.body);
+        if (!userUpdate.success)
+            return res.status(400).json({error: userUpdate.error});
+        console.log("parsing validated\n");
+        //update db
         const updatedUser = await prisma.users.update({
             where: {user_id: userId},
             data: userUpdate,
         });
+        console.log("db updated\n");
         return res.status(201).json({error: "User succesfully updated"});
     } catch (error) {
+        console.log("in error path\n");
         if (error instanceof Prisma.PrismaClientInitializationError)
             return res.status(503).json({ error: "Database unavailable" });
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -158,7 +169,7 @@ app.patch('/user/profile/:user_id', async (req, res) => {
             }
             return res.status(502).json({error: error.message});
         }
-        return res.status(500).json({error: "Bad gateway (svc-user)"});
+        return res.status(502).json({error: "Bad gateway (svc-user)"});
     }
 })
 

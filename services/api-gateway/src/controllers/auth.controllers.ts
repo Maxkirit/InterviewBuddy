@@ -1,15 +1,7 @@
 import { Request, Response } from 'express';
 import axios from 'axios';
 import { z } from 'zod';
-<<<<<<< HEAD
-
-export type ApiError = {
-  message: string;
-  code: number;
-};
-=======
 import { ApiError } from '../index.js';
->>>>>>> dev
 
 const LoginSchema = z.object({
   email: z.email(),
@@ -94,20 +86,12 @@ export const registrationFlow = async (req: Request, res: Response) => {
         return res.status(400).json({error: 'Missing fields in request', missing: missingFields});
     }
     try {
-<<<<<<< HEAD
-        const response = await axios.post("http://svc-auth:3000/api/v1/auth/user", {
-=======
         const response = await axios.post("http://svc-auth:3000/auth/user", {
->>>>>>> dev
             email: req.body['email'],
             password: req.body['password'],
             name: req.body['name'],
             surname: req.body['surname'],
-<<<<<<< HEAD
-            role_type: req.body.role_type,
-=======
             role_type: req.body['role_type'],
->>>>>>> dev
         });
         res.cookie('refreshToken', response.data.refreshToken, {
           httpOnly: true,

@@ -23,7 +23,7 @@ export async function validateAcccessToken(
     next: NextFunction,
 ) {
     const authHeader = req.headers.authorization;
-    if (!authHeader) return res.status(401).json({ error: "Missing header" });
+    if (!authHeader) return res.status(401).json({ error: "" });
 
     const [bearer, access_token] = authHeader.split(" ");
     if (bearer !== "Bearer")
