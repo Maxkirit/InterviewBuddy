@@ -61,11 +61,11 @@ app.post('/auth/auth-request', async (req, res) => {
         });
         if (await argon2.verify(userAuth.hashed_password , password)) {
             const response = await axios.get(`http://svc-user:3000/api/v1/userid/${userAuth.auth_id}`);
-            const accessToken = createAccessToken(response.data.user_id);
-            const refreshToken = createRefreshToken(response.data.user_id);
+            const accessToken = await createAccessToken(response.data.user_id);
+            const refreshToken = await createRefreshToken(response.data.user_id);
             // const accessToken = await createAccessToken(1);
             // const refreshToken = await createRefreshToken(1);
-            res.json({accessToken: accessToken, refreshToken: refreshToken});
+            res.json({accessToken: accessToken, refreshToken: refreshToken.refreshToken, maxAge: refreshToken.maxAge});
         } else {
             return res.status(401).json({error: "Incorrect email or password"});
         }
