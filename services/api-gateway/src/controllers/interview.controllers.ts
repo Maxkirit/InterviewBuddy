@@ -46,7 +46,7 @@ export const getInterviewList = async (req: Request, res: Response) => {
 		console.log('recruiter_id:', recruiter_id);
 		console.log('token_id:', token_id);
 		console.log('permissions:', permissions);
-		const result = await axios.get(`http://svc-interview-store:3000/interview/interviewList`, {
+		const result = await axios.get(`http://svc-interview-store:3000/interview/real-interviews`, {
 			params: {
 				recruiter_id: recruiter_id,
 				token_id: token_id,

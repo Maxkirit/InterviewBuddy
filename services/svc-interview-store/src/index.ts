@@ -80,7 +80,7 @@ app.post('/interview/real-interview', async (req, res) => {
     }
 });
 
-app.get('/interview/interviewList', async (req, res) => {
+app.get('/interview/real-interviews', async (req, res) => {
 	const{recruiter_id, token_id, perm} = req.query;
 	const permission = JSON.parse(perm as string);
 	if ((recruiter_id !== token_id && !permission.manageInterview )|| !permission.readInterview){
