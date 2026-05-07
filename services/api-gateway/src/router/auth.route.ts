@@ -4,6 +4,6 @@ import { login, refresh, registrationFlow } from '../controllers/auth.controller
 const router = Router();
 
 router.post('/login', login);
-router.post('/register', registrationFlow);
 router.post('/refresh', refresh);
+router.post('/register', registrationFlow);
 export default router

@@ -1,7 +1,9 @@
 import express, { Request, Response } from 'express';
 import { prisma, Prisma } from "./lib/prisma.js";
+import { gender_type } from './generated/prisma/enums.js';
 import { role_type } from './generated/prisma/enums.js';
 import { string, z } from 'zod';
+import { error } from 'node:console';
 
 const nameSurnameSchema = z.string()
                         .min(1, {error: "Name or surname field too short", abort: true})
@@ -11,9 +13,56 @@ const NewUser = z.object({
     email: z.email({error: "Wrong email format", abort: true}),
     name: nameSurnameSchema,
     surname: nameSurnameSchema,
-    role_type: z.string(),
+    role_type: z.enum(['candidate', 'recruiter', 'admin']),
 })
 
+const GenderTypeSchema = z.union([
+                    z.enum(['male', 'female', 'non_binary', 'prefer_not_to_say']),
+                    z.string().max(0),
+                    ]);
+
+const DateOfBirthSchema = z.union([
+                    z.string().max(0), 
+                    z.string()
+                    .length(10, {error: "Date not right length"})
+                    .pipe(z.coerce.date({error: "Invalid date format"}))]);
+
+const CountryJobOrgSchema = z.union([
+                            z.string()
+                            .min(1, {error: "Field too short"})
+                            .max(64, {error: "Field too long"}),
+                            z.string().max(0)
+            ]);
+
+const BioSchema = z.union([
+                    z.string()
+                    .min(1, {error: "Bio too short"})
+                    .max(1000, {error: "Bio too long"}),
+                    z.string().max(0)
+                ]);
+
+const LinkedinLinkSchema = z.union([
+                            z.string()
+                            .refine((url) => /^https?:\/\/(www\.)?linkedin\.com\//i.test(url),
+                                    { message: "Not a LinkedIn link" }),
+                            z.string().max(0)
+                        ]);
+
+const PhoneSchema = z.union([
+                    z.e164({error: "Invalid phone number"}),
+                    z.string().max(0)
+                ]);
+
+const ProfileUpdateSchema = z.object({
+    gender: GenderTypeSchema,
+    date_of_birth: DateOfBirthSchema,
+    country: CountryJobOrgSchema,
+    job_title: CountryJobOrgSchema,
+    organization: CountryJobOrgSchema,
+    bio: BioSchema,
+    linkedin_link: LinkedinLinkSchema,
+    phone_number: PhoneSchema,
+})
 
 const app = express();
 const port = 3000;
@@ -21,7 +70,7 @@ const port = 3000;
 app.set("query parser", "extended")
 app.use(express.json());
 
-app.get('/api/v1/userid/:auth_id', async (req, res) => {
+app.get('/user/userid/:auth_id', async (req, res) => {
 	const { auth_id } = req.params;
 	try {
 		const user = await prisma.users.findUnique({
@@ -47,7 +96,7 @@ app.get('/api/v1/user/:user_id', async (req, res) => {
 	}
 });
 
-app.post('/svc-user/profile/:auth_id', async (req, res) => {
+app.post('/user/profile/:auth_id', async (req, res) => {
     console.log("in post new user\n");
     console.log(req.body);
     const newUserParse = NewUser.safeParse(req.body)
@@ -93,7 +142,6 @@ app.post('/svc-user/profile/:auth_id', async (req, res) => {
     }
 
     if (error instanceof Prisma.PrismaClientInitializationError) {
-        // Can't connect to DB
         return res.status(503).json({ error: "Database unavailable" });
     }
 
@@ -157,6 +205,69 @@ app.get('/user/:userId/connections', async (req, res) => {
         return res.status(500).json({error: "Bad gateway in svc-user get/connections"});
     }
 });
+
+app.patch('/user/profile/:user_id', async (req, res) => {
+    console.log("in update user profile route\n");
+    try {
+        //validate perms
+        const userId = parseInt(req.params.user_id);
+        if ((!req.body.permissions.includes("modifyOwnUser") && !req.body.permissions.includes("manageUserInfo")) || 
+                (req.body.permissions.includes("modifyOwnUser") && req.body.userId !== userId)){
+            return res.status(403).json({error: "Wrong permissions for route"});
+        }
+        console.log("permissions validated\n");
+        console.log(req.body.body);
+        //validate input
+        const userUpdate = ProfileUpdateSchema.safeParse(req.body.body);
+        if (!userUpdate.success)
+            return res.status(400).json({error: userUpdate.error}); //propgate wrong field properly
+        console.log("parsing validated\n");
+        //update db
+        const updatedUser = await prisma.users.update({
+            where: {user_id: userId},
+            data: {
+                gender: req.body.body.gender === "" ? null : req.body.body.gender,
+                date_of_birth: req.body.body.date_of_birth === "" ? null : req.body.body.date_of_birth,
+                country: req.body.body.country === "" ? null : req.body.body.country,
+                job_title: req.body.body.job_title === "" ? null : req.body.body.job_title,
+                organization: req.body.body.organization === "" ? null : req.body.body.organization,
+                bio: req.body.body.bio === "" ? null : req.body.body.bio,
+                linkedin_link: req.body.body.linkedin_link === "" ? null : req.body.body.linkedin_link,
+                phone_number: req.body.body.phone_number === "" ? null : req.body.body.phone_number,
+            },
+        });
+        console.log("db updated\n");
+        return res.status(201).json({error: "User succesfully updated"});
+    } catch (error) {
+        console.log("in error path\n");
+        if (error instanceof Prisma.PrismaClientInitializationError)
+            return res.status(503).json({ error: "Database unavailable" });
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            if (error.code === 'P2025') {
+                return res.status(404).json({error: "User not found"});
+            }
+            return res.status(502).json({error: error.message});
+        }
+        console.log(error);
+        return res.status(502).json({error: "Bad gateway (svc-user)"});
+    }
+})
+
+app.get('/user/connection-check/:recruiter_id/:candidate_id', async(req, res) => {
+    const [parsedRecId, parsedCanId] = [parseInt(req.params.recruiter_id), parseInt(req.params.candidate_id)];
+    if (parsedCanId <= 0 || parsedRecId <= 0)
+        return res.status(400);
+    try {
+        const validate = await prisma.connections.findUniqueOrThrow({
+            where: {
+                recruiter_id_candidate_id: {recruiter_id: parsedRecId, candidate_id: parsedCanId},
+            },
+        })
+        return res.status(200);
+    } catch (error) {
+        return res.status(403);
+    }
+})
 
 app.listen(port, () => {
 	console.log(`listening on port ${port}`);
