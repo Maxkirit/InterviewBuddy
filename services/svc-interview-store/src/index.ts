@@ -102,6 +102,31 @@ app.get('/interview/real-interviews', async (req, res) => {
 	}
 });
 
+app.get('/interview/candidat-interviews', async (req, res) => {
+	const{candidate_id, token_id, perm} = req.query;
+	const permission = JSON.parse(perm as string);
+	if ((candidate_id !== token_id && !permission.manageInterview )|| !permission.readInterview){
+		console.log('candidat_id:', candidate_id);
+		console.log('token_id:', token_id);
+		console.log('permissions:', permission);
+		return res.status(403).json({error : "forbiden"})
+	}
+	console.log("access authorized for read interview");
+	console.log('candidat_id:', candidate_id);
+	console.log('token_id:', token_id);
+	console.log('permissions:', permission);
+	try {
+		const interview = await prisma.interviews.findMany({
+			where: {candidate_id: parseInt(candidate_id as string, 10)}
+		})
+		console.log("ici on passe")
+		res.status(200).json(interview);
+	}
+	catch(e){
+		return res.status(500).json({error:"internal error"});
+	}
+});
+
 app.listen(port, () => {
 	console.log(`listening on port ${port}`);
 });
