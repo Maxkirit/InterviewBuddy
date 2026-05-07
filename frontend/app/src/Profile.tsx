@@ -2,7 +2,7 @@ import './styles/Profile.css';
 import { useEffect, useState, useContext, type SubmitEvent } from 'react';
 import { AuthContext } from './AuthProvider';
 
-export default function Profile() {
+export default function MyProfile() {
     const [firstname, setFirstname] = useState<string>();
     const [lastname, setLastname] = useState<string>();
     const [country, setCountry] = useState<string>();
@@ -49,9 +49,9 @@ export default function Profile() {
                 bio: bio ?? "",
                 linkedin_link: linkedin ?? "",
                 phone_number: phone ?? "",
-                job_title: jobTitle ?? "", // add property in profile form
-                gender: gender ?? "", // add property in profile form
-                date_of_birth: dob ?? "", // add property in profile form
+                job_title: jobTitle ?? "",
+                gender: gender ?? "",
+                date_of_birth: dob ?? "",
             })
         } catch (error) {
             // display error banner
