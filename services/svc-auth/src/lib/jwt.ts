@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import { randomBytes } from "node:crypto";
 import { prisma } from "./prisma.js";
 
-const ACCESS_SECRET = "changewhenvaultisup";
+export const ACCESS_SECRET = "changewhenvaultisup";
 const REFRESH_SECRET = "changewhenvaultisup";
 const REFRESH_MAX_AGE = 604800; //7 days in seconds === 604800
 
@@ -77,10 +77,10 @@ export async function rotateRefreshToken(oldJti: string, userId: number) {
         },
     });
     const newRefresh = await createRefreshToken(userId);
-    const newAccess = createAccessToken(userId);
+    const newAccess = await createAccessToken(userId);
     return {
-        newRefresh: newRefresh,
+        newRefresh: newRefresh.refreshToken,
         newAccess: newAccess,
-        refreshMaxAge: REFRESH_MAX_AGE,
+        refreshMaxAge: newRefresh.maxAge,
     };
 }
