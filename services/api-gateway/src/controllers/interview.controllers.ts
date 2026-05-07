@@ -56,8 +56,9 @@ export const getInterviewList = async (req: Request, res: Response) => {
 		console.log("success");
 		return res.status(200).json(result.data);
 	} catch (e) {
+		console.log("error");
 		if (axios.isAxiosError(e) && e.response?.status)
-		return res.status(e.response.status).json({ error: e.response.data.message });
+			return res.status(e.response.status).json({ error: e.response.data.error });
 		return res.status(502).json({ error: 'Bad gateway' });
 	}
 };
