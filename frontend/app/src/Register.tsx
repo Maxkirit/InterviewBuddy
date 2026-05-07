@@ -1,6 +1,6 @@
 import './styles/Auth.css';
 import { useState, useContext, type SubmitEvent } from 'react';
-import { AuthContext } from './AuthProvider';
+import { AuthContext, decodeJwt } from './AuthProvider';
 import { Navigate, Link, useNavigate } from 'react-router-dom';
 import { z, ZodError } from 'zod';
 import axios from 'axios';
@@ -50,8 +50,9 @@ export default function Register() {
                 password: password,
                 role_type: selectedRole,
             });
-            authContext?.login(result.data.accessToken);
-            navigate("/")
+            const decoded = decodeJwt(result.data.access);
+            authContext?.login(result.data.accessToken, parseInt(decoded.userId));
+            navigate("/");
         } catch (error) {
             if (error instanceof ZodError) {
                 // error banner

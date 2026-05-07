@@ -2,7 +2,7 @@ import "./styles/Auth.css";
 import { useState, useContext, type SubmitEvent } from "react";
 import { z, ZodError } from 'zod';
 import axios from "axios";
-import { AuthContext } from "./AuthProvider";
+import { AuthContext, decodeJwt } from "./AuthProvider";
 import { Navigate, Link, useNavigate } from "react-router-dom";
 
 const LoginSchema = z.object({
@@ -39,7 +39,8 @@ export default function Login() {
                 email: email,
                 password: password,
             });
-            authContext?.login(result.data.accessToken);
+            const decoded = decodeJwt(result.data.accessToken);
+            authContext?.login(result.data.accessToken, parseInt(decoded.userId));
             navigate("/");
         } catch (error) {
             if (error instanceof ZodError) {

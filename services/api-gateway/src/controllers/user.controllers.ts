@@ -25,7 +25,7 @@ export const listConnections = async (req: Request, res: Response) => {
 				permissions: (req as ReqWithUser).permissions,
 			}
 		});
-        res.status(200).json({message: "Connection list retrieved"});
+        res.status(200).json({connections: result.data.connections, message: "Connection list retrieved"});
     } catch (error) {
         if (axios.isAxiosError<ApiError>(error) && error.response?.status) {
             return res.status(error.response.status).json({ error: error.response.data.message });
