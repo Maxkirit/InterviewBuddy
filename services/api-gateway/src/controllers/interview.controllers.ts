@@ -35,11 +35,29 @@ export const createMockInterview = async (req: Request, res: Response) => {
     }
 }
 
-export const getInterviewList = async (req :Request, res: Response) =>{
-	try{
-		const result = await axios.post("http://svc-interview-store:3000/interview/interviewList/:user_id", {
-            userId: (req as ReqWithUser).userId,
-            permissions: (req as ReqWithUser).permissions,
-        });
+export const getInterviewList = async (req: Request, res: Response) => {
+	console.log('route redirect to interview');
+	const { recruiter_id } = req.params;
+	const tokenReq = req as ReqWithUser;
+
+	const token_id = tokenReq.userId ?? req.query.token_id;
+  	const permissions = tokenReq.permissions ?? JSON.parse(req.query.perm as string || '{}');
+	try {
+		console.log('recruiter_id:', recruiter_id);
+		console.log('token_id:', token_id);
+		console.log('permissions:', permissions);
+		const result = await axios.get(`http://svc-interview-store:3000/interview/interviewList`, {
+			params: {
+				recruiter_id: recruiter_id,
+				token_id: token_id,
+				perm: JSON.stringify(permissions)
+			}
+		});
+		console.log("success");
+		return res.status(200).json(result.data);
+	} catch (e) {
+		if (axios.isAxiosError(e) && e.response?.status)
+		return res.status(e.response.status).json({ error: e.response.data.message });
+		return res.status(502).json({ error: 'Bad gateway' });
 	}
-}
+};

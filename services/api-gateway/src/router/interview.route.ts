@@ -5,6 +5,6 @@ const router = Router()
 
 router.post('/real-interview', createRealInterview);
 router.post('/mock-inteview', createMockInterview);
-router.get('/interviewList', getInterviewList);
+router.get('/interviewList/:recruiter_id', getInterviewList);
 
 export default router

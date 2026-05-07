@@ -1,5 +1,46 @@
 services:
     api-gateway:
+<<<<<<< HEAD
+=======
+        # profiles: ["app"]
+        container_name: api-gateway
+        build: services/api-gateway
+        ports:
+            - "3000:3000"
+        networks:
+            - frontend-network
+            - backend-network
+        restart: unless-stopped
+
+    # svc-auth:
+    #     container_name: svc-auth
+    #     build: services/svc-auth
+    #     networks:
+    #         - backend-network
+    #     # secrets:
+    #     #     - svc_auth_role_id
+    #     #     - svc_auth_secret_id
+    #     restart: unless-stopped
+    #     secrets:
+    #         - auth_db_superuser_password
+    #     depends_on:
+    #         auth-db:
+    #             condition: service_healthy
+
+    # svc-user:
+    #     container_name: svc-user
+    #     build: services/svc-user
+    #     networks:
+    #         - backend-network
+    #     restart: unless-stopped
+    #     secrets:
+    #       - user_db_superuser_password
+    #     depends_on:
+    #       user-db:
+    #         condition: service_healthy
+
+    svc-interview-store:
+>>>>>>> 816f352 (fix: connexion between interview & api-gateway)
         # profiles: ["app"]
         container_name: api-gateway
         build: services/api-gateway
