@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./Login";
 import Register from "./Register";
 import ProtectedLayout from "./ProtectedLayout";
-import Profile from "./Profile";
+import MyProfile from "./Profile";
 
 export default function Router() {
     return (
@@ -12,7 +12,7 @@ export default function Router() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route element={<ProtectedLayout />}>
-                    <Route path="/profile" element={<Profile />} />
+                    <Route path="/profile" element={<MyProfile />} />
                     <Route path="/interview" />
                     <Route path="/candidate" />
                     <Route path="/recruiter" />

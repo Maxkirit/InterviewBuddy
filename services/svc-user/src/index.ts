@@ -84,7 +84,7 @@ app.get('/user/userid/:auth_id', async (req, res) => {
 	}
 });
 
-app.get('/api/v1/user/:user_id', async (req, res) => {
+app.get('/user/:user_id', async (req, res) => {
 	const { user_id } = req.params;
 	try {
 		const user = await prisma.users.findUnique({
@@ -177,7 +177,7 @@ app.get('/user/:userId/connections', async (req, res) => {
                         firstname: true,
                         lastname: true,
                         profile_pic_url: true,
-                        job_title: true,
+                        organization: true,
                     },
                 },
                 // When this user is the recruiter, select the candidate's info
@@ -187,7 +187,6 @@ app.get('/user/:userId/connections', async (req, res) => {
                         firstname: true,
                         lastname: true,
                         profile_pic_url: true,
-                        job_title: true,
                     },
                 },
             },
