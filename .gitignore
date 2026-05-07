@@ -5,3 +5,5 @@
 /infrastructure/secrets/*
 
 services/*/dist
+
+/logs/*

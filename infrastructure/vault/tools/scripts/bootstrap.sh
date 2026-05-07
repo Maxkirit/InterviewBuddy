@@ -127,17 +127,27 @@ while IFS= read -r svc || [ -n "$svc" ]; do
   vault policy write "$POLICY_NAME" "$POLICY_FILE" >/dev/null
 
   # Create/Update AppRole (idempotent)
-  vault write "auth/approle/role/$ROLE" token_policies="$POLICY_NAME" >/dev/null
+
+  vault write auth/approle/role/$ROLE \
+  token_policies="$POLICY_NAME" \
+  token_ttl="30m" \
+  token_max_ttl="2h" \
+  secret_id_ttl="24h" \
+  secret_id_num_uses=0
 
   # Export RoleID/SecretID (for docker secrets / mounts)
   ROLE_ID="$(vault read -field=role_id "auth/approle/role/$ROLE/role-id")"
   SECRET_ID="$(vault write -f -field=secret_id "auth/approle/role/$ROLE/secret-id")"
-
+  
+  mkdir -p "$CREDS_OUT_DIR/$ROLE"
   umask 077
   echo "$ROLE_ID" > "$CREDS_OUT_DIR/$ROLE/$ROLE.role_id"
   echo "$SECRET_ID" > "$CREDS_OUT_DIR/$ROLE/$ROLE.secret_id"
+  
+  chown 100:1000 "$CREDS_OUT_DIR/$ROLE/$ROLE.role_id" "$CREDS_OUT_DIR/$ROLE/$ROLE.secret_id" 2>/dev/null || true
+  chmod 0440 "$CREDS_OUT_DIR/$ROLE/$ROLE.role_id" "$CREDS_OUT_DIR/$ROLE/$ROLE.secret_id"
 
-  echo "[bootstrap] wrote $CREDS_OUT_DIR/$ROLE.role_id and $CREDS_OUT_DIR/$ROLE.secret_id"
+  echo "[bootstrap] wrote $CREDS_OUT_DIR/$ROLE/$ROLE.role_id and $CREDS_OUT_DIR/$ROLE/$ROLE.secret_id"
 done < "$SERVICES_FILE"
 
 echo "[bootstrap] DONE"
