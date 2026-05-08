@@ -5,9 +5,17 @@ import axios from "axios";
 import { AuthContext, decodeJwt } from "./AuthProvider";
 import { Navigate, Link, useNavigate } from "react-router-dom";
 
+export const passwordSchema = z.string()
+                        .min(8, {error: "Password too short", abort: true})
+                        .max(128, {error: "Password too long", abort: true})
+                        .refine((password) => /[A-Z]/.test(password), {error: "Missing at least 1 uppercase letter", abort: true})
+                        .refine((password) => /[a-z]/.test(password), {error: "Missing at least 1 lowercase letter", abort: true})
+                        .refine((password) => /[!@#$%^&*()+\-=[\]{};':"\\|,.<>/?~`]/.test(password), {error: "Missing at least 1 special character", abort: true});
+
+
 const LoginSchema = z.object({
     email: z.email(),
-    password: z.string().min(1),
+    password: passwordSchema,
 });
 
 export default function Login() {

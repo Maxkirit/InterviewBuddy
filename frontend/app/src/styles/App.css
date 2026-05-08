@@ -288,7 +288,6 @@ nav {
 dialog {
     border: none;
     border-radius: 16px;
-    padding: 32px 36px;
     width: 100%;
     max-width: 440px;
     box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12);
@@ -300,6 +299,10 @@ dialog {
 
 dialog::backdrop {
     background: rgba(0, 0, 0, 0.35);
+}
+
+.modal-div {
+    padding: 32px 36px;
 }
 
 .modal-header {

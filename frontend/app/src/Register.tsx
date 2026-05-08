@@ -4,12 +4,13 @@ import { AuthContext, decodeJwt } from './AuthProvider';
 import { Navigate, Link, useNavigate } from 'react-router-dom';
 import { z, ZodError } from 'zod';
 import axios from 'axios';
+import { passwordSchema } from './Login';
 
 const RegisterSchema = z.object({
     first_name: z.string().min(1),
     last_name: z.string().min(1),
     email: z.email(),
-    password: z.string().min(1),
+    password: passwordSchema,
     role_type: z.literal(["candidate", "recruiter"]),
 });
 

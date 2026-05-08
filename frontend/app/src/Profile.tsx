@@ -1,6 +1,22 @@
 import './styles/Profile.css';
 import { useEffect, useState, useContext, type SubmitEvent } from 'react';
 import { AuthContext } from './AuthProvider';
+import z from 'zod';
+
+const ProfileSchema = z.object({
+    firstname: z.string().min(1),
+    lastname: z.string().min(1),
+    country: z.string().nullable(),
+    organization: z.string().nullable(),
+    bio: z.string().nullable(),
+    linkedin_link: z.union([z.string().refine((url) => /^https?:\/\/(www\.)?linkedin\.com\//i.test(url),
+                            { message: "Not a LinkedIn link" }),
+                            z.string().max(0)]),
+    phone_number: z.string().nullable(),
+    job_title: z.string().nullable(),
+    gender: z.literal(["male", "female", "non_binary", "prefer_not_to_say"]).nullable(),
+    date_of_birth: z.date().nullable(),
+});
 
 export default function MyProfile() {
     const [firstname, setFirstname] = useState<string>();
@@ -19,7 +35,7 @@ export default function MyProfile() {
     useEffect(() => {
         async function getUserInfo() {
             try {
-                const userInfo = await authContext.axiosInstance.get(`http://localhost:3000/api/v1/user/${authContext.userId}`);
+                const userInfo = await authContext.axiosInstance.get(`/api/v1/user/${authContext.userId}`);
                 setFirstname(userInfo.data.firstname);
                 setLastname(userInfo.data.lastname);
                 setCountry(userInfo.data.country);
@@ -41,7 +57,7 @@ export default function MyProfile() {
     async function handleSubmit(event: SubmitEvent) {
         event.preventDefault();
         try {
-            await authContext.axiosInstance.patch('http://localhost:3000/api/v1/user/profile', {
+            const input = {
                 firstname: firstname ?? "",
                 lastname: lastname ?? "",
                 country: country ?? "",
@@ -52,7 +68,9 @@ export default function MyProfile() {
                 job_title: jobTitle ?? "",
                 gender: gender ?? "",
                 date_of_birth: dob ?? "",
-            })
+            }
+            ProfileSchema.parse(input);
+            await authContext.axiosInstance.patch('http://localhost:3000/api/v1/user/profile', input);
         } catch (error) {
             // display error banner
         }
