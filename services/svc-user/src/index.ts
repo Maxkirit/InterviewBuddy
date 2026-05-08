@@ -83,15 +83,19 @@ app.get('/user/userid/:auth_id', async (req, res) => {
 	}
 });
 
-app.get('/api/v1/user/:user_id', async (req, res) => {
-	const { user_id } = req.params;
-	const{token_id, perm} = req.query;
+app.get('/user/:user_id', async (req, res) => {
+	const{user_id, token_id, perm} = req.query;
 	const permission = JSON.parse(perm as string);
-	if (user_id !== token_id && !permission.readUserInfo)
+	console.log("start on route user get unser info");
+	if (user_id !== token_id || !permission.readUserInfo)
 		return res.status(403).json({error: "forbiden"})
+	console.log("access authorized for read user info");
+	console.log('user_id:', user_id);
+	console.log('token_id:', token_id);
+	console.log('permissions:', permission);
 	try {
 		const user = await prisma.users.findUnique({
-			where: { user_id: parseInt(user_id, 10) },
+			where: { user_id: parseInt(user_id as string, 10) },
 		});
 		if (!user) return res.status(404).json({ error: "not find" });
 		res.json(user);

@@ -31,7 +31,7 @@ app.use(cookieParser());
 // // other routes after (needs verification) 
 
 // app.use('/api/v1/auth', protectedAuthRoute)
-// app.use('/api/v1/user', userRoute)
+app.use('/api/v1/user', userRoute)
 app.use('/api/v1/interview', interviewRoute);
 
 app.listen(port, () => {

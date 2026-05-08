@@ -4,14 +4,25 @@ import { ReqWithUser } from '../validateToken.js';
 
 export const getUser = async(req: Request, res: Response) =>{
 	const { user_id } = req.params; 
-	const reqtoken = req as ReqWithUser
+	const tokenReq = req as ReqWithUser;
+	console.log("in get user info");
+	const token_id = tokenReq.userId ?? req.query.token_id;
+  	const permissions = tokenReq.permissions ?? JSON.parse(req.query.perm as string || '{}');
 	try{
-		const user = await axios.get(`http://svc-user:3000/user/${user_id}`)
+		console.log('token_id:', token_id);
+		console.log('perm', permissions);
+		const user = await axios.get(`http://svc-user:3000/user/${user_id}`,{
+			params :{
+				user_id: user_id,
+				token_id: token_id,
+				perm: JSON.stringify(permissions)
+			}
+		})
 		return(res.status(200).json(user.data))
 	}
-	catch(error){
-		if (axios.isAxiosError(error) && error.response?.status)
-			return res.status(error.response.status).json({error: error.response.data.message})
+	catch(e){
+		if (axios.isAxiosError(e) && e.response?.status)
+			return res.status(e.response.status).json({error: e.response.data.error})
 		return res.status(502).json({ error: 'Bad gateway' });
 	}
 };
