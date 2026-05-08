@@ -203,7 +203,7 @@ app.get('/user/:userId/connections', async (req, res) => {
                         firstname: true,
                         lastname: true,
                         profile_pic_url: true,
-                        job_title: true,
+                        organization: true,
                     },
                 },
                 // When this user is the recruiter, select the candidate's info
@@ -213,7 +213,6 @@ app.get('/user/:userId/connections', async (req, res) => {
                         firstname: true,
                         lastname: true,
                         profile_pic_url: true,
-                        job_title: true,
                     },
                 },
             },
