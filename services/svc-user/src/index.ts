@@ -4,6 +4,7 @@ import { gender_type } from './generated/prisma/enums.js';
 import { role_type } from './generated/prisma/enums.js';
 import { string, z } from 'zod';
 import { error } from 'node:console';
+import { addConnection } from './connections/addConnection.js';
 
 const nameSurnameSchema = z.string()
                         .min(1, {error: "Name or surname field too short", abort: true})
@@ -294,6 +295,8 @@ app.get('/user/connection-check/:recruiter_id/:candidate_id', async(req, res) =>
         return res.status(403);
     }
 })
+
+app.post('/user/:user_id/connections/:link_id', addConnection);
 
 app.listen(port, () => {
 	console.log(`listening on port ${port}`);
