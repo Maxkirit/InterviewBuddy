@@ -19,13 +19,22 @@ export default function CandidateOfficialInterview() {
     console.log("Candidate interviews mounts");
 
     useEffect(() => {
-        console.log("In use effect");
         async function getInterviews() {
-            setInterviews([{id: 1, recruiterId: 2, candidateId: 1, jobTitle: "Big Boss", status: "scheduled", dueDate: new Date("2026-05-18")}])
+            // setInterviews([{id: 1, recruiterId: 2, candidateId: 1, jobTitle: "Big Boss", status: "scheduled", dueDate: new Date("2026-05-18")}])
             try {
-                const result = await authContext.axiosInstance.get(`/api/v1/interview/${authContext.userId}`);
-                setInterviews(result.data.interviews);
+                const result = await authContext.axiosInstance.get(`/api/v1/interview/candidat-interviews/${authContext.userId}`);
+                console.log(result.data);
+                const parsed = (result.data).map((item) => ({
+                    id: item.unique_interview_id,
+                    recruiterId: item.recruiter_id,
+                    candidateId: item.candidate_id,
+                    jobTitle: item.job_title,
+                    status: item.status,
+                    dueDate: new Date(item.du_date),
+                }));
+                setInterviews(parsed);
             } catch (error) {
+                console.log("in error path");
                 // error banner
             }
         }
