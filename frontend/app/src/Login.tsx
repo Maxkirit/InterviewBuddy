@@ -48,7 +48,7 @@ export default function Login() {
                 password: password,
             });
             const decoded = decodeJwt(result.data.accessToken);
-            authContext?.login(result.data.accessToken, parseInt(decoded.userId));
+            authContext?.login(result.data.accessToken, parseInt(decoded.userId), decoded.role);
             navigate("/");
         } catch (error) {
             if (error instanceof ZodError) {

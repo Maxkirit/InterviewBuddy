@@ -4,13 +4,13 @@ import { AuthContext, decodeJwt } from './AuthProvider';
 import { Navigate, Link, useNavigate } from 'react-router-dom';
 import { z, ZodError } from 'zod';
 import axios from 'axios';
-import { passwordSchema } from './Login';
+// import { passwordSchema } from './Login';
 
 const RegisterSchema = z.object({
     first_name: z.string().min(1),
     last_name: z.string().min(1),
     email: z.email(),
-    password: passwordSchema,
+    // password: passwordSchema,
     role_type: z.literal(["candidate", "recruiter"]),
 });
 
@@ -51,8 +51,8 @@ export default function Register() {
                 password: password,
                 role_type: selectedRole,
             });
-            const decoded = decodeJwt(result.data.access);
-            authContext?.login(result.data.accessToken, parseInt(decoded.userId));
+            const decoded = decodeJwt(result.data.accessToken);
+            authContext?.login(result.data.accessToken, parseInt(decoded.userId), decoded.role);
             navigate("/");
         } catch (error) {
             if (error instanceof ZodError) {

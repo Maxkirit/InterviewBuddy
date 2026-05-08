@@ -3,9 +3,9 @@ import { createContext, useEffect, useState, type ReactNode } from "react";
 
 type AuthContextType = {
     userId: number,
-    // role: string,
+    role: string,
     accessToken: string | null,
-    login: (token: string, userId: number) => void;
+    login: (token: string, userId: number, role: string) => void;
     logout: () => void;
     isLoading: boolean,
     axiosInstance: AxiosInstance,
@@ -14,6 +14,7 @@ type AuthContextType = {
 type JwtPayload = {
     userId: string, 
     permissions: string[],
+    role: string,
 };
 
 export const AuthContext = createContext<AuthContextType | null>(null);
@@ -26,12 +27,13 @@ export function decodeJwt(token: string): JwtPayload {
 export default function AuthProvider({ children }: { children: ReactNode }) {
     const [token, setToken] = useState<string | null>(null);
     const [userId, setUserId] = useState<number | null>(null);
-    // const [role, setRole] = useState<string | null>(null);
+    const [role, setRole] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    function login(token: string, userId: number) {
+    function login(token: string, userId: number, role: string) {
         setToken(token);
         setUserId(userId);
+        setRole(role);
     }
 
     function logout() {
@@ -99,6 +101,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
                 const decoded = decodeJwt(result.data.accessToken);
                 setToken(result.data.accessToken);
                 setUserId(parseInt(decoded.userId));
+                setRole(decoded.role);
             } catch (error) {
                 if (axios.isCancel(error)) return;
                 // genuinely not logged in
@@ -120,7 +123,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     // }
 
     return (
-        <AuthContext.Provider value={{ accessToken: token, userId: userId, login: login, logout: logout, isLoading: isLoading, axiosInstance: axiosInstance }}>
+        <AuthContext.Provider value={{ accessToken: token, userId: userId, role: role, login: login, logout: logout, isLoading: isLoading, axiosInstance: axiosInstance }}>
             {children}
         </AuthContext.Provider>
     );
