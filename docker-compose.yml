@@ -1,46 +1,5 @@
 services:
     api-gateway:
-<<<<<<< HEAD
-=======
-        # profiles: ["app"]
-        container_name: api-gateway
-        build: services/api-gateway
-        ports:
-            - "3000:3000"
-        networks:
-            - frontend-network
-            - backend-network
-        restart: unless-stopped
-
-    # svc-auth:
-    #     container_name: svc-auth
-    #     build: services/svc-auth
-    #     networks:
-    #         - backend-network
-    #     # secrets:
-    #     #     - svc_auth_role_id
-    #     #     - svc_auth_secret_id
-    #     restart: unless-stopped
-    #     secrets:
-    #         - auth_db_superuser_password
-    #     depends_on:
-    #         auth-db:
-    #             condition: service_healthy
-
-    # svc-user:
-    #     container_name: svc-user
-    #     build: services/svc-user
-    #     networks:
-    #         - backend-network
-    #     restart: unless-stopped
-    #     secrets:
-    #       - user_db_superuser_password
-    #     depends_on:
-    #       user-db:
-    #         condition: service_healthy
-
-    svc-interview-store:
->>>>>>> 816f352 (fix: connexion between interview & api-gateway)
         # profiles: ["app"]
         container_name: api-gateway
         build: services/api-gateway
@@ -81,18 +40,18 @@ services:
           user-db:
             condition: service_healthy
 
-    # svc-interview-store:
-    #     # profiles: ["app"]
-    #     container_name: svc-interview-store
-    #     build: services/svc-interview-store
-    #     networks:
-    #         - backend-network
-    #     restart: unless-stopped
-    #     depends_on:
-    #       interview-store-db:
-    #         condition: service_healthy
-    #     secrets:
-    #         - interview_store_db_superuser_password
+    svc-interview-store:
+        # profiles: ["app"]
+        container_name: svc-interview-store
+        build: services/svc-interview-store
+        networks:
+            - backend-network
+        restart: unless-stopped
+        depends_on:
+          interview-store-db:
+            condition: service_healthy
+        secrets:
+            - interview_store_db_superuser_password
 
     # # svc-serialization:
     # #     container_name: svc-serialization
@@ -156,23 +115,23 @@ services:
           - user_db:/var/lib/postgresql
         restart: unless-stopped
 
-    # interview-store-db:
-    #     # profiles: ["app"]
-    #     container_name: interview-store-db
-    #     build: infrastructure/databases/interview-store-db
-    #     networks:
-    #         - backend-network
-    #     env_file:
-    #       - infrastructure/databases/interview-store-db/.env_interview_store_db
-    #     environment:
-    #       POSTGRES_PASSWORD_FILE: /run/secrets/interview_store_db_superuser_password
-    #     secrets:
-    #       - interview_store_db_superuser_password
-    #       - interview_store_db_admin_password
-    #       - interview_store_db_app_password
-    #     volumes:
-    #       - interview_store_db:/var/lib/postgresql
-    #     restart: unless-stopped
+    interview-store-db:
+        # profiles: ["app"]
+        container_name: interview-store-db
+        build: infrastructure/databases/interview-store-db
+        networks:
+            - backend-network
+        env_file:
+          - infrastructure/databases/interview-store-db/.env_interview_store_db
+        environment:
+          POSTGRES_PASSWORD_FILE: /run/secrets/interview_store_db_superuser_password
+        secrets:
+          - interview_store_db_superuser_password
+          - interview_store_db_admin_password
+          - interview_store_db_app_password
+        volumes:
+          - interview_store_db:/var/lib/postgresql
+        restart: unless-stopped
 
     # grading-db:
     #     container_name: grading-db
