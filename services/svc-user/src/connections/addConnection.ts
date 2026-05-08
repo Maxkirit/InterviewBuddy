@@ -6,12 +6,12 @@ export const addConnection =  async (req: Request, res: Response) =>
 {
 	const { userId, permissions } = req.body;
 
-	if (!permissions.includes("createConnection")) 
+	if (!permissions.includes("createConnection") || req.body.userId !== req.params.user_id) 
         return res.status(403).json({error: "No permissions for this actions"});
 
 	const invite = await prisma.invite_link.findUnique({
   		where: { link:req.params.link_id as string}
-	})
+	})	
 	if (!invite)
 		return res.status(404).json({error: "link not found"});
 	
