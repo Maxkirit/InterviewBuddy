@@ -83,7 +83,22 @@ app.post('/interview/real-interview', async (req, res) => {
 app.get('/interview/real-interviews', async (req, res) => {
 	const{recruiter_id, token_id, perm} = req.query;
 	const permission = JSON.parse(perm as string);
-	if ((recruiter_id !== token_id && !permission.manageInterview )|| !permission.readInterview){
+
+	if (recruiter_id === 'all') {
+		console.log("try to return all db to an admin")
+		if (!permission.manageInterview) {
+			return res.status(403).json({ error: 'Forbidden' });
+		}
+		try {
+			console.log("admin perm okay...")
+			const interviews = await prisma.interviews.findMany();
+			return res.status(200).json(interviews);
+		} catch (e) {
+			return res.status(500).json({ error: 'Internal error' });
+		}
+	}
+
+	if (!permission.manageInterview && (recruiter_id !== token_id || !permission.readInterview)){
 		return res.status(403).json({error : "forbiden"})
 	}
 	console.log("access authorized for read interview");
@@ -105,7 +120,7 @@ app.get('/interview/real-interviews', async (req, res) => {
 app.get('/interview/candidat-interviews', async (req, res) => {
 	const{candidate_id, token_id, perm} = req.query;
 	const permission = JSON.parse(perm as string);
-	if ((candidate_id !== token_id && !permission.manageInterview )|| !permission.readInterview){
+	if (!permission.manageInterview && (candidate_id !== token_id || !permission.readInterview)){
 		console.log('candidat_id:', candidate_id);
 		console.log('token_id:', token_id);
 		console.log('permissions:', permission);

@@ -37,7 +37,7 @@ export const createMockInterview = async (req: Request, res: Response) => {
 
 export const getInterviewReal = async (req: Request, res: Response) => {
 	console.log('route redirect to interview');
-	const { recruiter_id } = req.params;
+	const { recruiter_id } = req.params; // recuperer en param puis passer un query si vous trouver que c'est incoherent je modifie
 	const tokenReq = req as ReqWithUser;
 
 	const token_id = tokenReq.userId ?? req.query.token_id;
