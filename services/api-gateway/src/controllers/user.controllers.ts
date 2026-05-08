@@ -1,17 +1,27 @@
 import { Request, Response } from 'express';
-import { ApiError } from '../index.js';
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 import { ReqWithUser } from '../validateToken.js';
 
 export const getUser = async(req: Request, res: Response) =>{
 	const { user_id } = req.params; 
+	const tokenReq = req as ReqWithUser;
+	console.log("in get user info");
+	const token_id = tokenReq.userId;
+  	const permissions = tokenReq.permissions;
 	try{
-		const user = await axios.get(`http://svc-user:3000/user/${user_id}`)
+		console.log('token_id:', token_id);
+		console.log('perm', permissions);
+		const user = await axios.get(`http://svc-user:3000/user/${user_id}`,{
+			params :{
+				token_id: token_id,
+				perm: permissions
+			}
+		})
 		return(res.status(200).json(user.data))
 	}
-	catch(error){
-		if (axios.isAxiosError(error) && error.response?.status)
-			return res.status(error.response.status).json({error: error.response.data.message})
+	catch(e){
+		if (axios.isAxiosError(e) && e.response?.status)
+			return res.status(e.response.status).json({error: e.response.data.error})
 		return res.status(502).json({ error: 'Bad gateway' });
 	}
 };
