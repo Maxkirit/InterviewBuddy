@@ -40,8 +40,8 @@ export const getInterviewReal = async (req: Request, res: Response) => {
 	const { recruiter_id } = req.params; // recuperer en param puis passer un query si vous trouver que c'est incoherent je modifie
 	const tokenReq = req as ReqWithUser;
 
-	const token_id = tokenReq.userId ?? req.query.token_id;
-  	const permissions = tokenReq.permissions ?? JSON.parse(req.query.perm as string || '{}');
+	const token_id = tokenReq.userId;
+  	const permissions = tokenReq.permissions;
 	try {
 		console.log('recruiter_id:', recruiter_id);
 		console.log('token_id:', token_id);
@@ -50,7 +50,7 @@ export const getInterviewReal = async (req: Request, res: Response) => {
 			params: {
 				recruiter_id: recruiter_id,
 				token_id: token_id,
-				perm: JSON.stringify(permissions)
+				perm: permissions
 			}
 		});
 		console.log("success");
@@ -68,8 +68,8 @@ export const getInterviewCandidat = async (req: Request, res: Response) => {
 	const { candidat_id } = req.params;
 	const tokenReq = req as ReqWithUser;
 
-	const token_id = tokenReq.userId ?? req.query.token_id;
-  	const permissions = tokenReq.permissions ?? JSON.parse(req.query.perm as string || '{}');
+	const token_id = tokenReq.userId;
+  	const permissions = tokenReq.permissions;
 	try {
 		console.log('candidat_id:', candidat_id);
 		console.log('token_id:', token_id);
@@ -78,7 +78,7 @@ export const getInterviewCandidat = async (req: Request, res: Response) => {
 			params: {
 				candidate_id: candidat_id,
 				token_id: token_id,
-				perm: JSON.stringify(permissions)
+				perm: permissions
 			}
 		});
 		console.log("success");

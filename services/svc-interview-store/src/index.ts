@@ -2,6 +2,7 @@ import express, { Request } from 'express';
 import { prisma, Prisma } from "./lib/prisma.js";
 import { int, z } from 'zod';
 import axios from 'axios';
+import { parseArgs } from 'node:util';
 
 export interface ReqWithUser extends Request {
     userId: number;
@@ -32,6 +33,7 @@ const RealInterviewSchema = z.object({
     due_date: z.date(),
 });
 
+app.set("query parser", "extended")
 app.use(express.json())
 
 app.post('/interview/mock-interview', async (req, res) => {
@@ -81,12 +83,15 @@ app.post('/interview/real-interview', async (req, res) => {
 });
 
 app.get('/interview/real-interviews', async (req, res) => {
-	const{recruiter_id, token_id, perm} = req.query;
-	const permission = JSON.parse(perm as string);
+	console.log('req.query:', req.query);
+	const{recruiter_id, token_id} = req.query;
+	const tmp = req.query.perm ?? {};
+	const permission = Object.values(tmp) as string[];
+	console.log('permission:', permission);
 
 	if (recruiter_id === 'all') {
 		console.log("try to return all db to an admin")
-		if (!permission.manageInterview) {
+		if (!permission.includes("manageInterview")) {
 			return res.status(403).json({ error: 'Forbidden' });
 		}
 		try {
@@ -98,7 +103,7 @@ app.get('/interview/real-interviews', async (req, res) => {
 		}
 	}
 
-	if (!permission.manageInterview && (recruiter_id !== token_id || !permission.readInterview)){
+	if (!permission.includes("manageInterview") && (recruiter_id !== token_id || !permission.includes("readInterview"))){
 		return res.status(403).json({error : "forbiden"})
 	}
 	console.log("access authorized for read interview");
@@ -118,9 +123,12 @@ app.get('/interview/real-interviews', async (req, res) => {
 });
 
 app.get('/interview/candidat-interviews', async (req, res) => {
-	const{candidate_id, token_id, perm} = req.query;
-	const permission = JSON.parse(perm as string);
-	if (!permission.manageInterview && (candidate_id !== token_id || !permission.readInterview)){
+	console.log('req.query:', req.query);
+	const{candidate_id, token_id} = req.query;
+	const tmp = req.query.perm ?? {};
+	const permission = Object.values(tmp) as string[];
+
+	if (!permission.includes("manageInterview") && (candidate_id !== token_id || !permission.includes("readInterview"))){
 		console.log('candidat_id:', candidate_id);
 		console.log('token_id:', token_id);
 		console.log('permissions:', permission);

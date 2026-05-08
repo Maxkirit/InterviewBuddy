@@ -6,16 +6,15 @@ export const getUser = async(req: Request, res: Response) =>{
 	const { user_id } = req.params; 
 	const tokenReq = req as ReqWithUser;
 	console.log("in get user info");
-	const token_id = tokenReq.userId ?? req.query.token_id;
-  	const permissions = tokenReq.permissions ?? JSON.parse(req.query.perm as string || '{}');
+	const token_id = tokenReq.userId;
+  	const permissions = tokenReq.permissions;
 	try{
 		console.log('token_id:', token_id);
 		console.log('perm', permissions);
 		const user = await axios.get(`http://svc-user:3000/user/${user_id}`,{
 			params :{
-				user_id: user_id,
 				token_id: token_id,
-				perm: JSON.stringify(permissions)
+				perm: permissions
 			}
 		})
 		return(res.status(200).json(user.data))

@@ -25,12 +25,12 @@ app.use(express.json());
 // middleware for cookie parsing
 app.use(cookieParser());
 
-// app.use('/api/v1/auth',authRoute);
+app.use('/api/v1/auth',authRoute);
 // // signup before validateAcccessToken
-// app.use(validateAcccessToken);
+app.use(validateAcccessToken);
 // // other routes after (needs verification) 
 
-// app.use('/api/v1/auth', protectedAuthRoute)
+app.use('/api/v1/auth', protectedAuthRoute)
 app.use('/api/v1/user', userRoute)
 app.use('/api/v1/interview', interviewRoute);
 

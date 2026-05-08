@@ -84,23 +84,40 @@ app.get('/user/userid/:auth_id', async (req, res) => {
 });
 
 app.get('/user/:user_id', async (req, res) => {
-	const{user_id, token_id, perm} = req.query;
-	const permission = JSON.parse(perm as string);
-	console.log("start on route user get unser info");
-	if (user_id !== token_id || !permission.readUserInfo)
+	const { user_id } = req.params;
+	const token_id = req.query.token_id as string;
+	const tmp = req.query.perm ?? {};
+	const permission = Object.values(tmp) as string[];
+
+	console.log(`start on route user get unser info perm : ${permission} token : ${token_id}, user_id: ${user_id}`);
+	if (user_id === 'all') {
+		console.log("try to return all db to an admin")
+		if (!permission?.includes("manageUserInfo")) {
+			return res.status(403).json({ error: 'Forbidden' });
+		}
+		try {
+			console.log("admin perm okay...")
+			const user = await prisma.users.findMany();
+			return res.status(200).json(user);
+		} catch (e) {
+			return res.status(500).json({ error: 'Internal error' });
+	}
+
+	}
+	if (user_id !== token_id || !permission?.includes("readUserInfo"))
 		return res.status(403).json({error: "forbiden"})
-	console.log("access authorized for read user info");
-	console.log('user_id:', user_id);
-	console.log('token_id:', token_id);
-	console.log('permissions:', permission);
-	try {
-		const user = await prisma.users.findUnique({
-			where: { user_id: parseInt(user_id as string, 10) },
-		});
-		if (!user) return res.status(404).json({ error: "not find" });
-		res.json(user);
-	} catch (e) {
-		return res.status(500).json({ error: "internal error" });
+		console.log("access authorized for read user info");
+		console.log('user_id:', user_id);
+		console.log('token_id:', token_id);
+		console.log('permissions:', permission);
+		try {
+			const user = await prisma.users.findUnique({
+				where: { user_id: parseInt(user_id as string, 10) },
+			});
+			if (!user) return res.status(404).json({ error: "not find" });
+			res.json(user);
+		} catch (e) {
+			return res.status(500).json({ error: "internal error" });
 	}
 });
 
@@ -161,7 +178,9 @@ app.post('/user/profile/:auth_id', async (req, res) => {
 app.get('/user/:userId/connections', async (req, res) => {
     const userId = parseInt(req.params.userId);
     const id = parseInt(req.query.userId as string);
-    const permissions = req.query.permissions as string[];
+    const tmp = req.query.perm ?? {};
+	const permissions = Object.values(tmp) as string[];
+
     console.log(`userId=${userId} id=${id} permissions=${permissions}`);
     if ((!permissions?.includes("readConnection") && !permissions?.includes("manageConnection"))
         || (permissions?.includes("readConnection") && id != userId)) {
