@@ -1,5 +1,22 @@
 # FORMAT:
-# <service> <vault_kv_path> <field_name> <docker_secret_name>
+# <service> <kv_path> <field> literal:<value>
+# <service> <kv_path> <field> secret:<docker_secret_name>
 
-vault-test kv/svc/vault-test/demo msg vault_test_msg
-vault-test kv/svc/vault-test/demo foo vault_test_foo
+auth kv/svc/auth/db host literal:auth-db
+auth kv/svc/auth/db port literal:5432
+auth kv/svc/auth/db database literal:auth_db
+auth kv/svc/auth/db user literal:app_auth
+auth kv/svc/auth/db password secret:auth_db_app_password
+auth kv/svc/auth/jwt private_pem secret:svc_auth_jwt_private_key
+
+user kv/svc/user/db host literal:user-db
+user kv/svc/user/db port literal:5432
+user kv/svc/user/db database literal:user_db
+user kv/svc/user/db user literal:app_user
+user kv/svc/user/db password secret:user_db_app_password
+
+interview-store kv/svc/interview-store/db host literal:interview-store-db
+interview-store kv/svc/interview-store/db port literal:5432
+interview-store kv/svc/interview-store/db database literal:interview_store_db
+interview-store kv/svc/interview-store/db user literal:app_interview
+interview-store kv/svc/interview-store/db password secret:interview_store_db_app_password
