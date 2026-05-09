@@ -83,6 +83,7 @@ export const registrationFlow = async (req: Request, res: Response) => {
     const REQUIRED_FIELDS = [
         'email', 'password', 'name', 'surname', 'role_type'
     ] as const;
+	console.log(req.body);
     const missingFields = REQUIRED_FIELDS.filter(field => !req.body[field]);
     if (missingFields.length > 0){
         return res.status(400).json({error: 'Missing fields in request', missing: missingFields});
