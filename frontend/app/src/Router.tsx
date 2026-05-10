@@ -17,9 +17,15 @@ export default function Router() {
                 <Route path="/register" element={<Register />} />
                 <Route element={<ProtectedLayout />}>
                     <Route path="/candidate" element={<CandidateView />}>
-                        <Route path="/candidate/official-interviews" element={<CandidateOfficialInterview />} />
+                        <Route
+                            path="/candidate/official-interviews"
+                            element={<CandidateOfficialInterview />}
+                        />
                     </Route>
-                    <Route path="/recruiter" element={<RecruiterView />}></Route>
+                    <Route
+                        path="/recruiter"
+                        element={<RecruiterView />}
+                    ></Route>
                     <Route path="/admin" element={<AdminView />}></Route>
                     <Route path="/profile" element={<MyProfile />} />
                 </Route>

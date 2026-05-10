@@ -181,6 +181,8 @@ services:
         profiles: ["app"]
         container_name: interview-store-db
         build: infrastructure/databases/interview-store-db
+        ports:
+            - "5432:5432"
         networks:
             - backend-network
         env_file:

@@ -1,13 +1,22 @@
-import { Router } from 'express';
-import { getUser, addConnection, listConnections, updateOwnUserInfo, dowloadAvatar, uploadAvatar } from '../controllers/user.controllers.js';
+import { Router } from "express";
+import {
+    getUser,
+    addConnection,
+    listConnections,
+    updateOwnUserInfo,
+    dowloadAvatar,
+    uploadAvatar,
+    getUserPublic,
+} from "../controllers/user.controllers.js";
 
-const router= Router()
+const router = Router();
 
-router.get('/:user_id/connections', listConnections);
-router.get('/:user_id', getUser);
-router.patch('/profile', updateOwnUserInfo);
-router.put('/avatar/:user_id', uploadAvatar);
-router.get('/avatar/:user_id', uploadAvatar);
-router.post('/:user_id/connections/:link_id', addConnection);
+router.get("/:user_id/connections", listConnections);
+router.get("/:user_id", getUser);
+router.get("/:user_id/public", getUserPublic);
+router.patch("/profile", updateOwnUserInfo);
+router.put("/avatar/:user_id", uploadAvatar);
+router.get("/avatar/:user_id", uploadAvatar);
+router.post("/:user_id/connections/:link_id", addConnection);
 
-export default router
+export default router;

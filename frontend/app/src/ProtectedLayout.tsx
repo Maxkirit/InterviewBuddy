@@ -7,7 +7,9 @@ export default function ProtectedLayout() {
 
     if (authContext?.isLoading === true) {
         return (
-            <div><p>Loading...</p></div>
+            <div>
+                <p>Loading...</p>
+            </div>
         );
     }
 
