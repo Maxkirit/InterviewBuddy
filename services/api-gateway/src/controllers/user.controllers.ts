@@ -23,7 +23,7 @@ export const getUser = async (req: Request, res: Response) => {
         if (axios.isAxiosError(e) && e.response?.status)
             return res
                 .status(e.response.status)
-                .json({ error: e.response.data.error });
+                .json({error: e.response.data?.error ?? e.message});
         return res.status(502).json({ error: "Bad gateway" });
     }
 };
@@ -49,7 +49,7 @@ export const getUserPublic = async (req: Request, res: Response) => {
         if (axios.isAxiosError(e) && e.response?.status)
             return res
                 .status(e.response.status)
-                .json({ error: e.response.data.error });
+                .json({error: e.response.data?.error ?? e.message});
         return res.status(502).json({ error: "Bad gateway" });
     }
 };
@@ -74,7 +74,7 @@ export const listConnections = async (req: Request, res: Response) => {
         if (axios.isAxiosError<ApiError>(error) && error.response?.status) {
             return res
                 .status(error.response.status)
-                .json({ error: error.response.data.message });
+                .json({error: error.response.data?.error ?? error.message});
         }
         return res.status(502).json({ error: "Bad gateway" });
     }
@@ -121,7 +121,7 @@ export const updateOwnUserInfo = async (req: Request, res: Response) => {
         if (axios.isAxiosError<ApiError>(error) && error.response?.status)
             return res
                 .status(error.response.status)
-                .json({ error: error.response });
+                .json({error: error.response.data?.error ?? error.message});
         return res.status(502).json({ error: "Bad gateway (api gateway)" });
     }
 };
@@ -150,7 +150,7 @@ export const uploadAvatar = async (req: Request, res: Response) => {
         if (axios.isAxiosError<ApiError>(error) && error.response?.status)
             return res
                 .status(error.response.status)
-                .json({ error: error.response.data.message });
+                .json({error: error.response.data?.error ?? error.message});
         return res.status(502).json({ error: "Bad gateway (api gateway)" });
     }
 };
@@ -172,7 +172,7 @@ export const addConnection = async (req: Request, res: Response) => {
         if (error instanceof AxiosError && error.response?.status) {
             return res
                 .status(error.response.status)
-                .json({ error: error.response.data.error });
+                .json({error: error.response.data?.error ?? error.message});
         }
         return res.status(502).json({ error: "Bad gateway" });
     }

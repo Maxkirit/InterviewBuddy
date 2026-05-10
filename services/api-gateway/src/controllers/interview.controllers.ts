@@ -13,7 +13,7 @@ export const createRealInterview = async (req: Request, res: Response) => {
         res.status(201).json({message: "Interview created successfully"});
     } catch (error) {
         if (axios.isAxiosError<ApiError>(error) && error.response?.status) {
-            return res.status(error.response.status).json({ error: error.response.data.message });
+            return res.status(error.response.status).json({error: error.response.data?.error ?? error.message});
         }
         return res.status(502).json({ error: 'Bad gateway' });
     }
@@ -29,7 +29,7 @@ export const createMockInterview = async (req: Request, res: Response) => {
         res.status(201).json({message: "Interview created successfully"});
     } catch (error) {
         if (axios.isAxiosError<ApiError>(error) && error.response?.status) {
-            return res.status(error.response.status).json({ error: error.response.data.message });
+            return res.status(error.response.status).json({error: error.response.data?.error ?? error.message});
         }
         return res.status(502).json({ error: 'Bad gateway' });
     }
@@ -58,7 +58,7 @@ export const getInterviewReal = async (req: Request, res: Response) => {
 	} catch (e) {
 		console.log("error");
 		if (axios.isAxiosError(e) && e.response?.status)
-			return res.status(e.response.status).json({ error: e.response.data.error });
+			return res.status(e.response.status).json({error: e.response.data?.error ?? e.message});
 		return res.status(502).json({ error: 'Bad gateway' });
 	}
 };
@@ -86,7 +86,7 @@ export const getInterviewCandidat = async (req: Request, res: Response) => {
 	} catch (e) {
 		console.log("error");
 		if (axios.isAxiosError(e) && e.response?.status)
-			return res.status(e.response.status).json({ error: e.response.data.error });
+			return res.status(e.response.status).json({error: e.response.data?.error ?? e.message});
 		return res.status(502).json({ error: 'Bad gateway' });
 	}
 };

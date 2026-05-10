@@ -8,8 +8,7 @@ import protectedAuthRoute from './router/protected-auth.route.js';
 import interviewRoute from './router/interview.route.js';
 
 export type ApiError = {
-  message: string;
-  code: number;
+  error: string,
 };
 
 const app = express();

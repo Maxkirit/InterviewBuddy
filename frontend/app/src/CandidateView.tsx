@@ -1,11 +1,11 @@
 import { useContext } from "react";
 import { AuthContext } from "./AuthProvider";
-import { Navigate, Outlet, Link } from "react-router-dom";
+import { Navigate, Outlet, Link, NavLink } from "react-router-dom";
 
-const navLinkClass =
-    "no-underline text-sm font-medium text-gray-500 px-3.5 py-1.5 rounded-lg hover:bg-[#f0f3ff] hover:text-[#4f6ef7] transition";
-const navLinkActiveClass =
-    "no-underline text-sm font-medium px-3.5 py-1.5 rounded-lg bg-[#eef1ff] text-[#4f6ef7]";
+const navLinkClass = ({ isActive }: { isActive: boolean }) =>
+    isActive
+        ? "no-underline text-sm font-medium px-3.5 py-1.5 rounded-lg bg-[#eef1ff] text-[#4f6ef7]"
+        : "no-underline text-sm font-medium text-gray-500 px-3.5 py-1.5 rounded-lg hover:bg-[#f0f3ff] hover:text-[#4f6ef7] transition";
 
 export default function CandidateView() {
     const authContext = useContext(AuthContext);
@@ -38,22 +38,19 @@ export default function CandidateView() {
                 </div>
                 <ul className="flex gap-1 list-none">
                     <li>
-                        <Link to="" className={navLinkClass}>
+                        <NavLink to="/candidate/mock-interviews" className={navLinkClass}>
                             Mock Interviews
-                        </Link>
+                        </NavLink>
                     </li>
                     <li>
-                        <Link
-                            to="/candidate/official-interviews"
-                            className={navLinkActiveClass}
-                        >
+                        <NavLink to="/candidate/official-interviews" className={navLinkClass}>
                             Official Interviews
-                        </Link>
+                        </NavLink>
                     </li>
                     <li>
-                        <Link to="" className={navLinkClass}>
+                        <NavLink to="/candidate/recruiters" className={navLinkClass}>
                             Recruiter List
-                        </Link>
+                        </NavLink>
                     </li>
                 </ul>
                 <div className="flex items-center gap-3">

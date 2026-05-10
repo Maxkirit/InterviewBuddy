@@ -28,7 +28,7 @@ export const login = async (req: Request, res: Response) => {
     return res.status(200).json({ accessToken: response.data.accessToken, message: 'Login successful' });
   } catch (error) {
     if (axios.isAxiosError<ApiError>(error) && error.response?.status) {
-      return res.status(error.response.status).json({ error: error.message });
+      return res.status(error.response.status).json({error: error.response.data?.error ?? error.message});
     }
     return res.status(502).json({ error: 'Bad gateway' });
   }
@@ -50,7 +50,7 @@ export const refresh = async (req: Request, res: Response) =>{
 		return res.json({accessToken: result.data.accessToken, message: 'Refresh successful'});
 	} catch (error){
 		if (axios.isAxiosError<ApiError>(error) && error.response?.status){
-			return res.status(error.response.status).json({error: error.message});
+			return res.status(error.response.status).json({error: error.response.data?.error ?? error.message});
 		} else {
 			return res.status(502).json({error: "Bad gateway"});
 		}
@@ -72,7 +72,7 @@ export const logout = async (req: Request, res: Response) =>{
 		return res.status(200).json({message: 'Logout successful'});
 	} catch (error) {
 		if (axios.isAxiosError<ApiError>(error) && error.response?.status){
-			return res.status(error.response.status).json({error: error.message});
+			return res.status(error.response.status).json({error: error.response.data?.error ?? error.message});
 		} else {
 			return res.status(502).json({error: "Bad gateway"});
 		} 
@@ -110,7 +110,7 @@ export const registrationFlow = async (req: Request, res: Response) => {
                 return res.status(error.response.status).json({error: 'User already registered'});
             }
             console.log("different axios error\n");
-            return res.status(error.response.status).json({error: error.message});
+            return res.status(error.response.status).json({error: error.response.data?.error ?? error.message});
         }
         return res.status(502).json({error: "Bad gateway"});
     }
