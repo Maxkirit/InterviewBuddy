@@ -3,7 +3,13 @@ import axios, {
     type AxiosError,
     type InternalAxiosRequestConfig,
 } from "axios";
-import { createContext, useEffect, useRef, useState, type ReactNode } from "react";
+import {
+    createContext,
+    useEffect,
+    useRef,
+    useState,
+    type ReactNode,
+} from "react";
 
 interface RetryConfig extends InternalAxiosRequestConfig {
     _retry?: boolean;
@@ -74,7 +80,10 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     const isRefreshing = useRef(false);
     const failedQueue = useRef<QueueItem[]>([]);
 
-    const processQueue = (error: AxiosError | null, token: string | null = null): void => {
+    const processQueue = (
+        error: AxiosError | null,
+        token: string | null = null,
+    ): void => {
         failedQueue.current.forEach((item) => {
             if (error) {
                 item.reject(error);
@@ -90,30 +99,37 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
         async (error: AxiosError) => {
             const originalRequest = error.config as RetryConfig | undefined;
 
-            if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
+            if (
+                error.response?.status === 401 &&
+                originalRequest &&
+                !originalRequest._retry
+            ) {
                 if (isRefreshing.current) {
                     // Queue the request until the refresh completes
                     return new Promise<string>((resolve, reject) => {
                         failedQueue.current.push({ resolve, reject });
                     })
-                    .then((token) => {
-                        originalRequest.headers["Authorization"] = `Bearer ${token}`;
-                        return axiosInstance(originalRequest);
-                    })
-                    .catch((err) => Promise.reject(err));
+                        .then((token) => {
+                            originalRequest.headers["Authorization"] =
+                                `Bearer ${token}`;
+                            return axiosInstance(originalRequest);
+                        })
+                        .catch((err) => Promise.reject(err));
                 }
 
                 originalRequest._retry = true;
                 isRefreshing.current = true;
 
                 try {
-                    const { data } = await axios.post("/auth/refresh",
+                    const { data } = await axios.post(
+                        "/api/v1/auth/refresh",
                         null,
-                        { withCredentials: true,}
+                        { withCredentials: true },
                     );
                     const newToken = data.accessToken;
                     setToken(newToken);
-                    axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
+                    axiosInstance.defaults.headers.common["Authorization"] =
+                        `Bearer ${newToken}`;
 
                     processQueue(null, newToken);
                     return axiosInstance(originalRequest);
@@ -128,7 +144,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
             }
 
             return Promise.reject(error);
-        }
+        },
     );
 
     useEffect(() => {
