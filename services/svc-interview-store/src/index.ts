@@ -2,6 +2,7 @@ import express, { Request } from 'express';
 import { prisma, Prisma } from "./lib/prisma.js";
 import { int, z } from 'zod';
 import axios from 'axios';
+import { parseArgs } from 'node:util';
 
 export interface ReqWithUser extends Request {
     userId: number;
@@ -9,8 +10,7 @@ export interface ReqWithUser extends Request {
 }
 
 export type ApiError = {
-  message: string;
-  code: number;
+  error: string,
 };
 
 const app = express();
@@ -32,6 +32,7 @@ const RealInterviewSchema = z.object({
     due_date: z.date(),
 });
 
+app.set("query parser", "extended")
 app.use(express.json())
 
 app.post('/interview/mock-interview', async (req, res) => {
@@ -78,4 +79,76 @@ app.post('/interview/real-interview', async (req, res) => {
         }
         return res.status(502).json({error: "Bad gateway"});
     }
+});
+
+app.get('/interview/real-interviews', async (req, res) => {
+	console.log('req.query:', req.query);
+	const{recruiter_id, token_id} = req.query;
+	const tmp = req.query.perm ?? {};
+	const permission = Object.values(tmp) as string[];
+	console.log('permission:', permission);
+
+	if (recruiter_id === 'all') {
+		console.log("try to return all db to an admin")
+		if (!permission.includes("manageInterview")) {
+			return res.status(403).json({ error: 'Forbidden' });
+		}
+		try {
+			console.log("admin perm okay...")
+			const interviews = await prisma.interviews.findMany();
+			return res.status(200).json(interviews);
+		} catch (e) {
+			return res.status(500).json({ error: 'Internal error' });
+		}
+	}
+
+	if (!permission.includes("manageInterview") && (recruiter_id !== token_id || !permission.includes("readInterview"))){
+		return res.status(403).json({error : "forbiden"})
+	}
+	console.log("access authorized for read interview");
+	console.log('recruiter_id:', recruiter_id);
+	console.log('token_id:', token_id);
+	console.log('permissions:', permission);
+	try {
+		const interview = await prisma.interviews.findMany({
+			where: {recruiter_id: parseInt(recruiter_id as string, 10)}
+		})
+		console.log("ici on passe")
+		res.status(200).json(interview);
+	}
+	catch(e){
+		return res.status(500).json({error:"internal error"});
+	}
+});
+
+app.get('/interview/candidat-interviews', async (req, res) => {
+	console.log('req.query:', req.query);
+	const{candidate_id, token_id} = req.query;
+	const tmp = req.query.perm ?? {};
+	const permission = Object.values(tmp) as string[];
+
+	if (!permission.includes("manageInterview") && (candidate_id !== token_id || !permission.includes("readInterview"))){
+		console.log('candidat_id:', candidate_id);
+		console.log('token_id:', token_id);
+		console.log('permissions:', permission);
+		return res.status(403).json({error : "forbiden"})
+	}
+	console.log("access authorized for read interview");
+	console.log('candidat_id:', candidate_id);
+	console.log('token_id:', token_id);
+	console.log('permissions:', permission);
+	try {
+		const interview = await prisma.interviews.findMany({
+			where: {candidate_id: parseInt(candidate_id as string, 10)}
+		})
+		console.log("ici on passe")
+		res.status(200).json(interview);
+	}
+	catch(e){
+		return res.status(500).json({error:"internal error"});
+	}
+});
+
+app.listen(port, () => {
+	console.log(`listening on port ${port}`);
 });

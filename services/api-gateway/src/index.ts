@@ -8,8 +8,7 @@ import protectedAuthRoute from './router/protected-auth.route.js';
 import interviewRoute from './router/interview.route.js';
 
 export type ApiError = {
-  message: string;
-  code: number;
+  error: string,
 };
 
 const app = express();
@@ -26,12 +25,12 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use('/api/v1/auth',authRoute);
-// signup before validateAcccessToken
+// // signup before validateAcccessToken
 app.use(validateAcccessToken);
-// other routes after (needs verification) 
+// // other routes after (needs verification) 
 
-app.use('/api/v1/auth', protectedAuthRoute)
-app.use('/api/v1/user', userRoute)
+app.use('/api/v1/auth', protectedAuthRoute);
+app.use('/api/v1/user', userRoute);
 app.use('/api/v1/interview', interviewRoute);
 
 app.listen(port, () => {

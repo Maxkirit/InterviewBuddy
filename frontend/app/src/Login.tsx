@@ -1,13 +1,29 @@
-import "./styles/Auth.css";
 import { useState, useContext, type SubmitEvent } from "react";
-import { z, ZodError } from 'zod';
+import { z, ZodError } from "zod";
 import axios from "axios";
-import { AuthContext } from "./AuthProvider";
+import { AuthContext, decodeJwt } from "./AuthProvider";
 import { Navigate, Link, useNavigate } from "react-router-dom";
+
+export const passwordSchema = z
+    .string()
+    .min(8, { error: "Password too short", abort: true })
+    .max(128, { error: "Password too long", abort: true })
+    .refine((password) => /[A-Z]/.test(password), {
+        error: "Missing at least 1 uppercase letter",
+        abort: true,
+    })
+    .refine((password) => /[a-z]/.test(password), {
+        error: "Missing at least 1 lowercase letter",
+        abort: true,
+    })
+    .refine(
+        (password) => /[!@#$%^&*()+\-=[\]{};':"\\|,.<>/?~`]/.test(password),
+        { error: "Missing at least 1 special character", abort: true },
+    );
 
 const LoginSchema = z.object({
     email: z.email(),
-    password: z.string().min(1),
+    password: passwordSchema,
 });
 
 export default function Login() {
@@ -18,7 +34,9 @@ export default function Login() {
 
     if (authContext?.isLoading === true) {
         return (
-            <div><p>Loading...</p></div>
+            <div>
+                <p>Loading...</p>
+            </div>
         );
     }
 
@@ -33,13 +51,21 @@ export default function Login() {
             const input = {
                 email: email,
                 password: password,
-            }
+            };
             LoginSchema.parse(input);
-            const result = await axios.post('http://localhost:3000/api/v1/auth/login', {
-                email: email,
-                password: password,
-            });
-            authContext?.login(result.data.accessToken);
+            const result = await axios.post(
+                "http://localhost:3000/api/v1/auth/login",
+                {
+                    email: email,
+                    password: password,
+                },
+            );
+            const decoded = decodeJwt(result.data.accessToken);
+            authContext?.login(
+                result.data.accessToken,
+                parseInt(decoded.userId),
+                decoded.role,
+            );
             navigate("/");
         } catch (error) {
             if (error instanceof ZodError) {
@@ -51,20 +77,25 @@ export default function Login() {
     }
 
     return (
-        <div className="auth-page">
-            <div className="auth-card">
-                <span className="auth-logo">
-                    Interview<span>Buddy</span>
+        <div className="min-h-screen flex items-center justify-center p-6">
+            <div className="bg-white border border-[#e4e8f0] rounded-2xl py-10 px-11 w-full max-w-[420px]">
+                <span className="text-[1.4rem] font-bold text-[#4f6ef7] tracking-[-0.3px] mb-7 block cursor-default">
+                    Interview<span className="text-[#1a1d2e]">Buddy</span>
                 </span>
 
-                <h1>Welcome back</h1>
-                <p className="auth-subtitle">
+                <h1 className="text-[1.4rem] font-bold text-[#1a1d2e] mb-1.5">
+                    Welcome back
+                </h1>
+                <p className="text-sm text-gray-500 mb-7">
                     Log in to your account to continue.
                 </p>
                 <form onSubmit={handleSubmit}>
-                    <div className="form-group">
-                        <label htmlFor="email">Email</label>
+                    <div className="form-field">
+                        <label htmlFor="email" className="form-label">
+                            Email
+                        </label>
                         <input
+                            className="form-input"
                             type="email"
                             id="email"
                             placeholder="you@example.com"
@@ -73,9 +104,12 @@ export default function Login() {
                         />
                     </div>
 
-                    <div className="form-group">
-                        <label htmlFor="password">Password</label>
+                    <div className="form-field">
+                        <label htmlFor="password" className="form-label">
+                            Password
+                        </label>
                         <input
+                            className="form-input"
                             type="password"
                             id="password"
                             placeholder="••••••••"
@@ -84,16 +118,23 @@ export default function Login() {
                         />
                     </div>
 
-                    <button className="btn-primary" type="submit">
+                    <button
+                        className="btn-primary w-full py-[11px] mt-2"
+                        type="submit"
+                    >
                         Log in
                     </button>
                 </form>
-                <div className="auth-divider">or</div>
 
-                <button className="btn-google">
-                    {/* Google "G" logo */}
+                <div className="flex items-center gap-3 my-5 text-[#d1d5db] text-[0.8rem]">
+                    <span className="flex-1 h-px bg-[#e4e8f0]" />
+                    or
+                    <span className="flex-1 h-px bg-[#e4e8f0]" />
+                </div>
+
+                <button className="w-full py-[10px] rounded-[10px] border border-[#e4e8f0] bg-white text-[#374151] text-[0.9rem] font-medium cursor-pointer flex items-center justify-center gap-2.5 hover:bg-gray-50 hover:border-gray-300 transition">
                     <svg
-                        className="google-icon"
+                        className="w-[18px] h-[18px] shrink-0"
                         viewBox="0 0 24 24"
                         xmlns="http://www.w3.org/2000/svg"
                     >
@@ -117,8 +158,14 @@ export default function Login() {
                     Continue with Google
                 </button>
 
-                <p className="auth-footer">
-                    Don't have an account? <Link to="/register">Sign up</Link>
+                <p className="text-center mt-6 text-[0.825rem] text-gray-500">
+                    Don't have an account?{" "}
+                    <Link
+                        to="/register"
+                        className="text-[#4f6ef7] no-underline font-medium hover:underline"
+                    >
+                        Sign up
+                    </Link>
                 </p>
             </div>
         </div>

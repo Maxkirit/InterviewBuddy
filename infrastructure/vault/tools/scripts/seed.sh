@@ -13,6 +13,7 @@ if [ ! -f "$INIT_JSON" ]; then
   echo "[seed] ERROR: missing $INIT_JSON"
   exit 1
 fi
+
 if [ ! -f "$MANIFEST" ]; then
   echo "[seed] ERROR: missing $MANIFEST"
   exit 1
@@ -32,16 +33,18 @@ if [ -z "$ROOT_TOKEN" ] || [ "$ROOT_TOKEN" = "null" ]; then
   exit 1
 fi
 
-# Build a JSON payload per Vault path, then write once per path.
-# For each line: <svc> <kv_path> <field> <secret_name>
 TMP_DIR="/tmp/vault-seed"
 mkdir -p "$TMP_DIR"
+
+STORE="$TMP_DIR/store.json"
+echo '{}' > "$STORE"
 
 echo "[seed] reading manifest: $MANIFEST"
 
 while IFS= read -r line || [ -n "$line" ]; do
   # trim
   line="$(echo "$line" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
+
   # skip empty/comments
   [ -z "$line" ] && continue
   echo "$line" | grep -q '^[#]' && continue
@@ -49,22 +52,14 @@ while IFS= read -r line || [ -n "$line" ]; do
   svc="$(echo "$line" | awk '{print $1}')"
   kvpath="$(echo "$line" | awk '{print $2}')"
   field="$(echo "$line" | awk '{print $3}')"
-  secret_name="$(echo "$line" | awk '{print $4}')"
+  source="$(echo "$line" | awk '{print $4}')"
 
-  if [ -z "$svc" ] || [ -z "$kvpath" ] || [ -z "$field" ] || [ -z "$secret_name" ]; then
+  if [ -z "$svc" ] || [ -z "$kvpath" ] || [ -z "$field" ] || [ -z "$source" ]; then
     echo "[seed] ERROR: bad line: $line"
     exit 1
   fi
 
-  secret_file="/run/secrets/$secret_name"
-  if [ ! -f "$secret_file" ]; then
-    echo "[seed] ERROR: missing docker secret file: $secret_file (from $secret_name)"
-    exit 1
-  fi
-
-  value="$(cat "$secret_file")"
-
-  # We seed only the service's own namespace as a safety net
+  # Safety: a service can only seed its own namespace.
   expected_prefix="kv/svc/$svc/"
   case "$kvpath" in
     "$expected_prefix"*) : ;;
@@ -74,36 +69,80 @@ while IFS= read -r line || [ -n "$line" ]; do
       ;;
   esac
 
-  # Convert "kv/..." to API v2 "kv/data/..."
+  case "$source" in
+    literal:*)
+      value="${source#literal:}"
+      display="$source"
+      ;;
+    secret:*)
+      secret_name="${source#secret:}"
+      secret_file="/run/secrets/$secret_name"
+
+      if [ ! -f "$secret_file" ]; then
+        echo "[seed] ERROR: missing docker secret file: $secret_file (from $source)"
+        exit 1
+      fi
+
+      value="$(cat "$secret_file")"
+      display="$source"
+      ;;
+    *)
+      # Backward-compatible mode:
+      # fourth field is directly interpreted as a Docker secret name.
+      secret_name="$source"
+      secret_file="/run/secrets/$secret_name"
+
+      if [ ! -f "$secret_file" ]; then
+        echo "[seed] ERROR: missing docker secret file: $secret_file (from $source)"
+        exit 1
+      fi
+
+      value="$(cat "$secret_file")"
+      display="secret:$source"
+      ;;
+  esac
+
+  # Convert CLI path "kv/..." to KV v2 API path "/v1/kv/data/..."
   api_path="/v1/$(echo "$kvpath" | sed 's#^kv/#kv/data/#')"
 
-  # tmp file per api_path
-  out="$TMP_DIR/$(echo "$api_path" | sed 's#[/ ]#_#g').json"
+  # Merge into one JSON payload per Vault API path:
+  # {
+  #   "/v1/kv/data/svc/auth/db": {
+  #     "data": {
+  #       "host": "...",
+  #       "password": "..."
+  #     }
+  #   }
+  # }
+  jq --arg p "$api_path" \
+     --arg k "$field" \
+     --arg v "$value" \
+     '.[$p].data[$k] = $v' \
+     "$STORE" > "$STORE.tmp"
 
-  # merge field into {"data":{...}}
-  if [ -f "$out" ]; then
-    jq --arg k "$field" --arg v "$value" '.data[$k]=$v' "$out" > "$out.tmp" && mv "$out.tmp" "$out"
-  else
-    jq -n --arg k "$field" --arg v "$value" '{data:{($k):$v}}' > "$out"
-  fi
+  mv "$STORE.tmp" "$STORE"
 
-  echo "[seed] plan: $kvpath <= $secret_name (field=$field)"
+  echo "[seed] plan: $kvpath <= $display (field=$field)"
 done < "$MANIFEST"
 
-echo "[seed] writing to Vault..."
-for f in "$TMP_DIR"/*.json; do
-  [ -e "$f" ] || break
-  api_path="$(basename "$f" | sed 's#^_v1_##;s#_#/#g')"
-  # we reconstructed filename; easier: store api_path inside file name is messy.
-  # Instead, we re-derive from file content? We'll do a simple approach:
-  # We stored file name based on api path; rebuild it:
-  api_path="/$(echo "$(basename "$f" .json)" | sed 's#^_##;s#_#/#g')"
+COUNT="$(jq 'keys | length' "$STORE")"
+if [ "$COUNT" = "0" ]; then
+  echo "[seed] nothing to write"
+  echo "[seed] DONE"
+  exit 0
+fi
 
-  curl -sS --cacert "$VAULT_CACERT" \
+echo "[seed] writing to Vault..."
+
+jq -r 'keys[]' "$STORE" | while IFS= read -r api_path; do
+  payload="$TMP_DIR/payload.json"
+  jq --arg p "$api_path" '.[$p]' "$STORE" > "$payload"
+
+  curl -sS --fail --cacert "$VAULT_CACERT" \
     -H "X-Vault-Token: $ROOT_TOKEN" \
     -H "Content-Type: application/json" \
     -X POST "$VAULT_ADDR$api_path" \
-    -d @"$f" >/dev/null
+    -d @"$payload" >/dev/null
 
   echo "[seed] wrote $api_path"
 done
