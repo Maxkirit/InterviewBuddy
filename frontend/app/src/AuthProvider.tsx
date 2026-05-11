@@ -5,8 +5,8 @@ import axios, {
 import { createContext, useEffect, useState, type ReactNode } from "react";
 
 type AuthContextType = {
-    userId: number;
-    role: string;
+    userId: number | null;
+    role: string | null;
     accessToken: string | null;
     login: (token: string, userId: number, role: string) => void;
     logout: () => void;
