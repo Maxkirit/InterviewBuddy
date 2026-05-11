@@ -6,7 +6,6 @@ import authRoute from './router/auth.route.js';
 import userRoute from './router/user.route.js'
 import protectedAuthRoute from './router/protected-auth.route.js';
 import interviewRoute from './router/interview.route.js';
-import connectionsRoute from './router/connections.route.js';
 
 export type ApiError = {
   message: string;

@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
-import axios from 'axios';
+import type { ApiError } from '../index.js';
+import axios, { AxiosError } from 'axios';
 import { ReqWithUser } from '../validateToken.js';
 
 export const getUser = async(req: Request, res: Response) =>{
