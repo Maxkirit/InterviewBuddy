@@ -39,6 +39,8 @@ services:
         depends_on:
           user-db:
             condition: service_healthy
+        volumes:
+        - profile_pictures:/var/www/avatars
 
     # svc-interview-store:
     #     # profiles: ["app"]
@@ -80,6 +82,8 @@ services:
     #     networks:
     #         - frontend-network
     #     restart: unless-stopped
+    #     volume:
+    #     - profile_pictures:/var/www/avatars
 
     auth-db:
         container_name: auth-db
@@ -350,7 +354,8 @@ volumes:
         name: ingress_volume
     minio:
         name: minio_volume
-    
+    profile_pictures:
+        name: profile_pictures_shared_volume
     vault_data:
         name: vault_data_volume
     vault_tls:
