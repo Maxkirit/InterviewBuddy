@@ -74,7 +74,7 @@ CREATE TABLE $TABLE_USER (
 	role			role_type		NOT NULL DEFAULT 'candidate',
 	firstname		VARCHAR(64)		NOT NULL,						-- 64 = convention standard
 	lastname		VARCHAR(64)		NOT NULL,
-	profile_pic_url	TEXT,
+	profile_pic_url	TEXT            NOT NULL DEFAULT '/var/www/avatars/base_avatar.jpg',
 	gender			gender_type,
 	date_of_birth	TEXT,
 	country			VARCHAR(64),

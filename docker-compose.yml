@@ -55,6 +55,7 @@ services:
             - backend-network
         volumes:
             - svc_user_secrets:/secrets:ro
+            - profile_pictures:/var/www/avatars
         depends_on:
             user-db:
                 condition: service_healthy
@@ -145,23 +146,24 @@ services:
     #         - ./frontend/nginx/tools/certgen.sh:/certgen.sh:ro
     #     restart: "no"
 
-    # frontend:
-    #     profiles: ["app"]
-    #     container_name: frontend
-    #     build:
-    #         context: ./frontend
-    #         dockerfile: Dockerfile.waf
-    #     ports:
-    #         - "443:443"
-    #     networks:
-    #         - frontend-network
-    #         - backend-network
-    #     depends_on:
-    #         frontend-certgen:
-    #             condition: service_completed_successfully
-    #     volumes:
-    #         - frontend_tls:/etc/nginx/ssl
-    #     restart: unless-stopped
+    frontend:
+        profiles: ["app"]
+        container_name: frontend
+        build:
+            context: ./frontend
+            dockerfile: Dockerfile
+        ports:
+            - "443:443"
+        networks:
+            - frontend-network
+            - backend-network
+        depends_on:
+            frontend-certgen:
+                condition: service_completed_successfully
+        volumes:
+            - frontend_tls:/etc/nginx/ssl
+            - profile_pictures:/var/www/avatars
+        restart: unless-stopped
 
     auth-db:
         container_name: auth-db
@@ -427,7 +429,8 @@ volumes:
         name: svc_interview_store_secrets_volume
     svc_interview_store_vault_creds:
         name: svc_interview_store_vault_creds_volume
-
+    profile_pictures:
+        name: profile_pictures_shared_volume
     vault_data:
         name: vault_data_volume
     vault_tls:
