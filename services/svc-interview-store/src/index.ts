@@ -10,8 +10,7 @@ export interface ReqWithUser extends Request {
 }
 
 export type ApiError = {
-  message: string;
-  code: number;
+  error: string,
 };
 
 const app = express();

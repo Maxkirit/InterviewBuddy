@@ -2,7 +2,7 @@ import { useContext } from "react";
 import { AuthContext } from "./AuthProvider";
 import { Navigate, Outlet } from "react-router-dom";
 
-export default function ProtectedLayout() {
+export default function RecruiterView() {
     const authContext = useContext(AuthContext);
 
     if (authContext?.isLoading === true) {
@@ -15,6 +15,10 @@ export default function ProtectedLayout() {
 
     if (authContext?.accessToken === null) {
         return <Navigate to="/login" replace />;
+    }
+
+    if (authContext?.role !== "recruiter") {
+        return <Navigate to="/profile" replace />;
     }
 
     return <Outlet />;

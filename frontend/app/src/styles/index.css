@@ -1,16 +1,67 @@
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+@import "tailwindcss";
+
+@layer base {
+    body {
+        font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+        background: #f4f6fb;
+        color: #1a1d2e;
+        min-height: 100vh;
+    }
+
+    dialog {
+        border: none;
+        border-radius: 1rem;
+        width: 100%;
+        max-width: 440px;
+        box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12);
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        padding: 0;
+    }
+
+    dialog::backdrop {
+        background: rgba(0, 0, 0, 0.35);
+    }
 }
 
-body {
-    font-family:
-        "Segoe UI",
-        system-ui,
-        -apple-system,
-        sans-serif;
-    background: #f4f6fb;
-    color: #1a1d2e;
-    min-height: 100vh;
+@layer components {
+    /* ── Form ── */
+    .form-input {
+        @apply w-full px-3.5 py-2.5 border border-[#e4e8f0] rounded-[10px] text-[0.9rem] text-[#1a1d2e] outline-none transition focus:border-[#4f6ef7] focus:shadow-[0_0_0_3px_rgba(79,110,247,0.12)] placeholder:text-[#b0b7c3];
+    }
+    .form-label {
+        @apply text-[0.825rem] font-semibold text-[#374151];
+    }
+    .form-field {
+        @apply flex flex-col gap-1.5 mb-4;
+    }
+
+    /* ── Buttons ── */
+    .btn-primary {
+        @apply border-0 bg-[#4f6ef7] text-white font-semibold rounded-[10px] text-[0.925rem] cursor-pointer hover:bg-[#3d5ce6] transition;
+    }
+    .btn-cancel {
+        @apply px-5 py-[9px] rounded-lg border border-[#e4e8f0] bg-white text-[#4b5563] text-sm font-medium cursor-pointer hover:bg-[#f4f6fb] hover:border-gray-300 transition;
+    }
+    .btn-danger {
+        @apply px-5 py-[9px] rounded-lg border-0 bg-[#ef4444] text-white text-sm font-semibold cursor-pointer hover:bg-[#dc2626] transition;
+    }
+
+    /* ── Status badges ── */
+    .status-badge {
+        @apply text-[0.775rem] font-semibold px-2.5 py-[3px] rounded-[20px] whitespace-nowrap;
+    }
+    .status-pending   { @apply bg-[#fef3c7] text-[#b45309]; }
+    .status-completed { @apply bg-[#d1fae5] text-[#065f46]; }
+    .status-overdue   { @apply bg-[#fee2e2] text-[#991b1b]; }
+    .status-mock      { @apply bg-[#ede9fe] text-[#6d28d9]; }
+    .status-candidate { @apply bg-[#eef1ff] text-[#4f6ef7]; }
+    .status-recruiter { @apply bg-[#fdf4ff] text-[#9333ea]; }
+
+    /* ── Avatar ── */
+    .avatar {
+        @apply w-9 h-9 rounded-full bg-gradient-to-br from-[#4f6ef7] to-[#7c3aed] flex items-center justify-center text-white text-[0.8rem] font-semibold shrink-0 cursor-pointer;
+    }
 }

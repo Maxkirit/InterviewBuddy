@@ -1,4 +1,6 @@
-/* ── Auth pages (login + register) ── */
+/* ── Migrated to Tailwind. Original CSS preserved below for reference. ──
+
+── Auth pages (login + register) ──
 .auth-page {
     min-height: 100vh;
     display: flex;
@@ -103,7 +105,7 @@
     text-decoration: underline;
 }
 
-/* ── Role picker (register page only) ── */
+── Role picker (register page only) ──
 .role-picker {
     display: flex;
     gap: 10px;
@@ -149,3 +151,4 @@
     color: #6b7280;
     margin-top: 2px;
 }
+*/

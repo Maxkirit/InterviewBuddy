@@ -10,8 +10,7 @@ import { createPublicKey } from 'crypto'
 import { string, z } from 'zod';
 
 type ApiError = {
-  message: string;
-  code: number;
+  error: string,
 };
 
 const passwordSchema = z.string()
@@ -97,7 +96,7 @@ app.post('/auth/auth-request', async (req, res) => {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
             return res.status(401).json({error: "Incorrect email or password"});
         } else if (axios.isAxiosError<ApiError>(error) && error.response?.status) {
-            return res.status(error.response.status).json({error: error.message});
+            return res.status(error.response.status).json({error: error.response.data?.error ?? error.message});
         } else {
             return res.status(502).json({error: "Bad gateway"});
         }
@@ -229,7 +228,7 @@ app.post("/auth/user", async (req, res) => {
         }
         if (axios.isAxiosError<ApiError>(error) && error.response?.status) {
             console.log(error);
-            return res.status(error.response.status).json({error: error.message});
+            return res.status(error.response.status).json({error: error.response.data?.error ?? error.message});
         } else if (error instanceof Prisma.PrismaClientKnownRequestError) {
             if (error.code === 'P2001')
                 return res.status(401).json({error: "Incorrect role type"});
