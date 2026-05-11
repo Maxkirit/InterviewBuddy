@@ -1,4 +1,6 @@
-/* ── Interview list (recruiter-interviews, candidate-interviews, admin-interviews) ── */
+/* ── Migrated to Tailwind. Original CSS preserved below for reference. ──
+
+── Interview list (recruiter-interviews, candidate-interviews, admin-interviews) ──
 .interview-list {
     display: flex;
     flex-direction: column;
@@ -76,7 +78,7 @@
     gap: 20px;
 }
 
-/* ── Mini report preview (completed rows) ── */
+── Mini report preview (completed rows) ──
 .interview-mini-report {
     display: flex;
     align-items: center;
@@ -132,3 +134,4 @@
     text-align: right;
     flex-shrink: 0;
 }
+*/

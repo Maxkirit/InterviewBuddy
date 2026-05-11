@@ -16,6 +16,7 @@ export async function createAccessToken(userId: number) {
         select: {
             roles: {
                 select: {
+                    name: true,
                     role_permissions: {
                         where: {
                             is_active: true,
@@ -35,11 +36,13 @@ export async function createAccessToken(userId: number) {
     if (!userPerms) {
         return;
     }
+    const role = userPerms.roles.name;
+    console.log(role);
     const perms = userPerms.roles.role_permissions.flatMap((rp) =>
         rp.permissions ? [rp.permissions.name] : [],
     );
     const access_token = jwt.sign(
-        { userId: userId, permissions: perms },
+        { userId: userId, role: role, permissions: perms },
         ACCESS_SECRET,
         { expiresIn: "10m" },
     );
