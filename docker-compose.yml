@@ -253,20 +253,20 @@ services:
     #     restart: unless-stopped
 
     vault-certgen:
-      profiles: ["vault"]
-      container_name: vault_certgen
-      image: alpine:3.20
-      entrypoint: ["/bin/sh", "-lc"]
-      command: ["sh /certgen.sh"]
-      environment:
-        VAULT_UID: "100"
-        VAULT_GID: "1000"
-      volumes:
-          - vault_tls:/tls
-          - ./infrastructure/vault/tools/scripts/certgen.sh:/certgen.sh:ro
-      networks:
-          - backend-network
-      restart: "no"
+        profiles: ["vault"]
+        container_name: vault_certgen
+        image: alpine:3.20
+        entrypoint: ["/bin/sh", "-lc"]
+        command: ["sh /certgen.sh"]
+        environment:
+            VAULT_UID: "100"
+            VAULT_GID: "1000"
+        volumes:
+            - vault_tls:/tls
+            - ./infrastructure/vault/tools/scripts/certgen.sh:/certgen.sh:ro
+        networks:
+            - backend-network
+        restart: "no"
 
     vault:
         profiles: ["vault"]
@@ -275,21 +275,25 @@ services:
         entrypoint: ["/bin/sh", "-lc"]
         command: ["sh /vault/tools/wait_tls.sh"]
         networks:
-          - backend-network
+            - backend-network
         ports:
-          - "127.0.0.1:8200:8200"
+            - "127.0.0.1:8200:8200"
         volumes:
-          - vault_data:/vault/file
-          - vault_tls:/vault/tls:ro
+            - vault_data:/vault/file
+            - vault_tls:/vault/tls:ro
         depends_on:
-          - vault-certgen
+            - vault-certgen
         restart: unless-stopped
 
         healthcheck:
-          test: ["CMD-SHELL", "export VAULT_ADDR=https://127.0.0.1:8200 VAULT_CACERT=/vault/tls/ca.crt; vault status -format=json | jq -e '.initialized==true and .sealed==false' >/dev/null"]
-          interval: 10s
-          timeout: 5s
-          retries: 5
+            test:
+                [
+                    "CMD-SHELL",
+                    "export VAULT_ADDR=https://127.0.0.1:8200 VAULT_CACERT=/vault/tls/ca.crt; vault status -format=json | jq -e '.initialized==true and .sealed==false' >/dev/null",
+                ]
+            interval: 10s
+            timeout: 5s
+            retries: 5
 
     vault-bootstrap:
         profiles: ["vault"]
