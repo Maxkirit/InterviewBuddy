@@ -169,13 +169,14 @@ export const uploadAvatar = async (req: Request, res: Response) => {
     } catch (error) {
         console.log("in normal error path");
         if (axios.isAxiosError<ApiError>(error) && error.response?.status) {
-            return res.status(error.response.status).json({ error: error.message });
+            return res
+                .status(error.response.status)
+                .json({error: error.response.data?.error ?? error.message});
         }
         return res.status(502).json({error: "Bad gateway (api gateway)"});
     }
 };
 
-}
 
 export const getAvatarURL = async (req: Request, res: Response) => {
     try {
@@ -190,10 +191,13 @@ export const getAvatarURL = async (req: Request, res: Response) => {
     } catch (error) {
         console.log("in error path");
         if (axios.isAxiosError<ApiError>(error) && error.response?.status) {
-            return res.status(error.response.status).json({ error: error.message });
+            return res
+                .status(error.response.status)
+                .json({error: error.response.data?.error ?? error.message});
         }
         return res.status(502).json({error: "Bad gateway (api gateway)"});
     }
+};
 
 export const addConnection = async (req: Request, res: Response) => {
     const { user_id, link_id } = req.params;
