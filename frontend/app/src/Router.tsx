@@ -4,6 +4,7 @@ import Register from "./Register";
 import ProtectedLayout from "./ProtectedLayout";
 import MyProfile from "./Profile";
 import CandidateOfficialInterview from "./CandidateOfficialInterview";
+import CandidateListRecruiters from "./CandidateListRecruiters";
 import CandidateView from "./CandidateView";
 import RecruiterView from "./RecruiterView";
 import AdminView from "./AdminView";
@@ -20,6 +21,10 @@ export default function Router() {
                         <Route
                             path="/candidate/official-interviews"
                             element={<CandidateOfficialInterview />}
+                        />
+						<Route
+                            path="/candidate/recruiters"
+                            element={<CandidateListRecruiters />}
                         />
                     </Route>
                     <Route
