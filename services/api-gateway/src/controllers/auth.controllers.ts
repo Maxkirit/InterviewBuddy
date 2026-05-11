@@ -21,7 +21,7 @@ export const login = async (req: Request, res: Response) => {
     console.log(response.data.refreshToken);
     res.cookie('refreshToken', response.data.refreshToken, {
       httpOnly: true,
-      secure: true,
+      secure: false,
       sameSite: 'strict',
       maxAge: response.data.maxAge,
     });
@@ -46,7 +46,7 @@ export const refresh = async (req: Request, res: Response) =>{
 		const result = await axios.post("http://svc-auth:3000/auth/refresh-token", {
 			refreshToken: oldRefreshToken,
 		});
-    res.cookie("refreshToken", result.data.refreshToken, {httpOnly: true, secure:  true, sameSite: "strict", maxAge: result.data.refreshMaxAge});
+    res.cookie("refreshToken", result.data.refreshToken, {httpOnly: true, secure:  false, sameSite: "strict", maxAge: result.data.refreshMaxAge});
 		return res.json({accessToken: result.data.accessToken, message: 'Refresh successful'});
 	} catch (error){
 		if (axios.isAxiosError<ApiError>(error) && error.response?.status){
@@ -68,7 +68,7 @@ export const logout = async (req: Request, res: Response) =>{
 			refreshToken: refreshToken,
 		});
 		//post message to RabbitMQ
-		res.cookie("refreshToken", refreshToken, {httpOnly: true, secure: true, sameSite: "strict", maxAge: -1});
+		res.cookie("refreshToken", refreshToken, {httpOnly: true, secure: false, sameSite: "strict", maxAge: -1});
 		return res.status(200).json({message: 'Logout successful'});
 	} catch (error) {
 		if (axios.isAxiosError<ApiError>(error) && error.response?.status){
@@ -98,7 +98,7 @@ export const registrationFlow = async (req: Request, res: Response) => {
         });
         res.cookie('refreshToken', response.data.refreshToken, {
           httpOnly: true,
-          secure: true,
+          secure: false,
           sameSite: 'strict',
           maxAge: response.data.maxAge,
         });
