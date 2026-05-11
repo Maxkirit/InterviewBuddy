@@ -115,3 +115,7 @@ export const registrationFlow = async (req: Request, res: Response) => {
         return res.status(502).json({error: "Bad gateway"});
     }
 }
+
+export const externalRegistrationFlow = async (req: Request, res: Response) => {
+    
+}
