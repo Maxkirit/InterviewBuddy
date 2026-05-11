@@ -1,8 +1,18 @@
 import axios, {
     type AxiosInstance,
+    type AxiosError,
     type InternalAxiosRequestConfig,
 } from "axios";
 import { createContext, useEffect, useState, type ReactNode } from "react";
+
+interface RetryConfig extends InternalAxiosRequestConfig {
+    _retry?: boolean;
+}
+
+type QueueItem = {
+    resolve: (token: string) => void;
+    reject: (error: AxiosError) => void;
+};
 
 type AuthContextType = {
     userId: number | null;
@@ -61,38 +71,72 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
         },
     );
 
+    let isRefreshing = false;
+    let failedQueue: QueueItem[] = [];
+
+    const processQueue = (
+        error: AxiosError | null,
+        token: string | null = null,
+    ): void => {
+        failedQueue.forEach((item) => {
+            if (error) {
+                item.reject(error);
+            } else {
+                item.resolve(token!);
+            }
+        });
+        failedQueue = [];
+    };
+
     axiosInstance.interceptors.response.use(
-        function (response) {
-            return response;
-        },
-        async function (error) {
-            const originalRequest = error.config;
+        (response) => response,
+        async (error: AxiosError) => {
+            const originalRequest = error.config as RetryConfig | undefined;
+
             if (
-                error.response &&
-                error.response.status === 403 &&
+                error.response?.status === 401 &&
+                originalRequest &&
                 !originalRequest._retry
             ) {
+                if (isRefreshing) {
+                    // Queue the request until the refresh completes
+                    return new Promise<string>((resolve, reject) => {
+                        failedQueue.push({ resolve, reject });
+                    })
+                        .then((token) => {
+                            originalRequest.headers["Authorization"] =
+                                `Bearer ${token}`;
+                            return axiosInstance(originalRequest);
+                        })
+                        .catch((err) => Promise.reject(err));
+                }
+
                 originalRequest._retry = true;
+                isRefreshing = true;
+
                 try {
-                    const response = await axios.post(
-                        "http://localhost:3000/api/v1/auth/refresh",
+                    const { data } = await axios.post(
+                        "/api/v1/auth/refresh",
                         null,
-                        {
-                            withCredentials: true,
-                        },
+                        { withCredentials: true },
                     );
-                    if (response) {
-                        //update the access token
-                        setToken(response.data.accessToken);
-                        originalRequest.headers["Authorization"] =
-                            `Bearer ${response.data.accessToken}`;
-                        return axiosInstance(originalRequest);
-                    }
-                } catch (error) {
-                    // console.error('Error fetching data:', error);
-                    logout();
+                    const newToken = data.accessToken;
+                    setToken(newToken);
+                    axiosInstance.defaults.headers.common["Authorization"] =
+                        `Bearer ${newToken}`;
+
+                    processQueue(null, newToken);
+                    return axiosInstance(originalRequest);
+                } catch (refreshError) {
+                    processQueue(refreshError, null);
+                    // Redirect to login or emit an event
+                    setToken(null);
+                    return Promise.reject(refreshError);
+                } finally {
+                    isRefreshing = false;
                 }
             }
+
             return Promise.reject(error);
         },
     );

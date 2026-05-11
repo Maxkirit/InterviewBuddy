@@ -224,12 +224,10 @@ app.post("/user/profile/:auth_id", async (req, res) => {
             if (error.code === "P2002") {
                 return res.status(409).json({ error: "User already exists" });
             }
-            return res
-                .status(400)
-                .json({
-                    error: "Database constraint violation",
-                    code: error.code,
-                });
+            return res.status(400).json({
+                error: "Database constraint violation",
+                code: error.code,
+            });
         }
 
         if (error instanceof Prisma.PrismaClientValidationError) {
@@ -249,7 +247,7 @@ app.post("/user/profile/:auth_id", async (req, res) => {
 app.get("/user/:userId/connections", async (req, res) => {
     const userId = parseInt(req.params.userId);
     const id = parseInt(req.query.userId as string);
-    const tmp = req.query.perm ?? {};
+    const tmp = req.query.permissions ?? {};
     const permissions = Object.values(tmp) as string[];
 
     console.log(`userId=${userId} id=${id} permissions=${permissions}`);
