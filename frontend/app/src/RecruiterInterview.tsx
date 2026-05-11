@@ -27,16 +27,13 @@ type CandidateData = {
 export default function RecruiterInterviews() {
     const authContext = useContext(AuthContext);
     const [interviews, setInterviews] = useState<Interview[]>([]);
-    const [candidateMap, setCandidateMap] = useState<
-        Record<string, CandidateData>
-    >({});
+    const [candidateMap, setCandidateMap] = useState<Record<string, CandidateData>>({});
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const [isSetupOpen, setIsSetupOpen] = useState(false);
     const confirmRef = useRef<HTMLDialogElement>(null);
 
     useEffect(() => {
         async function getInterviews() {
-            // setInterviews([{id: 1, recruiterId: 2, candidateId: 1, jobTitle: "Big Boss", status: "scheduled", dueDate: new Date("2026-05-18")}])
             try {
                 const result = await authContext?.axiosInstance.get(
                     `/api/v1/interview/candidat-interviews/${authContext.userId}`,
@@ -60,20 +57,13 @@ export default function RecruiterInterviews() {
     }, []);
 
     useEffect(() => {
-        const uniqueCandidateIds = [
-            ...new Set(interviews.map((i) => i.candidateId)),
-        ];
+        const uniqueCandidateIds = [...new Set(interviews.map((i) => i.candidateId))];
 
         uniqueCandidateIds.forEach(async (candidateId) => {
-            if (candidateMap[candidateId] || !candidateId) return; // already fetched
+            if (candidateMap[candidateId] || !candidateId) return;
             try {
-                const res = await authContext?.axiosInstance.get(
-                    `api/v1/user/${candidateId}/public`,
-                );
-                setCandidateMap((prev) => ({
-                    ...prev,
-                    [candidateId]: res?.data,
-                }));
+                const res = await authContext?.axiosInstance.get(`api/v1/user/${candidateId}/public`);
+                setCandidateMap((prev) => ({ ...prev, [candidateId]: res?.data }));
             } catch (error) {
                 // handle error
             }
@@ -88,87 +78,68 @@ export default function RecruiterInterviews() {
         }
     }, [isConfirmOpen]);
 
-    function handleBackdropClick(e) {
+    function handleBackdropClick(e: React.MouseEvent<HTMLDialogElement>) {
         if (e.target === confirmRef.current) {
             setIsConfirmOpen(false);
         }
     }
 
     function renderInterviews(interview: Interview) {
+        const candidate = candidateMap[interview.candidateId];
+        const name = candidate ? `${candidate.firstname} ${candidate.lastname}` : "-";
+        const initials = candidate
+            ? `${candidate.firstname[0]}${candidate.lastname[0]}`.toUpperCase()
+            : "??";
+
         if (interview.status === "completed") {
             return (
-                <div className="interview-entry" key={interview.id}>
-                    <div className="interview-entry-left">
-                        <div className="avatar">PL</div>
-                        <div className="interview-entry-info">
-                            <div className="interview-entry-name">
-                                {candidateMap[interview.candidateId]
-                                    ?.firstname ?? "-"}{" "}
-                                {candidateMap[interview.candidateId]?.lastname}
-                            </div>
-                            <div className="interview-entry-pos">
-                                {interview.jobTitle}
-                            </div>
+                <div key={interview.id} className="bg-white border border-[#e4e8f0] rounded-[14px] px-6 py-5 flex items-center gap-6">
+                    <div className="flex items-center gap-3.5 flex-[0_0_240px]">
+                        <div className="avatar">{initials}</div>
+                        <div className="flex flex-col gap-0.5">
+                            <div className="text-[0.95rem] font-semibold text-[#1a1d2e]">{name}</div>
+                            <div className="text-[0.8rem] text-gray-500">{interview.jobTitle}</div>
                         </div>
                     </div>
-                    <div className="interview-entry-right interview-entry-right--stacked">
-                        <div className="interview-entry-right-top">
-                            <span className="interview-entry-question">
-                                Design a Rate Limiter
-                            </span>
-                            <span className="status-badge status-completed">
-                                {interview.status}
-                            </span>
+                    <div className="flex-1 flex flex-col items-end gap-3">
+                        <div className="flex items-center gap-5">
+                            <span className="text-[0.75rem] text-gray-400">Design a Rate Limiter</span>
+                            <span className="status-badge status-completed">{interview.status}</span>
                             <button
-                                className="btn-delete"
+                                className="px-4 py-[7px] rounded-lg bg-white text-[0.85rem] font-medium cursor-pointer whitespace-nowrap transition border border-[#ef4444] text-[#ef4444] hover:bg-[#ef4444] hover:text-white"
                                 title="Delete interview"
                                 onClick={() => setIsConfirmOpen(true)}
                             >
                                 Delete
                             </button>
                         </div>
-                        <div className="interview-mini-report">
-                            <div className="interview-mini-score">78%</div>
-                            <div className="interview-mini-bars">
-                                <div className="mini-bar-row">
-                                    <span className="mini-bar-label">
-                                        Architecture
-                                    </span>
-                                    <div className="mini-bar-wrap">
-                                        <div
-                                            className="mini-bar"
-                                            style={{ width: "80%" }}
-                                        ></div>
+                        <div className="flex items-center gap-[18px]">
+                            <div className="text-[1.15rem] font-bold text-[#4f6ef7] min-w-[44px] text-center">78%</div>
+                            <div className="flex flex-col gap-[5px] w-[180px]">
+                                <div className="flex items-center gap-1.5 text-[0.7rem] text-gray-500">
+                                    <span className="w-[80px] shrink-0 whitespace-nowrap overflow-hidden text-ellipsis">Architecture</span>
+                                    <div className="flex-1 h-1 bg-[#f0f3ff] rounded-sm">
+                                        <div className="h-full bg-[#4f6ef7] rounded-sm" style={{ width: "80%" }}></div>
                                     </div>
-                                    <span className="mini-bar-score">4/5</span>
+                                    <span className="w-6 text-right shrink-0">4/5</span>
                                 </div>
-                                <div className="mini-bar-row">
-                                    <span className="mini-bar-label">
-                                        Scalability
-                                    </span>
-                                    <div className="mini-bar-wrap">
-                                        <div
-                                            className="mini-bar amber"
-                                            style={{ width: "60%" }}
-                                        ></div>
+                                <div className="flex items-center gap-1.5 text-[0.7rem] text-gray-500">
+                                    <span className="w-[80px] shrink-0 whitespace-nowrap overflow-hidden text-ellipsis">Scalability</span>
+                                    <div className="flex-1 h-1 bg-[#f0f3ff] rounded-sm">
+                                        <div className="h-full bg-[#f59e0b] rounded-sm" style={{ width: "60%" }}></div>
                                     </div>
-                                    <span className="mini-bar-score">3/5</span>
+                                    <span className="w-6 text-right shrink-0">3/5</span>
                                 </div>
-                                <div className="mini-bar-row">
-                                    <span className="mini-bar-label">
-                                        Reasoning
-                                    </span>
-                                    <div className="mini-bar-wrap">
-                                        <div
-                                            className="mini-bar"
-                                            style={{ width: "80%" }}
-                                        ></div>
+                                <div className="flex items-center gap-1.5 text-[0.7rem] text-gray-500">
+                                    <span className="w-[80px] shrink-0 whitespace-nowrap overflow-hidden text-ellipsis">Reasoning</span>
+                                    <div className="flex-1 h-1 bg-[#f0f3ff] rounded-sm">
+                                        <div className="h-full bg-[#4f6ef7] rounded-sm" style={{ width: "80%" }}></div>
                                     </div>
-                                    <span className="mini-bar-score">4/5</span>
+                                    <span className="w-6 text-right shrink-0">4/5</span>
                                 </div>
                             </div>
                             <a href="report.html">
-                                <button className="btn-interview">
+                                <button className="px-4 py-[7px] rounded-lg bg-white text-[0.85rem] font-medium cursor-pointer whitespace-nowrap transition border border-[#4f6ef7] text-[#4f6ef7] hover:bg-[#4f6ef7] hover:text-white">
                                     See report
                                 </button>
                             </a>
@@ -179,52 +150,30 @@ export default function RecruiterInterviews() {
         } else {
             const overDue = interview.dueDate < new Date();
             return (
-                <div className="interview-entry" key={interview.id}>
-                    <div className="interview-entry-left">
-                        <div className="avatar">SK</div>
-                        <div className="interview-entry-info">
-                            <div className="interview-entry-name">
-                                {candidateMap[interview.candidateId]
-                                    ?.firstname ?? "-"}{" "}
-                                {candidateMap[interview.candidateId]?.lastname}
-                            </div>
-                            <div className="interview-entry-pos">
-                                {interview.jobTitle}
-                            </div>
+                <div key={interview.id} className="bg-white border border-[#e4e8f0] rounded-[14px] px-6 py-5 flex items-center gap-6">
+                    <div className="flex items-center gap-3.5 flex-[0_0_240px]">
+                        <div className="avatar">{initials}</div>
+                        <div className="flex flex-col gap-0.5">
+                            <div className="text-[0.95rem] font-semibold text-[#1a1d2e]">{name}</div>
+                            <div className="text-[0.8rem] text-gray-500">{interview.jobTitle}</div>
                         </div>
                     </div>
-                    <div className="interview-entry-right">
-                        <span className="interview-entry-question">
-                            Design a Distributed Cache
-                        </span>
-                        <span
-                            className={
-                                overDue
-                                    ? "text-[0.75rem] text-[#ef4444] font-semibold whitespace-nowrap"
-                                    : "text-[0.75rem] text-gray-400 whitespace-nowrap"
-                            }
-                        >
+                    <div className="flex-1 flex items-center gap-5 justify-end">
+                        <span className="text-[0.75rem] text-gray-400">Design a Distributed Cache</span>
+                        <span className={overDue ? "text-[0.75rem] text-[#ef4444] font-semibold whitespace-nowrap" : "text-[0.75rem] text-gray-400 whitespace-nowrap"}>
                             Due {interview.dueDate.toDateString()}
                         </span>
-                        <span
-                            className={
-                                overDue
-                                    ? "status-badge status-overdue"
-                                    : "status-badge status-pending"
-                            }
-                        >
+                        <span className={overDue ? "status-badge status-overdue" : "status-badge status-pending"}>
                             {overDue ? "Past due date" : "Pending"}
                         </span>
-                        {overDue ? (
+                        {overDue && (
                             <button
-                                className="btn-delete"
+                                className="px-4 py-[7px] rounded-lg bg-white text-[0.85rem] font-medium cursor-pointer whitespace-nowrap transition border border-[#ef4444] text-[#ef4444] hover:bg-[#ef4444] hover:text-white"
                                 title="Cancel interview"
                                 onClick={() => setIsConfirmOpen(true)}
                             >
                                 Delete
                             </button>
-                        ) : (
-                            ""
                         )}
                     </div>
                 </div>
@@ -235,51 +184,38 @@ export default function RecruiterInterviews() {
     return (
         <>
             <div className="max-w-[900px] mx-auto py-10 px-6">
-                <div className="page-header">
-                <h1>Interviews</h1>
-                <button
-                    className="btn-mock"
-                    onClick={() => setIsSetupOpen(true)}
-                >
-                    Schedule interview
-                </button>
-            </div>
+                <div className="flex items-baseline gap-3 mb-7">
+                    <h1 className="text-[1.75rem] font-bold text-[#1a1d2e]">Interviews</h1>
+                    <button
+                        className="border-0 bg-[#4f6ef7] text-white font-semibold cursor-pointer transition hover:bg-[#3d5ce6] px-5 py-[9px] rounded-lg text-sm"
+                        onClick={() => setIsSetupOpen(true)}
+                    >
+                        Schedule interview
+                    </button>
+                </div>
                 <div className="flex flex-col gap-3">
                     {interviews.map(renderInterviews)}
                 </div>
             </div>
 
-            <SetupInterviewModal
-                isOpen={isSetupOpen}
-                setIsOpen={setIsSetupOpen}
-            />
+            <SetupInterviewModal isOpen={isSetupOpen} setIsOpen={setIsSetupOpen} />
 
-            <dialog
-                ref={confirmRef}
-                id="confirm-modal"
-                onClick={handleBackdropClick}
-            >
-                <div onClick={(e) => e.stopPropagation()}>
-                    <div className="modal-header">
-                        <h2>Cancel interview?</h2>
+            <dialog ref={confirmRef} id="confirm-modal" onClick={handleBackdropClick}>
+                <div className="p-8 px-9" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex items-center justify-between mb-6">
+                        <h2 className="text-[1.1rem] font-bold text-[#1a1d2e]">Cancel interview?</h2>
                         <button
-                            className="modal-close"
+                            className="w-[30px] h-[30px] rounded-lg border border-[#e4e8f0] bg-white text-gray-400 text-xs cursor-pointer flex items-center justify-center transition hover:border-[#ef4444] hover:text-[#ef4444]"
                             onClick={() => setIsConfirmOpen(false)}
                         >
                             &#10005;
                         </button>
                     </div>
-                    <div className="modal-body">
-                        <p>
-                            This interview will be permanently cancelled and
-                            cannot be undone.
-                        </p>
+                    <div className="flex flex-col gap-4">
+                        <p>This interview will be permanently cancelled and cannot be undone.</p>
                     </div>
-                    <div className="modal-footer">
-                        <button
-                            className="btn-cancel"
-                            onClick={() => setIsSetupOpen(false)}
-                        >
+                    <div className="flex justify-end gap-2.5 mt-6">
+                        <button type="button" className="btn-cancel" onClick={() => setIsSetupOpen(false)}>
                             Keep
                         </button>
                         <button className="btn-danger">Cancel interview</button>

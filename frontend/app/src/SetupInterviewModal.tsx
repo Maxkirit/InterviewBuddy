@@ -18,12 +18,18 @@ const InterviewSchema = z.object({
     due_date: z.date(),
 });
 
-export default function SetupInterviewModal({ isOpen, setIsOpen }: {isOpen: boolean, setIsOpen: (open: boolean) => void}) {
+const selectArrowStyle = {
+    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b7280' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E")`,
+    backgroundRepeat: "no-repeat" as const,
+    backgroundPosition: "right 12px center",
+};
+
+export default function SetupInterviewModal({ isOpen, setIsOpen }: { isOpen: boolean, setIsOpen: (open: boolean) => void }) {
     const authContext = useContext(AuthContext);
     const setupRef = useRef<HTMLDialogElement>(null);
-    const [connections, setConnections] = useState<Connection[]>([])
+    const [connections, setConnections] = useState<Connection[]>([]);
     const [position, setPosition] = useState<string>("");
-    const [candidate, setCandidate] = useState<number>();
+    const [candidate, setCandidate] = useState<number>(0);
     const [question, setQuestion] = useState<string>("");
     const [dueDate, setDueDate] = useState<string>("");
 
@@ -31,13 +37,14 @@ export default function SetupInterviewModal({ isOpen, setIsOpen }: {isOpen: bool
         async function getConnections() {
             try {
                 const res = await authContext?.axiosInstance.get(`/api/v1/user/${authContext.userId}/connections`);
-                setConnections(res?.data);
+                setConnections(res?.data.connections);
             } catch (error) {
-                
+
             }
         }
 
         getConnections();
+        console.log(connections);
     }, []);
 
     useEffect(() => {
@@ -48,7 +55,7 @@ export default function SetupInterviewModal({ isOpen, setIsOpen }: {isOpen: bool
         }
     }, [isOpen]);
 
-    function handleBackdropClick(e) {
+    function handleBackdropClick(e: React.MouseEvent<HTMLDialogElement>) {
         if (e.target === setupRef.current) {
             setIsOpen(false);
         }
@@ -78,27 +85,28 @@ export default function SetupInterviewModal({ isOpen, setIsOpen }: {isOpen: bool
 
     function renderCandidateOptions(connection: Connection) {
         return (
-            <option value={connection.user_id}>{connection.firstname} {connection.lastname}</option>
+            <option key={connection.user_id} value={connection.user_id}>{connection.firstname} {connection.lastname}</option>
         );
     }
 
     return (
         <dialog ref={setupRef} id="setup-modal" onClick={handleBackdropClick}>
-            <div onClick={(e) => e.stopPropagation()}>
-                <div className="modal-header">
-                    <h2>Schedule interview</h2>
+            <div className="p-8 px-9" onClick={(e) => e.stopPropagation()}>
+                <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-[1.1rem] font-bold text-[#1a1d2e]">Schedule interview</h2>
                     <button
-                        className="modal-close"
+                        className="w-[30px] h-[30px] rounded-lg border border-[#e4e8f0] bg-white text-gray-400 text-xs cursor-pointer flex items-center justify-center transition hover:border-[#ef4444] hover:text-[#ef4444]"
                         onClick={() => setIsOpen(false)}
                     >
                         &#10005;
                     </button>
                 </div>
                 <form onSubmit={handleSubmit}>
-                    <div className="modal-body">
-                        <div className="form-group">
-                            <label htmlFor="modal-position">Position</label>
+                    <div className="flex flex-col gap-4">
+                        <div className="form-field">
+                            <label htmlFor="modal-position" className="form-label">Position</label>
                             <input
+                                className="form-input"
                                 type="text"
                                 id="modal-position"
                                 placeholder="e.g. Backend Engineer"
@@ -106,30 +114,29 @@ export default function SetupInterviewModal({ isOpen, setIsOpen }: {isOpen: bool
                                 onChange={(e) => setPosition(e.target.value)}
                             />
                         </div>
-                        <div className="form-group">
-                            <label htmlFor="modal-candidate">Candidate</label>
+                        <div className="form-field">
+                            <label htmlFor="modal-candidate" className="form-label">Candidate</label>
                             <select
+                                className="form-input appearance-none bg-white cursor-pointer pr-9"
+                                style={selectArrowStyle}
                                 id="modal-candidate"
                                 value={candidate}
                                 onChange={(e) => setCandidate(parseInt(e.target.value))}
                             >
-                                <option value={0} disabled selected>
-                                    Select a candidate…
-                                </option>
+                                <option value={0} disabled>Select a candidate…</option>
                                 {connections.map(renderCandidateOptions)}
                             </select>
                         </div>
-
-                        <div className="form-group">
-                            <label htmlFor="modal-question">Question</label>
+                        <div className="form-field">
+                            <label htmlFor="modal-question" className="form-label">Question</label>
                             <select
+                                className="form-input appearance-none bg-white cursor-pointer pr-9"
+                                style={selectArrowStyle}
                                 id="modal-question"
                                 value={question}
                                 onChange={(e) => setQuestion(e.target.value)}
                             >
-                                <option value="" disabled selected>
-                                    Select a question…
-                                </option>
+                                <option value="" disabled>Select a question…</option>
                                 <option>Design a URL Shortener</option>
                                 <option>Design a Rate Limiter</option>
                                 <option>Design a Notification System</option>
@@ -139,9 +146,10 @@ export default function SetupInterviewModal({ isOpen, setIsOpen }: {isOpen: bool
                                 <option>Design an API Gateway</option>
                             </select>
                         </div>
-                        <div className="form-group">
-                            <label htmlFor="modal-due-date">Due date</label>
+                        <div className="form-field">
+                            <label htmlFor="modal-due-date" className="form-label">Due date</label>
                             <input
+                                className="form-input"
                                 type="date"
                                 id="modal-due-date"
                                 value={dueDate}
@@ -149,18 +157,11 @@ export default function SetupInterviewModal({ isOpen, setIsOpen }: {isOpen: bool
                             />
                         </div>
                     </div>
-
-                    <div className="modal-footer">
-                        <button
-                            className="btn-cancel"
-                            onClick={() => setIsOpen(false)}
-                        >
+                    <div className="flex justify-end gap-2.5 mt-6">
+                        <button type="button" className="btn-cancel" onClick={() => setIsOpen(false)}>
                             Cancel
                         </button>
-                        <button
-                            type="submit"
-                            className="btn-primary btn-primary--compact"
-                        >
+                        <button type="submit" className="btn-primary px-6 py-[9px]">
                             Save
                         </button>
                     </div>

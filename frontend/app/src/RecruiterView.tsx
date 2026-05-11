@@ -39,7 +39,7 @@ export default function CandidateView() {
                 <ul className="flex gap-1 list-none">
                     <li>
                         <NavLink
-                            to="/recruiter/official-interviews"
+                            to="/recruiter/interviews"
                             className={navLinkClass}
                         >
                             Official Interviews
