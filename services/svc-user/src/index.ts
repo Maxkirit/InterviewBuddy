@@ -1,9 +1,12 @@
 import express, { Request, Response } from "express";
 import { prisma, Prisma } from "./lib/prisma.js";
-import { gender_type } from "./generated/prisma/enums.js";
-import { role_type } from "./generated/prisma/enums.js";
-import { string, z } from "zod";
-import { error } from "node:console";
+import { gender_type } from './generated/prisma/enums.js';
+import { role_type } from './generated/prisma/enums.js';
+import { string, z } from 'zod';
+import sharp from 'sharp';
+import { randomBytes } from "node:crypto";
+import { error, profile } from 'node:console';
+import { resolveSoa } from 'node:dns';
 import { addConnection } from "./connections/addConnection.js";
 
 const nameSurnameSchema = z
@@ -406,6 +409,105 @@ app.get(
 );
 
 app.post("/user/:user_id/connections/:link_id", addConnection);
+
+app.put('/user/:userId/avatar', async(req, res) => {
+    //check perm for admin and self
+    const userId = parseInt(req.params.userId) ?? null;
+    if (!userId)
+        return res.status(400).json({error: "invalid userId in request params"});
+    if ((!req.body.permissions.includes("modifyOwnUser") && !req.body.permissions.includes("manageUserInfo")) ||
+            (req.body.permissions.includes("modifyOwnUser") && userId !== req.body.userId)) {
+                return res.status(403).json({error: "Permissions denied on PUT /user/:userId/avatar"});
+            }
+    console.log("permissions validated");
+
+    const filename = `${req.params.userId}_${randomBytes(16).toString('hex')}`;
+    // const filesystemLocation = `/var/www/avatars/${filename}`; //comment out and replace with filename in file below if you want it local
+    console.log(filename);
+    try {
+        //this calls writes directly to filesystem
+        const file = await sharp(Buffer.from(req.body.imageContent, 'base64')).toFile(filename); //Buffer.from() interprets buffer as base64 encoding
+    } catch (error) {
+        return res.status(400).json({error: "Bad image sent"});
+    }
+    try {
+        const update = await prisma.users.update({
+            where: {user_id: userId},
+            data: {
+                profile_pic_url: filename, //replace with filesystemLocation
+            }
+        });
+        return res.status(201).json({message: "Avatar uploaded successfully"});
+    } catch (error) {
+        console.log("in error path\n");
+        console.log(error);
+        if (error instanceof Prisma.PrismaClientInitializationError)
+            return res.status(503).json({ error: "Database unavailable" });
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            if (error.code === 'P2025') {
+                return res.status(404).json({error: "User not found"});
+            }
+            return res.status(502).json({error: error.message});
+        }
+        console.log(error);
+        return res.status(502).json({error: "Bad gateway (svc-user)"});
+    }
+})
+
+app.get('/user/:userId/avatar', async(req, res) => {
+    const userId = req.query.userId as string; //user_id of who makes the request
+    const tmp = req.query.permissions ?? {};
+    const permission = Object.values(tmp) as string[];
+    console.log(`query param userID: ${userId}\npath parameter userID: ${req.params.userId}`);
+    //admin only
+    if (userId === "all"){
+        console.log("in admin fetch all path")
+        if (!permission.includes("manageUserInfo"))
+            return res.status(403).json({error: "Permissions denied"});
+        try {
+            const urls = await prisma.users.findMany({
+                select: {profile_pic_url: true},
+            });
+            return res.status(200).json(urls);
+        } catch (error) {
+            if (error instanceof Prisma.PrismaClientInitializationError)
+                return res.status(503).json({ error: "Database unavailable" });
+            return res.status(502).json({error: "Bad gateway (svc-user)"});
+        }        
+    }
+
+    //fetch one by one
+    console.log(tmp);
+    console.log(permission);
+    if ((!permission.includes("readUserInfo") && !permission.includes("manageUserInfo")) ||
+            (permission.includes("readUserInfo") && userId !== req.params.userId)) {
+                return res.status(403).json({error: "Permissions denied on GET /user/:userId/avatar"});
+            }
+    console.log("permission validated");
+    const targetId = parseInt(req.params.userId) ?? null;
+    if (!targetId)
+            return res.status(400).json({error: "Invalid target userId"});
+    try {
+        const url = await prisma.users.findUnique({
+            where: {user_id: targetId},
+            select: {profile_pic_url: true},
+        });
+        return res.status(200).json({data: url});
+    } catch (error) {
+        console.log("in error path\n");
+        console.log(error);
+        if (error instanceof Prisma.PrismaClientInitializationError)
+            return res.status(503).json({ error: "Database unavailable" });
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            if (error.code === 'P2025') {
+                return res.status(404).json({error: "User not found"});
+            }
+            return res.status(502).json({error: error.message});
+        }
+        console.log(error);
+        return res.status(502).json({error: "Bad gateway (svc-user)"});
+    }
+})
 
 app.listen(port, () => {
     console.log(`listening on port ${port}`);

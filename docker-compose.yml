@@ -55,9 +55,10 @@ services:
             - backend-network
         volumes:
             - svc_user_secrets:/secrets:ro
+            - profile_pictures:/var/www/avatars
         depends_on:
-            user-db:
-                condition: service_healthy
+          user-db:
+            condition: service_healthy
             # vault-agent-user:
             #     condition: service_started
         restart: unless-stopped
@@ -161,6 +162,7 @@ services:
                 condition: service_completed_successfully
         volumes:
             - frontend_tls:/etc/nginx/ssl
+            - profile_pictures:/var/www/avatars
         restart: unless-stopped
 
     auth-db:
@@ -421,7 +423,8 @@ volumes:
         name: svc_interview_store_secrets_volume
     svc_interview_store_vault_creds:
         name: svc_interview_store_vault_creds_volume
-
+    profile_pictures:
+        name: profile_pictures_shared_volume
     vault_data:
         name: vault_data_volume
     vault_tls:
