@@ -144,7 +144,6 @@ services:
         volumes:
             - frontend_tls:/tls
             - ./frontend/nginx/tools/certgen.sh:/certgen.sh:ro
-            - profile_pictures:/var/www/avatars
         restart: "no"
 
     frontend:
@@ -163,6 +162,7 @@ services:
                 condition: service_completed_successfully
         volumes:
             - frontend_tls:/etc/nginx/ssl
+            - profile_pictures:/var/www/avatars
         restart: unless-stopped
 
     auth-db:
