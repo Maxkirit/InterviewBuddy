@@ -3,13 +3,7 @@ import axios, {
     type AxiosError,
     type InternalAxiosRequestConfig,
 } from "axios";
-import {
-    createContext,
-    useEffect,
-    useRef,
-    useState,
-    type ReactNode,
-} from "react";
+import { createContext, useEffect, useState, type ReactNode } from "react";
 
 interface RetryConfig extends InternalAxiosRequestConfig {
     _retry?: boolean;
@@ -77,21 +71,21 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
         },
     );
 
-    const isRefreshing = useRef(false);
-    const failedQueue = useRef<QueueItem[]>([]);
+    let isRefreshing = false;
+    let failedQueue: QueueItem[] = [];
 
     const processQueue = (
         error: AxiosError | null,
         token: string | null = null,
     ): void => {
-        failedQueue.current.forEach((item) => {
+        failedQueue.forEach((item) => {
             if (error) {
                 item.reject(error);
             } else {
                 item.resolve(token!);
             }
         });
-        failedQueue.current = [];
+        failedQueue = [];
     };
 
     axiosInstance.interceptors.response.use(
@@ -104,10 +98,10 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
                 originalRequest &&
                 !originalRequest._retry
             ) {
-                if (isRefreshing.current) {
+                if (isRefreshing) {
                     // Queue the request until the refresh completes
                     return new Promise<string>((resolve, reject) => {
-                        failedQueue.current.push({ resolve, reject });
+                        failedQueue.push({ resolve, reject });
                     })
                         .then((token) => {
                             originalRequest.headers["Authorization"] =
@@ -118,7 +112,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
                 }
 
                 originalRequest._retry = true;
-                isRefreshing.current = true;
+                isRefreshing = true;
 
                 try {
                     const { data } = await axios.post(
@@ -139,7 +133,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
                     setToken(null);
                     return Promise.reject(refreshError);
                 } finally {
-                    isRefreshing.current = false;
+                    isRefreshing = false;
                 }
             }
 
