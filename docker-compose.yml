@@ -134,34 +134,34 @@ services:
     # #     ports:
     # #         - "5173:5173"
 
-    frontend-certgen:
-        profiles: ["app"]
-        container_name: frontend-certgen
-        image: alpine:3.20
-        user: "0:0"
-        entrypoint: ["/bin/sh", "/certgen.sh"]
-        volumes:
-            - frontend_tls:/tls
-            - ./frontend/nginx/tools/certgen.sh:/certgen.sh:ro
-        restart: "no"
+    # frontend-certgen:
+    #     profiles: ["app"]
+    #     container_name: frontend-certgen
+    #     image: alpine:3.20
+    #     user: "0:0"
+    #     entrypoint: ["/bin/sh", "/certgen.sh"]
+    #     volumes:
+    #         - frontend_tls:/tls
+    #         - ./frontend/nginx/tools/certgen.sh:/certgen.sh:ro
+    #     restart: "no"
 
-    frontend:
-        profiles: ["app"]
-        container_name: frontend
-        build:
-          context: ./frontend
-          dockerfile: Dockerfile.waf
-        ports:
-            - "443:443"
-        networks:
-            - frontend-network
-            - backend-network
-        depends_on:
-            frontend-certgen:
-                condition: service_completed_successfully
-        volumes:
-            - frontend_tls:/etc/nginx/ssl
-        restart: unless-stopped
+    # frontend:
+    #     profiles: ["app"]
+    #     container_name: frontend
+    #     build:
+    #         context: ./frontend
+    #         dockerfile: Dockerfile.waf
+    #     ports:
+    #         - "443:443"
+    #     networks:
+    #         - frontend-network
+    #         - backend-network
+    #     depends_on:
+    #         frontend-certgen:
+    #             condition: service_completed_successfully
+    #     volumes:
+    #         - frontend_tls:/etc/nginx/ssl
+    #     restart: unless-stopped
 
     auth-db:
         container_name: auth-db
@@ -185,6 +185,8 @@ services:
         build: infrastructure/databases/user-db
         networks:
             - backend-network
+        ports:
+            - "5433:5432"
         env_file:
             - infrastructure/databases/user-db/.env_user_db
         environment:
@@ -198,7 +200,7 @@ services:
         restart: unless-stopped
 
     interview-store-db:
-        profiles: ["app"]
+        # profiles: ["app"]
         container_name: interview-store-db
         build: infrastructure/databases/interview-store-db
         ports:

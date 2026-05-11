@@ -1,14 +1,14 @@
 #!/bin/bash
 set -e
 
-echo "[svc-user] waiting for /secrets/db.env..."
-while [ ! -f /secrets/db.env ]; do
-  sleep 1
-done
+# echo "[svc-user] waiting for /secrets/db.env..."
+# while [ ! -f /secrets/db.env ]; do
+#   sleep 1
+# done
 
-set -a
-. /secrets/db.env
-set +a
+# set -a
+# . /secrets/db.env
+# set +a
 
 if [ -z "${DATABASE_URL:-}" ]; then
   echo "[svc-user] ERROR: DATABASE_URL is missing"
