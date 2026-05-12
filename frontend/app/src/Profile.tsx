@@ -85,7 +85,7 @@ export default function MyProfile() {
             };
             ProfileSchema.parse(input);
             await authContext?.axiosInstance.patch(
-                "http://localhost:3000/api/v1/user/profile",
+                `http://localhost:3000/api/v1/user/profile/${authContext.userId}`,
                 input,
             );
         } catch (error) {

@@ -82,8 +82,9 @@ export const listConnections = async (req: Request, res: Response) => {
 
 //this route is not used for images
 // in this route
-export const updateOwnUserInfo = async (req: Request, res: Response) => {
-    console.log("in updateOwnUser\n");
+export const updateUserInfo = async (req: Request, res: Response) => {
+	const { user_id } = req.params;
+    console.log("in updateUser\n");
     const REQUIRED_FIELDS = [
         "gender",
         "date_of_birth",
@@ -107,7 +108,7 @@ export const updateOwnUserInfo = async (req: Request, res: Response) => {
     console.log("validated fields\n");
     try {
         const response = await axios.patch(
-            `http://svc-user:3000/user/profile/${(req as ReqWithUser).userId}`,
+            `http://svc-user:3000/user/profile/${user_id}`,
             {
                 body: req.body,
                 permissions: (req as ReqWithUser).permissions,

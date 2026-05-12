@@ -72,7 +72,7 @@ export default function AdminUsers(){
             };
             ProfileSchema.parse(input);
             await authContext?.axiosInstance.patch(
-                "/api/v1/user/profile",
+                `/api/v1/user/profile/${selectUser?.user_id}`,
                 input,
             );
             editModalUser.current?.close();

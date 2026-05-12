@@ -5,6 +5,7 @@ import { role_type } from "./generated/prisma/enums.js";
 import { string, z } from "zod";
 import { error } from "node:console";
 import { addConnection } from "./connections/addConnection.js";
+import { read } from "node:fs";
 
 const nameSurnameSchema = z
     .string()
@@ -315,13 +316,14 @@ app.patch("/user/profile/:user_id", async (req, res) => {
     console.log("in update user profile route\n");
     try {
         //validate perms
+		console.log(req.body.permissions);
         const userId = parseInt(req.params.user_id);
         if (
-            (!req.body.permissions.includes("modifyOwnUser") &&
-                !req.body.permissions.includes("manageUserInfo")) ||
-            (req.body.permissions.includes("modifyOwnUser") &&
-                req.body.userId !== userId)
+            ( req.body.userId !== userId &&
+                !req.body.permissions?.includes("manageUserInfo")) ||
+            !req.body.permissions.includes("modifyOwnUser")
         ) {
+			console.log(`${req.body.userId} vs ${userId}, perm : mdu ${req.body.permissions?.includes("modifyOwnUser")}, mui ${req.body.permissions?.includes("manageUserInfo")}`)
             return res
                 .status(403)
                 .json({ error: "Wrong permissions for route" });
