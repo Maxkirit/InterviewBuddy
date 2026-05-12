@@ -11,14 +11,21 @@ COPY ./app/ .
 
 RUN npm run build
 
+FROM debian:trixie-slim AS runner
 
-FROM nginx:1.30-trixie AS runner
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    nginx \
+    libnginx-mod-http-modsecurity \
+    libmodsecurity3 \
+    modsecurity-crs \
+    curl \
+    ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
 
 COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
-
+COPY ./nginx/modsecurity /etc/nginx/modsecurity
 COPY --from=builder /app/dist /usr/share/nginx/html
 
 EXPOSE 443
 
-ENTRYPOINT ["nginx", "-c", "/etc/nginx/nginx.conf"]
-CMD ["-g", "daemon off;"]
+CMD ["nginx", "-g", "daemon off;"]

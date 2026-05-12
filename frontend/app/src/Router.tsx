@@ -8,6 +8,7 @@ import CandidateListRecruiters from "./CandidateListRecruiters";
 import CandidateView from "./CandidateView";
 import RecruiterView from "./RecruiterView";
 import AdminView from "./AdminView";
+import RecruiterInterviews from "./RecruiterInterview";
 
 export default function Router() {
     return (
@@ -30,7 +31,9 @@ export default function Router() {
                     <Route
                         path="/recruiter"
                         element={<RecruiterView />}
-                    ></Route>
+                    >
+                        <Route path="/recruiter/interviews" element={<RecruiterInterviews />} />
+                    </Route>
                     <Route path="/admin" element={<AdminView />}></Route>
                     <Route path="/profile" element={<MyProfile />} />
                 </Route>
