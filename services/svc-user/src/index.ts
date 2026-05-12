@@ -8,6 +8,7 @@ import { randomBytes } from "node:crypto";
 import { error, profile } from 'node:console';
 import { resolveSoa } from 'node:dns';
 import { addConnection } from "./connections/addConnection.js";
+import { read } from "node:fs";
 
 const nameSurnameSchema = z
     .string()
@@ -161,7 +162,7 @@ app.get("/user/:user_id", async (req, res) => {
         }
         try {
             console.log("admin perm okay...");
-            const user = await prisma.users.findMany();
+            const user = await prisma.users.findMany({ orderBy: { user_id: 'asc' } });
             return res.status(200).json(user);
         } catch (e) {
             return res.status(500).json({ error: "Internal error" });
@@ -316,13 +317,14 @@ app.patch("/user/profile/:user_id", async (req, res) => {
     console.log("in update user profile route\n");
     try {
         //validate perms
+		console.log(req.body.permissions);
         const userId = parseInt(req.params.user_id);
         if (
-            (!req.body.permissions.includes("modifyOwnUser") &&
-                !req.body.permissions.includes("manageUserInfo")) ||
-            (req.body.permissions.includes("modifyOwnUser") &&
-                req.body.userId !== userId)
+            ( req.body.userId !== userId &&
+                !req.body.permissions?.includes("manageUserInfo")) ||
+            !req.body.permissions.includes("modifyOwnUser")
         ) {
+			console.log(`${req.body.userId} vs ${userId}, perm : mdu ${req.body.permissions?.includes("modifyOwnUser")}, mui ${req.body.permissions?.includes("manageUserInfo")}`)
             return res
                 .status(403)
                 .json({ error: "Wrong permissions for route" });

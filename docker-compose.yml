@@ -130,10 +130,10 @@ services:
     # #         - backend-network
     # #     restart: unless-stopped
 
-    # # dev-front:
-    # #     container_name: dev-front
-    # #     ports:
-    # #         - "5173:5173"
+    # dev-front:
+    #     container_name: dev-front
+    #     ports:
+    #         - "5173:5173"
 
     # frontend-certgen:
     #     profiles: ["app"]

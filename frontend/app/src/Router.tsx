@@ -8,6 +8,7 @@ import CandidateView from "./CandidateView";
 import RecruiterView from "./RecruiterView";
 import AdminView from "./AdminView";
 import RecruiterInterviews from "./RecruiterInterview";
+import AdminUsers from "./AdminUser";
 
 export default function Router() {
     return (
@@ -31,6 +32,7 @@ export default function Router() {
                     </Route>
                     <Route path="/admin" element={<AdminView />}></Route>
                     <Route path="/profile" element={<MyProfile />} />
+					<Route path="/admin/users" element={<AdminUsers />} />
                 </Route>
             </Routes>
         </BrowserRouter>
