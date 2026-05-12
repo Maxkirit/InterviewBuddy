@@ -1,0 +1,22 @@
+# Temporary WAF-focused Dockerfile.
+# Used to validate Nginx + ModSecurity + OWASP CRS while the frontend build is not passing.
+FROM debian:trixie-slim
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    nginx \
+    libnginx-mod-http-modsecurity \
+    libmodsecurity3 \
+    modsecurity-crs \
+    curl \
+    ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
+
+COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
+COPY ./nginx/modsecurity /etc/nginx/modsecurity
+
+RUN mkdir -p /usr/share/nginx/html /var/log/nginx && \
+    printf '<!doctype html><html><body><h1>frontend/nginx/modsecurity OK</h1></body></html>\n' > /usr/share/nginx/html/index.html
+
+EXPOSE 8080
+
+CMD ["nginx", "-g", "daemon off;"]
