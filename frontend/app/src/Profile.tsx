@@ -2,7 +2,7 @@ import { useEffect, useState, useContext, type SubmitEvent } from "react";
 import { AuthContext } from "./AuthProvider";
 import z from "zod";
 
-const ProfileSchema = z.object({
+export const ProfileSchema = z.object({
     firstname: z.string().min(1),
     lastname: z.string().min(1),
     country: z.string().nullable(),

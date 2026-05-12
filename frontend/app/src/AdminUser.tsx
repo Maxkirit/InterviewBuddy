@@ -1,13 +1,23 @@
 import { useState, useRef, useContext, useEffect} from 'react';
 import { AuthContext } from "./AuthProvider";
+import { ProfileSchema } from './Profile';
 
 type User = {
-    id: number;
+    user_id: number;
+    auth_id: number;
     firstname: string;
     lastname: string;
     email: string;
-    role: 'candidate' | 'recruiter';
-    joinedAt: string;
+    role: 'candidate' | 'recruiter' | 'admin';
+    created_at: string;
+    country: string | null;
+    organization: string | null;
+    bio: string | null;
+    linkedin_link: string | null;
+    phone_number: string | null;
+    job_title: string | null;
+    gender: string | null;
+    date_of_birth: string | null;
 };
 
 export default function AdminUsers(){
@@ -16,49 +26,82 @@ export default function AdminUsers(){
 	const editModalUser = useRef<HTMLDialogElement>(null);
 	const deleteModalUser = useRef<HTMLDialogElement>(null);
 	const authContext = useContext(AuthContext);
-	
+
 	useEffect(()=>{
 		async function getUser(){
-		try{
-			const result = await authContext?.axiosInstance.get("/api/v1/user/all");
-			console.log(result?.data);
-			setUsers(result?.data)
+			try{
+				const result = await authContext?.axiosInstance.get("/api/v1/user/all");
+				setUsers(result?.data);
+			} catch(e){
+				console.log("error in api/v1/user/all");
+			}
 		}
-		catch(e){
-			console.log("error in api/v1/user/all");
-		}
-	}
-	getUser();
+		getUser();
 	}, [])
-
 
 	function openEditModal(user?: User){
 		setSelectUser(user ?? null);
-		editModalUser.current?.showModal;
+		console.log(user);
+		editModalUser.current?.showModal();
 	}
 
-		function openDeleteModal(user: User){
-		setSelectUser(user ?? null);
-		deleteModalUser.current?.showModal;
+	function openDeleteModal(user: User){
+		console.log(user);
+		setSelectUser(user);
+		deleteModalUser.current?.showModal();
 	}
+
+	function updateField(field: keyof User, value: string){
+		setSelectUser(prev => prev ? { ...prev, [field]: value } : null);
+	}
+
+	async function handleSave(){
+		try {
+			console.log(selectUser);
+            const input = {
+                firstname: selectUser?.firstname ?? "",
+                lastname: selectUser?.lastname ?? "",
+                country: selectUser?.country ?? "",
+                organization: selectUser?.organization ?? "",
+                bio: selectUser?.bio ?? "",
+                linkedin_link: selectUser?.linkedin_link ?? "",
+                phone_number: selectUser?.phone_number ?? "",
+                job_title: selectUser?.job_title ?? "",
+                gender: selectUser?.gender ?? "",
+                date_of_birth: selectUser?.date_of_birth ?? "",
+            };
+            ProfileSchema.parse(input);
+            await authContext?.axiosInstance.patch(
+                "/api/v1/user/profile",
+                input,
+            );
+            editModalUser.current?.close();
+        } catch (error) {
+            console.log("in error path");
+            console.log(error);
+        }
+		try{
+			const result = await authContext?.axiosInstance.get("/api/v1/user/all");
+			setUsers(result?.data);
+		}
+		catch(e){
+			console.log("failed to reload data");
+			console.log(e);
+		}
+	}
+
 	return(
         <div className="max-w-[900px] mx-auto px-6 py-10">
 
             {/* Header */}
             <div className="flex items-baseline gap-3 mb-7">
                 <h1 className="text-[1.75rem] font-bold text-[#1a1d2e]">Users</h1>
-                <button
-                    onClick={() => openEditModal()}
-                    className="px-5 py-[9px] rounded-lg bg-[#4f6ef7] text-white text-sm font-semibold cursor-pointer hover:bg-[#3d5ce6] transition"
-                >
-                    + Add user
-                </button>
             </div>
 
             {/* Liste */}
             <div className="flex flex-col gap-3">
                 {users.map(user => (
-                    <div key={user.id} className="bg-white border border-[#e4e8f0] rounded-[14px] px-6 py-5 flex items-center gap-6">
+                    <div key={user.user_id} className="bg-white border border-[#e4e8f0] rounded-[14px] px-6 py-5 flex items-center gap-6">
 
                         {/* Gauche */}
                         <div className="flex items-center gap-3.5 flex-[0_0_240px]">
@@ -66,13 +109,14 @@ export default function AdminUsers(){
                             <div className="flex flex-col gap-0.5">
                                 <div className="text-[0.95rem] font-semibold text-[#1a1d2e]">{user.firstname} {user.lastname}</div>
                                 <div className="text-[0.8rem] text-[#6b7280]">{user.email}</div>
-                                <div className="text-[0.75rem] text-[#9ca3af]">Joined {user.joinedAt}</div>
+                                <div className="text-[0.75rem] text-[#9ca3af]">
+									 Created_at : {new Date(user.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+								</div>
                             </div>
                         </div>
-
                         {/* Droite */}
                         <div className="flex-1 flex items-center gap-5 justify-end">
-                            <span className={`status-badge status-${user.role}`}>
+                            <span className={`status-badge ${user.role === 'admin' ? 'bg-[#fef3c7] text-[#b45309]' : `status-${user.role}`}`}>
                                 {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
                             </span>
                             <button
@@ -95,9 +139,16 @@ export default function AdminUsers(){
             {/* Modal Edit / Add */}
             <dialog ref={editModalUser}>
                 <div className="flex items-center justify-between px-9 pt-8 mb-6">
-                    <h2 className="text-[1.1rem] font-bold text-[#1a1d2e]">
-                        {selectUser ? 'Edit user' : 'Add user'}
-                    </h2>
+                    <div>
+                        <h2 className="text-[1.1rem] font-bold text-[#1a1d2e]">
+                            {selectUser ? 'Edit user' : 'Add user'}
+                        </h2>
+                        {selectUser && (
+                            <p className="text-[0.85rem] text-[#6b7280] mt-0.5">
+                                {selectUser.firstname} {selectUser.lastname}
+                            </p>
+                        )}
+                    </div>
                     <button
                         onClick={() => editModalUser.current?.close()}
                         className="w-[30px] h-[30px] rounded-lg border border-[#e4e8f0] bg-white text-[#9ca3af] text-xs cursor-pointer flex items-center justify-center hover:border-[#ef4444] hover:text-[#ef4444] transition"
@@ -105,33 +156,49 @@ export default function AdminUsers(){
                         ✕
                     </button>
                 </div>
-                <div className="flex flex-col gap-4 px-9">
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="form-field">
-                            <label className="form-label">First name</label>
-                            <input className="form-input" type="text" placeholder="First name" defaultValue={selectUser?.firstname ?? ''} />
-                        </div>
-                        <div className="form-field">
-                            <label className="form-label">Last name</label>
-                            <input className="form-input" type="text" placeholder="Last name" defaultValue={selectUser?.lastname ?? ''} />
-                        </div>
-                    </div>
-                    <div className="form-field">
-                        <label className="form-label">Email</label>
-                        <input className="form-input" type="email" placeholder="user@example.com" defaultValue={selectUser?.email ?? ''} />
-                    </div>
-                    <div className="form-field">
-                        <label className="form-label">Role</label>
-                        <select className="form-input" defaultValue={selectUser?.role ?? ''}>
-                            <option value="" disabled>Select a role…</option>
-                            <option value="candidate">Candidate</option>
-                            <option value="recruiter">Recruiter</option>
-                        </select>
-                    </div>
-                </div>
+				<div className="flex flex-col gap-4 px-9">
+				    <div className="grid grid-cols-2 gap-4">
+				        <div className="form-field">
+				            <label className="form-label">Country</label>
+				            <input className="form-input border-[#d1d5db]" type="text"
+				                value={selectUser?.country ?? ''}
+								onChange={(e) => updateField('country', e.target.value)} />
+				        </div>
+				        <div className="form-field">
+				            <label className="form-label">Job title</label>
+				            <input className="form-input border-[#d1d5db]" type="text"
+				                value={selectUser?.job_title ?? ''}
+								onChange={(e) => updateField('job_title', e.target.value)} />
+				        </div>
+				    </div>
+				    <div className="form-field">
+				        <label className="form-label">Organisation</label>
+				        <input className="form-input border-[#d1d5db]" type="text"
+				            value={selectUser?.organization ?? ''}
+							onChange={(e) => updateField('organization', e.target.value)} />
+				    </div>
+				    <div className="form-field">
+				        <label className="form-label">Bio</label>
+				        <textarea className="form-input border-[#d1d5db] resize-y min-h-[90px]"
+				            value={selectUser?.bio ?? ''}
+							onChange={(e) => updateField('bio', e.target.value)} />
+				    </div>
+				    <div className="form-field">
+				        <label className="form-label">LinkedIn</label>
+				        <input className="form-input border-[#d1d5db]" type="url"
+				            value={selectUser?.linkedin_link ?? ''}
+							onChange={(e) => updateField('linkedin_link', e.target.value)} />
+				    </div>
+				    <div className="form-field">
+				        <label className="form-label">Phone</label>
+				        <input className="form-input border-[#d1d5db]" type="tel"
+				            value={selectUser?.phone_number ?? ''}
+							onChange={(e) => updateField('phone_number', e.target.value)} />
+				    </div>
+				</div>
                 <div className="flex justify-end gap-2.5 px-9 py-6">
                     <button className="btn-cancel" onClick={() => editModalUser.current?.close()}>Cancel</button>
-                    <button className="btn-primary px-6 py-[9px]">Save</button>
+                    <button className="btn-primary px-6 py-[9px]" onClick={handleSave}>Save</button>
                 </div>
             </dialog>
 
