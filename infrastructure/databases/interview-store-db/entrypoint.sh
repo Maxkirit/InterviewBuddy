@@ -85,6 +85,78 @@ CREATE TABLE IF NOT EXISTS $TABLE_MODEL_ANSWERS (
     updated_at				TIMESTAMPTZ		NOT NULL DEFAULT NOW()
 );
 
+ALTER TABLE questions ADD CONSTRAINT questions_name_unique UNIQUE (name);
+
+INSERT INTO questions (name, context, functional_req, non_functional_req)
+VALUES (
+    'URL Shortener',
+    'Design a URL Shortener',
+    'Given a URL, our service should generate a shorter and unique alias of it. This is called a short link. This link should be short enough to be easily copied and pasted into applications.'
+    || E'\n\n' ||
+    'When users access a short link, our service should redirect them to the original link.'
+    || E'\n\n' ||
+    'Users should optionally be able to pick a custom short link for their URL.'
+    || E'\n\n' ||
+    'Links will expire after a standard default timespan. Users should be able to specify the expiration time.',
+
+    'The system should be highly available. This is required because, if our service is down, all the URL redirections will start failing.'
+    || E'\n\n' ||
+    'URL redirection should happen in real-time with minimal latency.'
+    || E'\n\n' ||
+    'Shortened links should not be guessable (not predictable).'
+)
+ON CONFLICT (name) DO NOTHING;
+
+INSERT INTO questions (name, context, functional_req, non_functional_req)
+VALUES (
+    'Design Dropbox or Google Drive',
+    'Design a cloud file storage and sync service like Dropbox or Google Drive.',
+
+    'Users should be able to upload a file from any device'
+    || E'\n\n' ||
+    'Users should be able to download a file from any device'
+    || E'\n\n' ||
+    'Users should be able to share a file with other users and view the files shared with them'
+    || E'\n\n' ||
+    'Users can automatically sync files across devices'
+    || E'\n\n' ||
+    'Editing files is out of scope',
+
+    'The system should be highly available (prioritizing availability over consistency).'
+    || E'\n\n' ||
+    'The system should support files as large as 50GB.'
+    || E'\n\n' ||
+    'The system should be secure and reliable. We should be able to recover files if they are lost or corrupted.'
+    || E'\n\n' ||
+    'The system should make upload, download, and sync times as fast as possible (low latency).'
+)
+ON CONFLICT (name) DO NOTHING;
+
+INSERT INTO questions (name, context, functional_req, non_functional_req)
+VALUES (
+    'Distributed Counter',
+    'Design a distributed counter system.',
+
+    'The total count of users currently viewing the website or a particular web page should be shown in real-time.'
+    || E'\n\n' ||
+    'The value of the counter must decrement when a user exits the website.'
+    || E'\n\n' ||
+    'The user receives the count of unread notifications when subscribed web pages are modified.',
+
+    'Highly available.'
+    || E'\n\n' ||
+    'Eventually consistent.'
+    || E'\n\n' ||
+    'Accurate.'
+    || E'\n\n' ||
+    'Reliable.'
+    || E'\n\n' ||
+    'Scalable.'
+    || E'\n\n' ||
+    'Low latency.'
+)
+ON CONFLICT (name) DO NOTHING;
+
 ALTER DEFAULT PRIVILEGES IN SCHEMA public
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO $POSTGRES_ADMIN, $POSTGRES_APP_USER, $POSTGRES_SUPERUSER;
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO $POSTGRES_SUPERUSER;
