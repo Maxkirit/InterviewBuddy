@@ -8,6 +8,7 @@ import {exportJWK, importSPKI} from 'jose'
 import dotenv from 'dotenv'
 import { createPublicKey } from 'crypto'
 import { string, z } from 'zod';
+import { readFileSync } from 'fs';
 
 type ApiError = {
   error: string,
@@ -29,9 +30,7 @@ const REFRESH_SECRET = "changewhenvaultisup";
 
 
 // dotenv.config() // {path: '...'} pour personnailiser ou est la cles
-const secret = process.env.SECRETKEY
-if (!secret) throw new Error('SECRETKEY manquante dans .env')
-
+const PRIVATE_KEY = readFileSync('/secrets/jwt_private.pem', 'utf-8');
 const app = express();
 const port = 3000;
 
@@ -39,7 +38,7 @@ app.use(express.json());
 
 app.get('/auth/signing-key', async (req, res) => {
     try {
-        const publicKeyPem = createPublicKey(secret).export({ type: 'spki', format: 'pem' })
+        const publicKeyPem = createPublicKey(PRIVATE_KEY).export({ type: 'spki', format: 'pem' })
         console.log("pub key created\n");
         const publicKey = await importSPKI(publicKeyPem, 'RS256')           // ← extrait la clé publique en PEM
         console.log("pub key extracted\n");

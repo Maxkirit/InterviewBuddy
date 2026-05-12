@@ -1,8 +1,9 @@
 import jwt from "jsonwebtoken";
 import { randomBytes } from "node:crypto";
 import { prisma } from "./prisma.js";
+import { readFileSync } from 'fs';
 
-export const ACCESS_SECRET = "changewhenvaultisup";
+const PRIVATE_KEY = readFileSync('/secrets/jwt_private.pem', 'utf-8');
 const REFRESH_SECRET = "changewhenvaultisup";
 const REFRESH_MAX_AGE = 604800; //7 days in seconds === 604800
 
@@ -43,8 +44,8 @@ export async function createAccessToken(userId: number) {
     );
     const access_token = jwt.sign(
         { userId: userId, role: role, permissions: perms },
-        ACCESS_SECRET,
-        { expiresIn: "10m" },
+        PRIVATE_KEY,
+        { algorithm: 'RS256', expiresIn: "10m" },
     );
     return access_token;
 }
