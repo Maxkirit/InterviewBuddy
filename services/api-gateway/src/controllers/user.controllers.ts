@@ -181,7 +181,7 @@ export const uploadAvatar = async (req: Request, res: Response) => {
         if (axios.isAxiosError<ApiError>(error) && error.response?.status) {
             return res
                 .status(error.response.status)
-                .json({ error: error.message });
+                .json({ error: error.response.data?.error ?? error.message });
         }
         return res.status(502).json({ error: "Bad gateway (api gateway)" });
     }
@@ -205,7 +205,7 @@ export const getAvatarURL = async (req: Request, res: Response) => {
         if (axios.isAxiosError<ApiError>(error) && error.response?.status) {
             return res
                 .status(error.response.status)
-                .json({ error: error.message });
+                .json({ error: error.response.data?.error ?? error.message });
         }
         return res.status(502).json({ error: "Bad gateway (api gateway)" });
     }
