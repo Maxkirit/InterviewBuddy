@@ -81,7 +81,7 @@ export default function MyProfile() {
                 phone_number: phone ?? "",
                 job_title: jobTitle ?? "",
                 gender: gender ?? "",
-                date_of_birth: dob ? new Date(dob) : null,
+                date_of_birth: dob ? new Date(dob) : "",
             };
             ProfileSchema.parse(input);
             await authContext?.axiosInstance.patch(
