@@ -48,7 +48,8 @@ export default function RecruiterListCandidates() {
 					connections.map((conn) => (
 						<div className="candidate-row" key={conn.user_id}>
 							<div className="candidate-row-left">
-								{conn.profile_pic_url ? (
+								{/* checks for picture url, if none, puts letters as avatar */}
+								{/* {conn.profile_pic_url ? (
 									<img
 										src={conn.profile_pic_url}
 										alt={`${conn.firstname} ${conn.lastname}`}
@@ -58,7 +59,10 @@ export default function RecruiterListCandidates() {
 									<div className="avatar">
 										{conn.firstname[0]}{conn.lastname[0]}
 									</div>
-								)}
+								)} */}
+								<div className="avatar">
+										{conn.firstname[0]}{conn.lastname[0]}
+									</div>
 								<div className="flex flex-col gap-0.5">
 									<span className="candidate-name">
 										{conn.firstname} {conn.lastname}
