@@ -8,6 +8,7 @@ import CandidateView from "./CandidateView";
 import RecruiterView from "./RecruiterView";
 import AdminView from "./AdminView";
 import RecruiterInterviews from "./RecruiterInterview";
+import AppLayout from "./AppLayout";
 
 export default function Router() {
     return (
@@ -17,20 +18,22 @@ export default function Router() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route element={<ProtectedLayout />}>
-                    <Route path="/candidate" element={<CandidateView />}>
+                    <Route element={<AppLayout />}>
+                        <Route path="/candidate" element={<CandidateView />}>
+                            <Route
+                                path="/candidate/official-interviews"
+                                element={<CandidateOfficialInterview />}
+                            />
+                        </Route>
                         <Route
-                            path="/candidate/official-interviews"
-                            element={<CandidateOfficialInterview />}
-                        />
+                            path="/recruiter"
+                            element={<RecruiterView />}
+                        >
+                            <Route path="/recruiter/interviews" element={<RecruiterInterviews />} />
+                        </Route>
+                        <Route path="/admin" element={<AdminView />}></Route>
+                        <Route path="/profile" element={<MyProfile />} />
                     </Route>
-                    <Route
-                        path="/recruiter"
-                        element={<RecruiterView />}
-                    >
-                        <Route path="/recruiter/interviews" element={<RecruiterInterviews />} />
-                    </Route>
-                    <Route path="/admin" element={<AdminView />}></Route>
-                    <Route path="/profile" element={<MyProfile />} />
                 </Route>
             </Routes>
         </BrowserRouter>
