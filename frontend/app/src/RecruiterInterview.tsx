@@ -105,7 +105,6 @@ export default function RecruiterInterviews() {
                     </div>
                     <div className="flex-1 flex flex-col items-end gap-3">
                         <div className="flex items-center gap-5">
-                            <span className="text-[0.75rem] text-gray-400">Design a Rate Limiter</span>
                             <span className="status-badge status-completed">{interview.status}</span>
                             <button
                                 className="px-4 py-[7px] rounded-lg bg-white text-[0.85rem] font-medium cursor-pointer whitespace-nowrap transition border border-[#ef4444] text-[#ef4444] hover:bg-[#ef4444] hover:text-white"
@@ -161,7 +160,6 @@ export default function RecruiterInterviews() {
                         </div>
                     </div>
                     <div className="flex-1 flex items-center gap-5 justify-end">
-                        <span className="text-[0.75rem] text-gray-400">Design a Distributed Cache</span>
                         <span className={overDue ? "text-[0.75rem] text-[#ef4444] font-semibold whitespace-nowrap" : "text-[0.75rem] text-gray-400 whitespace-nowrap"}>
                             Due {interview.dueDate.toDateString()}
                         </span>
@@ -217,7 +215,7 @@ export default function RecruiterInterviews() {
                         <p>This interview will be permanently cancelled and cannot be undone.</p>
                     </div>
                     <div className="flex justify-end gap-2.5 mt-6">
-                        <button type="button" className="btn-cancel" onClick={() => setIsSetupOpen(false)}>
+                        <button type="button" className="btn-cancel" onClick={() => setIsConfirmOpen(false)}>
                             Keep
                         </button>
                         <button className="btn-danger">Cancel interview</button>
