@@ -30,13 +30,14 @@ export default function RecruiterInterviews() {
     const [candidateMap, setCandidateMap] = useState<Record<string, CandidateData>>({});
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const [isSetupOpen, setIsSetupOpen] = useState(false);
+    const [refreshKey, setRefreshKey] = useState(0);
     const confirmRef = useRef<HTMLDialogElement>(null);
 
     useEffect(() => {
         async function getInterviews() {
             try {
                 const result = await authContext?.axiosInstance.get(
-                    `/api/v1/interview/candidat-interviews/${authContext.userId}`,
+                    `/api/v1/interview/real-interviews/${authContext.userId}`,
                 );
                 console.log(result?.data);
                 const parsed = (result?.data).map((item) => ({
@@ -54,7 +55,7 @@ export default function RecruiterInterviews() {
             }
         }
         getInterviews();
-    }, []);
+    }, [refreshKey]);
 
     useEffect(() => {
         const uniqueCandidateIds = [...new Set(interviews.map((i) => i.candidateId))];
@@ -198,7 +199,7 @@ export default function RecruiterInterviews() {
                 </div>
             </div>
 
-            <SetupInterviewModal isOpen={isSetupOpen} setIsOpen={setIsSetupOpen} />
+            <SetupInterviewModal isOpen={isSetupOpen} setIsOpen={setIsSetupOpen} refreshKey={refreshKey} setRefreshKey={setRefreshKey} />
 
             <dialog ref={confirmRef} id="confirm-modal" onClick={handleBackdropClick}>
                 <div className="p-8 px-9" onClick={(e) => e.stopPropagation()}>
