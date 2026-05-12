@@ -5,6 +5,7 @@ import {
     getInterviewReal,
     getInterviewCandidat,
     getQuestion,
+    startInterview
 } from "../controllers/interview.controllers.js";
 
 const router = Router();
@@ -14,4 +15,5 @@ router.post("/mock-inteview", createMockInterview);
 router.get("/real-interviews/:recruiter_id", getInterviewReal);
 router.get("/candidat-interviews/:candidat_id", getInterviewCandidat);
 router.get("/question/:question_id", getQuestion);
+router.patch("/:interview_id/start", startInterview);
 export default router;

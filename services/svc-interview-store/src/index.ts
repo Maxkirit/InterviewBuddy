@@ -198,6 +198,31 @@ app.get("/interview/question/:question_id", async (req, res) => {
     }
 });
 
+app.patch("interview/:interview_id/start", async (req, res) => {
+    try {
+        const { interview_id } = req.params;
+        const permissions = req.body.permissions;
+        const userId = parseInt(req.body.user_id);
+        const interview = prisma.interviews.findUniqueOrThrow({
+            where: {
+                unique_interview_id: parseInt(interview_id),
+            },
+            include: { questions: true },
+        })
+        if (interview.candidate_id !== userId || interview.status !== "scheduled") {
+            return res.status(403).json({ error: "forbiden" });
+        }
+        res.status(200).json(interview);
+    } catch (error) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            return res
+                .status(400)
+                .json({ error: "Interview not found", code: error.code });
+        }
+        return res.status(500).json({ error: "internal error" });
+    }
+});
+
 app.listen(port, () => {
     console.log(`listening on port ${port}`);
 });
