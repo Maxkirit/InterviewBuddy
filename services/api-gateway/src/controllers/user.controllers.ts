@@ -1,9 +1,9 @@
-import { Request, Response } from 'express';
-import { ApiError } from '../index.js';
-import axios, { AxiosError } from 'axios';
-import { ReqWithUser } from '../validateToken.js';
-import { file } from 'zod';
-import sharp from 'sharp';
+import { Request, Response } from "express";
+import { ApiError } from "../index.js";
+import axios, { AxiosError } from "axios";
+import { ReqWithUser } from "../validateToken.js";
+import { file } from "zod";
+import sharp from "sharp";
 
 export const getUser = async (req: Request, res: Response) => {
     const { user_id } = req.params;
@@ -25,7 +25,7 @@ export const getUser = async (req: Request, res: Response) => {
         if (axios.isAxiosError(e) && e.response?.status)
             return res
                 .status(e.response.status)
-                .json({error: e.response.data?.error ?? e.message});
+                .json({ error: e.response.data?.error ?? e.message });
         return res.status(502).json({ error: "Bad gateway" });
     }
 };
@@ -51,7 +51,7 @@ export const getUserPublic = async (req: Request, res: Response) => {
         if (axios.isAxiosError(e) && e.response?.status)
             return res
                 .status(e.response.status)
-                .json({error: e.response.data?.error ?? e.message});
+                .json({ error: e.response.data?.error ?? e.message });
         return res.status(502).json({ error: "Bad gateway" });
     }
 };
@@ -76,7 +76,7 @@ export const listConnections = async (req: Request, res: Response) => {
         if (axios.isAxiosError<ApiError>(error) && error.response?.status) {
             return res
                 .status(error.response.status)
-                .json({error: error.response.data?.error ?? error.message});
+                .json({ error: error.response.data?.error ?? error.message });
         }
         return res.status(502).json({ error: "Bad gateway" });
     }
@@ -100,12 +100,10 @@ export const updateOwnUserInfo = async (req: Request, res: Response) => {
         (field) => req.body[field] === undefined || req.body[field] === null,
     );
     if (missingFields.length > 0)
-        return res
-            .status(400)
-            .json({
-                error: "Missing fields in request",
-                missing: missingFields,
-            });
+        return res.status(400).json({
+            error: "Missing fields in request",
+            missing: missingFields,
+        });
     console.log("validated fields\n");
     try {
         const response = await axios.patch(
@@ -123,7 +121,7 @@ export const updateOwnUserInfo = async (req: Request, res: Response) => {
         if (axios.isAxiosError<ApiError>(error) && error.response?.status)
             return res
                 .status(error.response.status)
-                .json({error: error.response.data?.error ?? error.message});
+                .json({ error: error.response.data?.error ?? error.message });
         return res.status(502).json({ error: "Bad gateway (api gateway)" });
     }
 };
@@ -135,57 +133,71 @@ export const updateOwnUserInfo = async (req: Request, res: Response) => {
 //api gateway returns 201 uploaded
 //client queries route /data/app/avatar/:user_id to nginx to get picture
 export const uploadAvatar = async (req: Request, res: Response) => {
-    if (!req.body)
-        return res.status(400).json({error: "no files uploaded"});
+    if (!req.body) return res.status(400).json({ error: "no files uploaded" });
 
     //check magic bytes of req body. If the right bytes are not there, refuse
-    const validMagicBytes = [[0xFF, 0xD8, 0xFF], //jpeg, first 4 bytes
-                            [0x89, 0x50, 0x4E, 0x47], ]; //png
+    const validMagicBytes = [
+        [0xff, 0xd8, 0xff], //jpeg, first 4 bytes
+        [0x89, 0x50, 0x4e, 0x47],
+    ]; //png
     const bytes = new Uint8Array(req.body);
-    const isJpeg = validMagicBytes[0][0] === bytes[0] && validMagicBytes[0][1] === bytes[1] && validMagicBytes[0][2] === bytes[2];
-    const isPng = validMagicBytes[1][0] === bytes[0] && validMagicBytes[1][1] === bytes[1] && validMagicBytes[1][2] === bytes[2] && validMagicBytes[1][3];
+    const isJpeg =
+        validMagicBytes[0][0] === bytes[0] &&
+        validMagicBytes[0][1] === bytes[1] &&
+        validMagicBytes[0][2] === bytes[2];
+    const isPng =
+        validMagicBytes[1][0] === bytes[0] &&
+        validMagicBytes[1][1] === bytes[1] &&
+        validMagicBytes[1][2] === bytes[2] &&
+        validMagicBytes[1][3];
     if (!isJpeg && !isPng)
-            return res.status(400).json({error: "Not an image"});
+        return res.status(400).json({ error: "Not an image" });
     //check with sharp if file is not malicious
     let image;
     try {
         console.log("in sharp validation");
-        image = await sharp(bytes).resize({width: 512, height: 512}) //limits size and standardizes for easier frontend handling
-                                .toFormat('jpeg', {quality: 80}) //forces conversion to jpeg for standardisation
-                                .toBuffer(); //const image is a buffer, easier to send to svc-user
-    } catch (error){
+        image = await sharp(bytes)
+            .resize({ width: 512, height: 512 }) //limits size and standardizes for easier frontend handling
+            .toFormat("jpeg", { quality: 80 }) //forces conversion to jpeg for standardisation
+            .toBuffer(); //const image is a buffer, easier to send to svc-user
+    } catch (error) {
         console.log("sharp error path");
-        return res.status(400).json({error: "Invalid image format or file"});
+        return res.status(400).json({ error: "Invalid image format or file" });
     }
 
-    try { 
-        console.log(`route param userid in uploadAvatar: ${req.params.userId}`);                    
-        const response = await axios.put(`http://svc-user:3000/user/${req.params.userId}/avatar`, {
-            permissions: (req as ReqWithUser).permissions,
-            userId: (req as ReqWithUser).userId,
-            imageContent: image.toString('base64'),
-        });
-        return res.status(201).json({message: "Avatar uploaded"});
+    try {
+        console.log(`route param userid in uploadAvatar: ${req.params.userId}`);
+        const response = await axios.put(
+            `http://svc-user:3000/user/${req.params.userId}/avatar`,
+            {
+                permissions: (req as ReqWithUser).permissions,
+                userId: (req as ReqWithUser).userId,
+                imageContent: image.toString("base64"),
+            },
+        );
+        return res.status(201).json({ message: "Avatar uploaded" });
     } catch (error) {
         console.log("in normal error path");
         if (axios.isAxiosError<ApiError>(error) && error.response?.status) {
             return res
                 .status(error.response.status)
-                .json({error: error.response.data?.error ?? error.message});
+                .json({ error: error.response.data?.error ?? error.message });
         }
-        return res.status(502).json({error: "Bad gateway (api gateway)"});
+        return res.status(502).json({ error: "Bad gateway (api gateway)" });
     }
 };
 
-
 export const getAvatarURL = async (req: Request, res: Response) => {
     try {
-        const response = await axios.get(`http://svc-user:3000/user/${req.params.userId}/avatar`, {
-            params: {
-                permissions: (req as ReqWithUser).permissions,
-                userId: (req as ReqWithUser).userId,
-            }
-        });
+        const response = await axios.get(
+            `http://svc-user:3000/user/${req.params.userId}/avatar`,
+            {
+                params: {
+                    permissions: (req as ReqWithUser).permissions,
+                    userId: (req as ReqWithUser).userId,
+                },
+            },
+        );
         console.log("(req as ReqWithUser).permissions");
         return res.status(200).json(response.data);
     } catch (error) {
@@ -193,9 +205,9 @@ export const getAvatarURL = async (req: Request, res: Response) => {
         if (axios.isAxiosError<ApiError>(error) && error.response?.status) {
             return res
                 .status(error.response.status)
-                .json({error: error.response.data?.error ?? error.message});
+                .json({ error: error.response.data?.error ?? error.message });
         }
-        return res.status(502).json({error: "Bad gateway (api gateway)"});
+        return res.status(502).json({ error: "Bad gateway (api gateway)" });
     }
 };
 
@@ -214,7 +226,7 @@ export const addConnection = async (req: Request, res: Response) => {
         if (error instanceof AxiosError && error.response?.status) {
             return res
                 .status(error.response.status)
-                .json({error: error.response.data?.error ?? error.message});
+                .json({ error: error.response.data?.error ?? error.message });
         }
         return res.status(502).json({ error: "Bad gateway" });
     }

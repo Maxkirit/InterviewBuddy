@@ -146,24 +146,24 @@ services:
     #         - ./frontend/nginx/tools/certgen.sh:/certgen.sh:ro
     #     restart: "no"
 
-    frontend:
-        profiles: ["app"]
-        container_name: frontend
-        build:
-            context: ./frontend
-            dockerfile: Dockerfile
-        ports:
-            - "443:443"
-        networks:
-            - frontend-network
-            - backend-network
-        depends_on:
-            frontend-certgen:
-                condition: service_completed_successfully
-        volumes:
-            - frontend_tls:/etc/nginx/ssl
-            - profile_pictures:/var/www/avatars
-        restart: unless-stopped
+    # frontend:
+    #     profiles: ["app"]
+    #     container_name: frontend
+    #     build:
+    #         context: ./frontend
+    #         dockerfile: Dockerfile
+    #     ports:
+    #         - "443:443"
+    #     networks:
+    #         - frontend-network
+    #         - backend-network
+    #     depends_on:
+    #         frontend-certgen:
+    #             condition: service_completed_successfully
+    #     volumes:
+    #         - frontend_tls:/etc/nginx/ssl
+    #         - profile_pictures:/var/www/avatars
+    #     restart: unless-stopped
 
     auth-db:
         container_name: auth-db
