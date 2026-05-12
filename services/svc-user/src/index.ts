@@ -162,7 +162,7 @@ app.get("/user/:user_id", async (req, res) => {
         }
         try {
             console.log("admin perm okay...");
-            const user = await prisma.users.findMany();
+            const user = await prisma.users.findMany({ orderBy: { user_id: 'asc' } });
             return res.status(200).json(user);
         } catch (e) {
             return res.status(500).json({ error: "Internal error" });
