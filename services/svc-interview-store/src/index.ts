@@ -198,17 +198,17 @@ app.get("/interview/question/:question_id", async (req, res) => {
     }
 });
 
-app.patch("interview/:interview_id/start", async (req, res) => {
+app.get("/interview/:interview_id/start", async (req, res) => {
     try {
         const { interview_id } = req.params;
-        const permissions = req.body.permissions;
-        const userId = parseInt(req.body.user_id);
-        const interview = prisma.interviews.findUniqueOrThrow({
+        const userId = parseInt(req.query.user_id as string);
+        const interview = await prisma.interviews.findUniqueOrThrow({
             where: {
                 unique_interview_id: parseInt(interview_id),
             },
             include: { questions: true },
         })
+        console.log(interview);
         if (interview.candidate_id !== userId || interview.status !== "scheduled") {
             return res.status(403).json({ error: "forbiden" });
         }

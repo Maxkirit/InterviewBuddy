@@ -134,12 +134,13 @@ export const getQuestion = async (req: Request, res: Response) => {
 export const startInterview = async (req: Request, res: Response) => {
     const { interview_id } = req.params;
     try {
-        const result = await axios.patch(`http://svc-interview-store:3000/interview/${interview_id}/start`,{
-            user_id: (req as ReqWithUser).userId,
-            permissions: (req as ReqWithUser).permissions,
+        const result = await axios.get(`http://svc-interview-store:3000/interview/${interview_id}/start`,{
+            params: {
+                user_id: (req as ReqWithUser).userId,
+            }
         });
         res.status(200).json(result?.data);
-    } catch (error) {
+    } catch (e) {
         console.log("in error path");
         if (axios.isAxiosError(e) && e.response?.status)
             return res

@@ -10,6 +10,7 @@ import AdminView from "./AdminView";
 import RecruiterInterviews from "./RecruiterInterview";
 import AppLayout from "./AppLayout";
 import AdminUsers from "./AdminUser";
+import Interview from "./Interview";
 
 export default function Router() {
     return (
@@ -37,6 +38,7 @@ export default function Router() {
                         </Route>
                         <Route path="/profile" element={<MyProfile />} />
                     </Route>
+                    <Route path="/candidate/interview/:interview_id" element={<Interview />} />
                 </Route>
             </Routes>
         </BrowserRouter>
