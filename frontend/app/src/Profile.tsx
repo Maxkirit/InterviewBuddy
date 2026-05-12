@@ -81,11 +81,11 @@ export default function MyProfile() {
                 phone_number: phone ?? "",
                 job_title: jobTitle ?? "",
                 gender: gender ?? "",
-                date_of_birth: dob ? new Date(dob) : null,
+                date_of_birth: dob ? new Date(dob) : "",
             };
             ProfileSchema.parse(input);
             await authContext?.axiosInstance.patch(
-                `http://localhost:3000/api/v1/user/profile/${authContext.userId}`,
+                `/api/v1/user/profile/${authContext?.userId}`,
                 input,
             );
         } catch (error) {

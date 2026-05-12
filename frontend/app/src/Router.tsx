@@ -9,6 +9,7 @@ import CandidateView from "./CandidateView";
 import RecruiterView from "./RecruiterView";
 import AdminView from "./AdminView";
 import RecruiterInterviews from "./RecruiterInterview";
+import AppLayout from "./AppLayout";
 import AdminUsers from "./AdminUser";
 
 export default function Router() {
@@ -19,25 +20,28 @@ export default function Router() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route element={<ProtectedLayout />}>
-                    <Route path="/candidate" element={<CandidateView />}>
-                        <Route
-                            path="/candidate/official-interviews"
-                            element={<CandidateOfficialInterview />}
-                        />
-						<Route
+                    <Route element={<AppLayout />}>
+                        <Route path="/candidate" element={<CandidateView />}>
+                            <Route
+                                path="/candidate/official-interviews"
+                                element={<CandidateOfficialInterview />}
+                            />
+    						<Route
                             path="/candidate/recruiters"
                             element={<CandidateListRecruiters />}
                         />
                     </Route>
-                    <Route
-                        path="/recruiter"
-                        element={<RecruiterView />}
-                    >
-                        <Route path="/recruiter/interviews" element={<RecruiterInterviews />} />
+                        <Route
+                            path="/recruiter"
+                            element={<RecruiterView />}
+                        >
+                            <Route path="/recruiter/interviews" element={<RecruiterInterviews />} />
+                        </Route>
+                        <Route path="/admin" element={<AdminView />}>
+                            <Route path="/admin/users" element={<AdminUsers />} />
+                        </Route>
+                        <Route path="/profile" element={<MyProfile />} />
                     </Route>
-                    <Route path="/admin" element={<AdminView />}></Route>
-                    <Route path="/profile" element={<MyProfile />} />
-					<Route path="/admin/users" element={<AdminUsers />} />
                 </Route>
             </Routes>
         </BrowserRouter>

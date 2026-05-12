@@ -86,7 +86,8 @@ export const listConnections = async (req: Request, res: Response) => {
 // in this route
 export const updateUserInfo = async (req: Request, res: Response) => {
 	const { user_id } = req.params;
-    console.log("in updateUser\n");
+    console.log("in updateUser (api)\n");
+	console.log(req.body);
     const REQUIRED_FIELDS = [
         "gender",
         "date_of_birth",
@@ -100,11 +101,14 @@ export const updateUserInfo = async (req: Request, res: Response) => {
     const missingFields = REQUIRED_FIELDS.filter(
         (field) => req.body[field] === undefined || req.body[field] === null,
     );
-    if (missingFields.length > 0)
+    if (missingFields.length > 0){
+		console.log("missing field");
         return res.status(400).json({
             error: "Missing fields in request",
             missing: missingFields,
         });
+	}
+
     console.log("validated fields\n");
     try {
         const response = await axios.patch(
