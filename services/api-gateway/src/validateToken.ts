@@ -1,4 +1,5 @@
 import jwt, { TokenExpiredError, JsonWebTokenError } from "jsonwebtoken";
+import { importJWK, jwtVerify } from 'jose';
 import axios, { AxiosError } from "axios";
 import { Request, Response, NextFunction } from "express";
 
@@ -27,22 +28,13 @@ export async function validateAcccessToken(
 
     //get key from auth-serv
     //this should/will be cached at start up to avoid getting it at every call
-    // let key: string;
     try {
-        // const response = await axios.get("http://svc-auth:3000/auth/signing-key");
-
-        
-    } catch (error) {
-        if (error instanceof AxiosError)
-            return res.status(500).json({ error: error.message});
-    }
-    //checking signature of access_token
-    try {
-        const key = 'changewhenvaultisup'; //ACCESS_SECRET
-        //REMOVE IGNORE EXPIRATION IN PROD !!!
-        const decoded = jwt.verify(access_token, key, {ignoreExpiration: true}) as jwt.JwtPayload; // not sure what is up here
-        (req as ReqWithUser).userId = decoded.userId;
-        (req as ReqWithUser).permissions = decoded.permissions;
+        const response = await axios.get("http://svc-auth:3000/auth/signing-key");
+    	const jwk = response.data.keys[0];
+    	const publicKey = await importJWK(jwk, 'RS256');
+    	const { payload } = await jwtVerify(access_token, publicKey);
+        (req as ReqWithUser).userId = payload.userId as number;
+        (req as ReqWithUser).permissions = payload.permissions as string[];
         return next(); //valid access_token
     } catch (error) {
         console.log("validateaccesstoken error path\n");
