@@ -9,6 +9,7 @@ import RecruiterView from "./RecruiterView";
 import AdminView from "./AdminView";
 import RecruiterInterviews from "./RecruiterInterview";
 import AppLayout from "./AppLayout";
+import AdminUsers from "./AdminUser";
 
 export default function Router() {
     return (
@@ -31,7 +32,9 @@ export default function Router() {
                         >
                             <Route path="/recruiter/interviews" element={<RecruiterInterviews />} />
                         </Route>
-                        <Route path="/admin" element={<AdminView />}></Route>
+                        <Route path="/admin" element={<AdminView />}>
+                            <Route path="/admin/users" element={<AdminUsers />} />
+                        </Route>
                         <Route path="/profile" element={<MyProfile />} />
                     </Route>
                 </Route>

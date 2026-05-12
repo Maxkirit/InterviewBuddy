@@ -11,7 +11,7 @@ interface RetryConfig extends InternalAxiosRequestConfig {
 
 type QueueItem = {
     resolve: (token: string) => void;
-    reject: (error: AxiosError) => void;
+    reject: (error: unknown) => void;
 };
 
 type AuthContextType = {
@@ -75,7 +75,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     let failedQueue: QueueItem[] = [];
 
     const processQueue = (
-        error: AxiosError | null,
+        error: unknown | null,
         token: string | null = null,
     ): void => {
         failedQueue.forEach((item) => {

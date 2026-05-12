@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useContext } from "react";
 import { AuthContext } from "./AuthProvider";
 import SetupInterviewModal from "./SetupInterviewModal";
+import { type InterviewData } from "./CandidateOfficialInterview";
 
 type Interview = {
     id: number;
@@ -40,7 +41,7 @@ export default function RecruiterInterviews() {
                     `/api/v1/interview/real-interviews/${authContext.userId}`,
                 );
                 console.log(result?.data);
-                const parsed = (result?.data).map((item) => ({
+                const parsed = (result?.data).map((item: InterviewData) => ({
                     id: item.unique_interview_id,
                     recruiterId: item.recruiter_id,
                     candidateId: item.candidate_id,
