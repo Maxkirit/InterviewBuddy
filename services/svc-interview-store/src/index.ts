@@ -65,29 +65,33 @@ app.post("/interview/mock-interview", async (req, res) => {
 
 app.post("/interview/real-interview", async (req, res) => {
     try {
+        console.log(req.body.body.recruiter_id);
         const interview = RealInterviewSchema.parse({
-            recruiter_id: req.body.recruiter_id
-                ? parseInt(req.body.recruiter_id)
+            recruiter_id: req.body.body.recruiter_id
+                ? parseInt(req.body.body.recruiter_id)
                 : null,
-            candidate_id: parseInt(req.body.candidate_id),
-            question_id: parseInt(req.body.question_id),
-            job_title: req.body.job_title ? req.body.job_title : null,
-            due_date: req.body.due_date ? req.body.due_date : null,
+            candidate_id: parseInt(req.body.body.candidate_id),
+            question_id: parseInt(req.body.body.question_id),
+            job_title: req.body.body.job_title ? req.body.body.job_title : null,
+            due_date: req.body.body.due_date ? new Date(req.body.body.due_date) : null,
         });
+        console.log("input parsed");
         if (
-            !(req as ReqWithUser).permissions.includes("createRealInterview") ||
-            (req as ReqWithUser).userId != interview.recruiter_id
+            !req.body.permissions.includes("createRealInterview") ||
+            req.body.userId != interview.recruiter_id
         ) {
             return res
                 .status(403)
                 .json({ error: "No permissions for this actions" });
         }
         const check = await axios.get(
-            `http://svc-user/user/connection-check/${interview.recruiter_id}/${interview.candidate_id}`,
+            `http://svc-user:3000/user/connection-check/${interview.recruiter_id}/${interview.candidate_id}`,
         );
+        console.log("is connection");
         const result = await prisma.interviews.create({
-            data: { ...interview, status: "scheduled" },
+            data: { ...interview, status: "scheduled", due_date: new Date(interview.due_date) },
         });
+        console.log("interview created");
         res.status(201).json({ message: "Interview created successfully" });
     } catch (error) {
         if (axios.isAxiosError<ApiError>(error) && error.response?.status) {

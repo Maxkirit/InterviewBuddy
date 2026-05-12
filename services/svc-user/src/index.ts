@@ -389,8 +389,9 @@ app.get(
             parseInt(req.params.recruiter_id),
             parseInt(req.params.candidate_id),
         ];
-        if (parsedCanId <= 0 || parsedRecId <= 0) return res.status(400);
+        if (parsedCanId <= 0 || parsedRecId <= 0) return res.status(400).json({ error: "Invalid IDs" });
         try {
+            console.log(`rec: ${parsedRecId} can: ${parsedCanId}`);
             const validate = await prisma.connections.findUniqueOrThrow({
                 where: {
                     recruiter_id_candidate_id: {
@@ -399,9 +400,10 @@ app.get(
                     },
                 },
             });
-            return res.status(200);
+            console.log("connection found");
+            return res.status(200).json({message: "connection found"});
         } catch (error) {
-            return res.status(403);
+            return res.status(403).json({ error: "Connection not found" });
         }
     },
 );
