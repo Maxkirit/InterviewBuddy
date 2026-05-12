@@ -64,7 +64,7 @@ export const listConnections = async (req: Request, res: Response) => {
             {
                 params: {
                     userId: (req as ReqWithUser).userId,
-                    permissions: (req as ReqWithUser).permissions,
+                    perm: (req as ReqWithUser).permissions,
                 },
             },
         );
