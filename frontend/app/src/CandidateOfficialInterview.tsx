@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useContext } from "react";
 import { AuthContext } from "./AuthProvider";
 
-type InterviewData = {
+export type InterviewData = {
     unique_interview_id: number,
     recruiter_id: number,
     candidate_id: number,
