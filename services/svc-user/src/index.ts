@@ -316,7 +316,6 @@ app.get("/user/:userId/connections", async (req, res) => {
 app.patch("/user/profile/:user_id", async (req, res) => {
     console.log("in update user profile route\n");
     try {
-        //validate perms
 		console.log(req.body.permissions);
         const userId = parseInt(req.params.user_id);
         if (
