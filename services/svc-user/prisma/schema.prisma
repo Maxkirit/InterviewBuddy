@@ -38,7 +38,7 @@ model users {
   role                                        role_type     @default(candidate)
   firstname                                   String        @db.VarChar(64)
   lastname                                    String        @db.VarChar(64)
-  profile_pic_url                             String?
+  profile_pic_url                             String        @default("/var/www/avatars/base_avatar.jp")
   gender                                      gender_type?
   date_of_birth                               String?
   country                                     String?       @db.VarChar(64)

@@ -1,6 +1,16 @@
 import { useEffect, useRef, useState, useContext } from "react";
 import { AuthContext } from "./AuthProvider";
 
+type InterviewData = {
+    unique_interview_id: number,
+    recruiter_id: number,
+    candidate_id: number,
+    question_id: number,
+    job_title: string,
+    status: string,
+    due_date: string,
+}
+
 type Interview = {
     id: number;
     recruiterId: number;
@@ -38,13 +48,13 @@ export default function CandidateOfficialInterview() {
                     `/api/v1/interview/candidat-interviews/${authContext.userId}`,
                 );
                 console.log(result?.data);
-                const parsed = (result?.data).map((item) => ({
+                const parsed = (result?.data).map((item: InterviewData) => ({
                     id: item.unique_interview_id,
                     recruiterId: item.recruiter_id,
                     candidateId: item.candidate_id,
                     jobTitle: item.job_title,
                     status: item.status,
-                    dueDate: new Date(item.du_date),
+                    dueDate: new Date(item.due_date),
                 }));
                 setInterviews(parsed);
             } catch (error) {
@@ -79,7 +89,7 @@ export default function CandidateOfficialInterview() {
         }
     }, [isOpen]);
 
-    function handleBackdropClick(e) {
+    function handleBackdropClick(e: React.MouseEvent<HTMLDialogElement>) {
         if (e.target === ref.current) {
             setIsOpen(false);
         }
