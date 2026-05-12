@@ -11,6 +11,7 @@ import AdminView from "./AdminView";
 import RecruiterInterviews from "./RecruiterInterview";
 import AppLayout from "./AppLayout";
 import AdminUsers from "./AdminUser";
+import RecruiterListCandidates from "./RecruiterListCandidates";
 
 export default function Router() {
     return (
@@ -24,18 +25,19 @@ export default function Router() {
                         <Route path="/candidate" element={<CandidateView />}>
                             <Route
                                 path="/candidate/official-interviews"
-                                element={<CandidateOfficialInterview />}
-                            />
+                                element={<CandidateOfficialInterview />}/>
     						<Route
-                            path="/candidate/recruiters"
-                            element={<CandidateListRecruiters />}
-                        />
+                            	path="/candidate/recruiters"
+                            	element={<CandidateListRecruiters />}/>
                     </Route>
                         <Route
-                            path="/recruiter"
-                            element={<RecruiterView />}
-                        >
-                            <Route path="/recruiter/interviews" element={<RecruiterInterviews />} />
+                            path="/recruiter" element={<RecruiterView />}>
+                            <Route 
+								path="/recruiter/interviews" 
+								element={<RecruiterInterviews />}/>
+							<Route
+                            path="/recruiter/candidates"
+                            element={<RecruiterListCandidates />}/>
                         </Route>
                         <Route path="/admin" element={<AdminView />}>
                             <Route path="/admin/users" element={<AdminUsers />} />
