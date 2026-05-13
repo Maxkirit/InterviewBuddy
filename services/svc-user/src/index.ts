@@ -519,6 +519,9 @@ app.get('/user/link', async(req, res) =>{
     const permission = Object.values(tmp) as string[];
 	const token = crypto.randomUUID();
 	const user_id = req.query.token_id as string;
+
+	if (!permission.includes("createConnection"))
+		return res.status(403).json({error: "forbiden (create invite link)"})
 	try{
 		const newlink = await prisma.invite_link.create({
 			data: {
@@ -526,13 +529,14 @@ app.get('/user/link', async(req, res) =>{
 				link: token,
 			},
 	})
+		const link= process.env.LINK_URL;
+		const url = `${link}/invite/${token}`
+		return res.status(200).json({url : url})
 	}
 	catch(e){
 		console.log("error adding link to the db");
 		return res.status(500).json(e);
 	}
-	const link= process.env.LINK_URL;
-	const url = `${link}/invite/${token}`
 })
 
 app.listen(port, () => {
