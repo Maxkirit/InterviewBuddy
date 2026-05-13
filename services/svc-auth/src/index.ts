@@ -8,6 +8,7 @@ import {exportJWK, importSPKI} from 'jose'
 import dotenv from 'dotenv'
 import { createPublicKey, randomBytes, createHash, upload, digest } from 'crypto'
 import { string, z } from 'zod';
+import { readFileSync } from 'fs';
 
 type ApiError = {
   error: string,
@@ -36,9 +37,6 @@ const SESSION_TTL_MS = 2 * 60 * 1000; //TTL for state map entries in 3rd party a
 const oauthSessions= new Map<string, PendingOAuthSession>(); //map holding the "state":PendingOAuthSession() key value pairs,
 
 
-// dotenv.config() // {path: '...'} pour personnailiser ou est la cles
-const secret = process.env.SECRETKEY
-if (!secret) throw new Error('SECRETKEY manquante dans .env')
 //required for third party auth, check notion for value
 const clientId = process.env.CLIENT_ID;
 if (!clientId) throw new Error("CLIENT_ID missing in .env file");
@@ -46,6 +44,7 @@ if (!clientId) throw new Error("CLIENT_ID missing in .env file");
 const redirectURI = process.env.REDIRECT_URI;
 if (!clientId) throw new Error("REDIRECT_URI missing in .env file");
 
+const PRIVATE_KEY = readFileSync('/secrets/jwt_private.pem', 'utf-8');
 const app = express();
 const port = 3000;
 
@@ -83,7 +82,7 @@ app.get('/auth/google/init', async(req, res) => {
 
 app.get('/auth/signing-key', async (req, res) => {
     try {
-        const publicKeyPem = createPublicKey(secret).export({ type: 'spki', format: 'pem' })
+        const publicKeyPem = createPublicKey(PRIVATE_KEY).export({ type: 'spki', format: 'pem' })
         console.log("pub key created\n");
         const publicKey = await importSPKI(publicKeyPem, 'RS256')           // ← extrait la clé publique en PEM
         console.log("pub key extracted\n");

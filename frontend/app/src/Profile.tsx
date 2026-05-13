@@ -2,7 +2,7 @@ import { useEffect, useState, useContext, type SubmitEvent } from "react";
 import { AuthContext } from "./AuthProvider";
 import z from "zod";
 
-const ProfileSchema = z.object({
+export const ProfileSchema = z.object({
     firstname: z.string().min(1),
     lastname: z.string().min(1),
     country: z.string().nullable(),
@@ -81,11 +81,11 @@ export default function MyProfile() {
                 phone_number: phone ?? "",
                 job_title: jobTitle ?? "",
                 gender: gender ?? "",
-                date_of_birth: dob ? new Date(dob) : null,
+                date_of_birth: dob ? new Date(dob) : "",
             };
             ProfileSchema.parse(input);
             await authContext?.axiosInstance.patch(
-                "http://localhost:3000/api/v1/user/profile",
+                `/api/v1/user/profile/${authContext?.userId}`,
                 input,
             );
         } catch (error) {

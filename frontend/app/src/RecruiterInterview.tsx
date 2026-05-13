@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useContext } from "react";
 import { AuthContext } from "./AuthProvider";
 import SetupInterviewModal from "./SetupInterviewModal";
+import { type InterviewData } from "./CandidateOfficialInterview";
 
 type Interview = {
     id: number;
@@ -30,16 +31,17 @@ export default function RecruiterInterviews() {
     const [candidateMap, setCandidateMap] = useState<Record<string, CandidateData>>({});
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const [isSetupOpen, setIsSetupOpen] = useState(false);
+    const [refreshKey, setRefreshKey] = useState(0);
     const confirmRef = useRef<HTMLDialogElement>(null);
 
     useEffect(() => {
         async function getInterviews() {
             try {
                 const result = await authContext?.axiosInstance.get(
-                    `/api/v1/interview/candidat-interviews/${authContext.userId}`,
+                    `/api/v1/interview/real-interviews/${authContext.userId}`,
                 );
                 console.log(result?.data);
-                const parsed = (result?.data).map((item) => ({
+                const parsed = (result?.data).map((item: InterviewData) => ({
                     id: item.unique_interview_id,
                     recruiterId: item.recruiter_id,
                     candidateId: item.candidate_id,
@@ -54,7 +56,7 @@ export default function RecruiterInterviews() {
             }
         }
         getInterviews();
-    }, []);
+    }, [refreshKey]);
 
     useEffect(() => {
         const uniqueCandidateIds = [...new Set(interviews.map((i) => i.candidateId))];
@@ -103,7 +105,6 @@ export default function RecruiterInterviews() {
                     </div>
                     <div className="flex-1 flex flex-col items-end gap-3">
                         <div className="flex items-center gap-5">
-                            <span className="text-[0.75rem] text-gray-400">Design a Rate Limiter</span>
                             <span className="status-badge status-completed">{interview.status}</span>
                             <button
                                 className="px-4 py-[7px] rounded-lg bg-white text-[0.85rem] font-medium cursor-pointer whitespace-nowrap transition border border-[#ef4444] text-[#ef4444] hover:bg-[#ef4444] hover:text-white"
@@ -159,7 +160,6 @@ export default function RecruiterInterviews() {
                         </div>
                     </div>
                     <div className="flex-1 flex items-center gap-5 justify-end">
-                        <span className="text-[0.75rem] text-gray-400">Design a Distributed Cache</span>
                         <span className={overDue ? "text-[0.75rem] text-[#ef4444] font-semibold whitespace-nowrap" : "text-[0.75rem] text-gray-400 whitespace-nowrap"}>
                             Due {interview.dueDate.toDateString()}
                         </span>
@@ -198,7 +198,7 @@ export default function RecruiterInterviews() {
                 </div>
             </div>
 
-            <SetupInterviewModal isOpen={isSetupOpen} setIsOpen={setIsSetupOpen} />
+            <SetupInterviewModal isOpen={isSetupOpen} setIsOpen={setIsSetupOpen} refreshKey={refreshKey} setRefreshKey={setRefreshKey} />
 
             <dialog ref={confirmRef} id="confirm-modal" onClick={handleBackdropClick}>
                 <div className="p-8 px-9" onClick={(e) => e.stopPropagation()}>
@@ -215,7 +215,7 @@ export default function RecruiterInterviews() {
                         <p>This interview will be permanently cancelled and cannot be undone.</p>
                     </div>
                     <div className="flex justify-end gap-2.5 mt-6">
-                        <button type="button" className="btn-cancel" onClick={() => setIsSetupOpen(false)}>
+                        <button type="button" className="btn-cancel" onClick={() => setIsConfirmOpen(false)}>
                             Keep
                         </button>
                         <button className="btn-danger">Cancel interview</button>
