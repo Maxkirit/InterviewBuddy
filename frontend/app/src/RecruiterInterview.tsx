@@ -54,7 +54,7 @@ export default function RecruiterInterviews() {
     const navigate = useNavigate();
     const [interviews, setInterviews] = useState<Interview[]>([]);
     const [candidateMap, setCandidateMap] = useState<Record<string, CandidateData>>({});
-    const [gradeMap, setGradeMap] = useState<Record<number, Grade>>({});
+    const [gradeMap] = useState<Record<number, Grade>>({});
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const [isSetupOpen, setIsSetupOpen] = useState(false);
     const [refreshKey, setRefreshKey] = useState(0);

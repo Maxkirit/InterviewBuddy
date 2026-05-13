@@ -56,7 +56,7 @@ export default function CandidateOfficialInterview() {
     const navigate = useNavigate();
     const [interviews, setInterviews] = useState<Interview[]>([]);
     const [recruiterMap, setRecruiterMap] = useState<Record<string, RecruiterData>>({});
-    const [gradeMap, setGradeMap] = useState<Record<number, Grade>>({});
+    const [gradeMap] = useState<Record<number, Grade>>({});
     const [selectedInterview, setSelectedInterview] = useState<Interview | null>(null);
     const ref = useRef<HTMLDialogElement>(null);
 
