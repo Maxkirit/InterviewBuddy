@@ -7,6 +7,7 @@ import {
     getAvatarURL,
     uploadAvatar,
     getUserPublic,
+	getLink
 } from "../controllers/user.controllers.js";
 
 const router = Router();
@@ -20,6 +21,7 @@ router.post(
     express.raw({ type: ["image/jpeg", "image/png"] }),
     uploadAvatar,
 ); //allows single file uploaded, called avatar
+router.get("/link", getLink);
 router.get("/avatar/:userId", getAvatarURL);
 router.post("/:user_id/connections/:link_id", addConnection);
 

@@ -530,7 +530,7 @@ app.get('/user/link', async(req, res) =>{
 			},
 	})
 		const link= process.env.LINK_URL;
-		const url = `${link}/invite/${token}`
+		const url = `${link}/invite?token=${token}`
 		return res.status(200).json({url : url})
 	}
 	catch(e){
