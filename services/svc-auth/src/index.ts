@@ -6,12 +6,17 @@ import { createAccessToken, createRefreshToken, rotateRefreshToken } from './lib
 import jwt from 'jsonwebtoken';
 import {exportJWK, importSPKI} from 'jose'
 import dotenv from 'dotenv'
-import { createPublicKey } from 'crypto'
+import { createPublicKey, randomBytes, createHash, upload, digest } from 'crypto'
 import { string, z } from 'zod';
 
 type ApiError = {
   error: string,
 };
+
+type PendingOAuthSession = {
+    codeVerifier: string,
+    createdAt: number,
+}
 
 const passwordSchema = z.string()
                         .min(8, {error: "Password too short", abort: true})
@@ -26,16 +31,55 @@ const Login = z.object({
 });
 
 const REFRESH_SECRET = "changewhenvaultisup";
+const SESSION_TTL_MS = 2 * 60 * 1000; //TTL for state map entries in 3rd party auth
+//global scope necessary as it lives with the duration of the process
+const oauthSessions= new Map<string, PendingOAuthSession>(); //map holding the "state":PendingOAuthSession() key value pairs,
 
 
 // dotenv.config() // {path: '...'} pour personnailiser ou est la cles
 const secret = process.env.SECRETKEY
 if (!secret) throw new Error('SECRETKEY manquante dans .env')
+//required for third party auth, check notion for value
+const clientId = process.env.CLIENT_ID;
+if (!clientId) throw new Error("CLIENT_ID missing in .env file");
+//redirect_uri for third party auth, check notion for value
+const redirectURI = process.env.REDIRECT_URI;
+if (!clientId) throw new Error("REDIRECT_URI missing in .env file");
 
 const app = express();
 const port = 3000;
 
 app.use(express.json());
+
+//hashing: create a hash with the algo you want (sha256 here)
+//digest is the result of hashing your data
+//digesting the codeVerifier as base64url because of the following definition for google OAuth: code_challenge = BASE64URL(SHA256(ASCII(code_verifier)))
+function createNewSession() {
+    const state = randomBytes(8).toString("hex");
+    const codeVerifier = randomBytes(32).toString('hex'); //32 bytes is approx 43 characters which is minimum accepted by Google
+    const hash = createHash('sha256').update(codeVerifier);
+    oauthSessions.set(state, {codeVerifier: codeVerifier, createdAt: Date.now()});
+    const codeChallenge = hash.digest("base64url");
+    return {state: state, codeChallenge: codeChallenge, codeChallengeMethod: 'S256'};
+}
+
+//builds link
+app.get('/auth/google/init', async(req, res) => {
+    try {
+        const session = createNewSession();
+        const authURL = `https://accounts.google.com/o/oauth2/auth
+                            ?client_id=${clientId}
+                            &redirect_uri=${redirectURI}
+                            &response_type=code
+                            &scope=openid email profile
+                            &state=${session.state}
+                            &code_challenge=${session.codeChallenge}
+                            &code_challenge_method=${session.codeChallengeMethod}`;
+        return res.status(201).json({message: "OAuth session initialized", link: authURL});
+    } catch (error) {
+        return res.status(500).json({error: "Hashing issue in svc-auth"});
+    }
+})
 
 app.get('/auth/signing-key', async (req, res) => {
     try {

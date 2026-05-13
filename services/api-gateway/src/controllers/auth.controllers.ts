@@ -116,6 +116,17 @@ export const registrationFlow = async (req: Request, res: Response) => {
     }
 }
 
-export const externalRegistrationFlow = async (req: Request, res: Response) => {
-    
+export const intializeExternalAuth= async (req: Request, res: Response) => {
+    try {
+        const response = await axios.get('http://svc-auth/auth/google/init');
+        const body = {
+            message: "Redirect link for Google 3rd party auth",
+            link: response.data.link,
+        };
+        return res.status(302).json(body);
+    } catch (error) {
+        if (axios.isAxiosError<ApiError>(error) && error.response?.status)
+            return res.status(error.response.status).json({error: error.response.data?.error ?? error.message});
+        return res.status(502).json({error: "Bad gateway (svc-auth)"});
+    }    
 }
