@@ -149,3 +149,22 @@ export const startInterview = async (req: Request, res: Response) => {
         return res.status(502).json({ error: "Bad gateway" });
     }
 };
+
+export const submitInterview = async (req: Request, res: Response) => {
+    const { interview_id } = req.params;
+    try {
+        const result = await axios.patch(`http://svc-interview-store:3000/interview/${interview_id}/submit`,{
+            user_id: (req as ReqWithUser).userId,
+            permissions: (req as ReqWithUser).permissions,
+            body: req.body,
+        });
+        res.status(200).json(result?.data);
+    } catch (e) {
+        console.log("in error path");
+        if (axios.isAxiosError(e) && e.response?.status)
+            return res
+                .status(e.response.status)
+                .json({ error: e.response.data?.error ?? e.message });
+        return res.status(502).json({ error: "Bad gateway" });
+    }
+};

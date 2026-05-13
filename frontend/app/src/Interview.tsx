@@ -1,6 +1,7 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, type SubmitEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AuthContext } from "./AuthProvider";
+import z from "zod";
 
 type Question = {
     question_id: number,
@@ -20,6 +21,10 @@ type Interview = {
     status: string,
     due_date: string,
 };
+
+const AnswerSchema = z.object({
+    reasoning: z.string().min(1),
+});
 
 export default function Interview() {
     const authContext = useContext(AuthContext);
@@ -44,9 +49,10 @@ export default function Interview() {
     async function handleSubmit(event: SubmitEvent) {
         event.preventDefault();
         try {
-            // await authContext?.axiosInstance.patch(`/api/v1/interview/${interview_id}`, {
-            //     unfinised_text: reasoning,
-            // });
+            const parsed = AnswerSchema.safeParse({reasoning});
+            await authContext?.axiosInstance.patch(`/api/v1/interview/${interview_id}/submit`, {
+                reasoning: parsed.data?.reasoning,
+            });
             navigate('/candidate/official-interviews', {replace: true});
         } catch (error) {
             // error banner
