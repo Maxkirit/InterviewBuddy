@@ -129,3 +129,31 @@ export const getQuestion = async (req: Request, res: Response) => {
         return res.status(502).json({ error: "Bad gateway" });
     }
 };
+
+export const getInterviewById = async (req: Request, res: Response) => {
+    const { interview_id } = req.params; // recuperer en param puis passer un query si vous trouver que c'est incoherent je modifie
+    const tokenReq = req as ReqWithUser;
+
+    const user_id = tokenReq.userId;
+    const permissions = tokenReq.permissions;
+    try {
+        const result = await axios.get(
+            `http://svc-interview-store:3000/interview/${interview_id}`,
+            {
+                params: {
+                    token_id: user_id,
+                    perm: permissions,
+                },
+            },
+        );
+        console.log("success");
+        return res.status(200).json(result.data);
+    } catch (e) {
+        console.log("error");
+        if (axios.isAxiosError(e) && e.response?.status)
+            return res
+                .status(e.response.status)
+                .json({ error: e.response.data?.error ?? e.message });
+        return res.status(502).json({ error: "Bad gateway" });
+    }
+};

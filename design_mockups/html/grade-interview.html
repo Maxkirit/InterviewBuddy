@@ -1,0 +1,504 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>InterviewBuddy – Grade Interview</title>
+        <link rel="stylesheet" href="../css/styles.css" />
+        <style>
+            /* ── Grading page extras ── */
+            .section-step {
+                width: 28px;
+                height: 28px;
+                border-radius: 50%;
+                background: #eef1ff;
+                color: #4f6ef7;
+                font-size: 0.8rem;
+                font-weight: 700;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+            }
+
+            .section-header {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                margin-bottom: 20px;
+            }
+
+            .section-header h2 {
+                font-size: 1.05rem;
+                font-weight: 700;
+                color: #1a1d2e;
+                text-transform: none;
+                letter-spacing: 0;
+                margin-bottom: 0;
+            }
+
+            .section-header .section-aside {
+                margin-left: auto;
+                font-size: 0.775rem;
+                color: #b0b7c3;
+            }
+
+            /* Requirements grid */
+            .req-box {
+                border-radius: 10px;
+                padding: 16px;
+            }
+
+            .req-box-functional {
+                background: #f8f9ff;
+            }
+
+            .req-box-nonfunctional {
+                background: #fffbf0;
+            }
+
+            .req-box-label {
+                font-size: 0.775rem;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.06em;
+                margin-bottom: 10px;
+            }
+
+            .req-box-functional .req-box-label {
+                color: #4f6ef7;
+            }
+
+            .req-box-nonfunctional .req-box-label {
+                color: #b45309;
+            }
+
+            .req-box .req-list li::before {
+                background: #f59e0b;
+            }
+
+            .req-box-functional .req-list li::before {
+                background: #4f6ef7;
+            }
+
+            /* Candidate answer block */
+            .answer-block {
+                background: #f4f6fb;
+                border-radius: 10px;
+                padding: 20px;
+                font-size: 0.9rem;
+                color: #374151;
+                line-height: 1.7;
+                white-space: pre-line;
+            }
+
+            /* Guiding questions */
+            .guide-item {
+                display: flex;
+                align-items: flex-start;
+                gap: 12px;
+                font-size: 0.9rem;
+                color: #374151;
+            }
+
+            .guide-num {
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                background: #e4e8f0;
+                color: #6b7280;
+                font-size: 0.7rem;
+                font-weight: 700;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+                margin-top: 2px;
+            }
+
+            /* Score sliders */
+            .score-criteria-list {
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .score-row {
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+            }
+
+            .score-row-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .score-row-label {
+                font-size: 0.875rem;
+                font-weight: 600;
+                color: #374151;
+            }
+
+            .score-row-value {
+                font-size: 0.875rem;
+                font-weight: 700;
+                min-width: 36px;
+                text-align: right;
+                tabular-nums: true;
+            }
+
+            .slider-track {
+                position: relative;
+                height: 8px;
+                background: #e4e8f0;
+                border-radius: 99px;
+            }
+
+            .slider-fill {
+                position: absolute;
+                left: 0;
+                top: 0;
+                height: 8px;
+                border-radius: 99px;
+                transition: width 0.15s;
+            }
+
+            .slider-fill.blue   { background: #4f6ef7; }
+            .slider-fill.green  { background: #22c55e; }
+            .slider-fill.yellow { background: #eab308; }
+            .slider-fill.amber  { background: #f59e0b; }
+            .slider-fill.red    { background: #ef4444; }
+
+            input[type="range"] {
+                position: absolute;
+                inset: 0;
+                width: 100%;
+                height: 8px;
+                cursor: pointer;
+                -webkit-appearance: none;
+                appearance: none;
+                background: transparent;
+                --thumb-color: #b0b7c3;
+            }
+
+            input[type="range"]::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                width: 18px;
+                height: 18px;
+                border-radius: 50%;
+                background: #fff;
+                border: 2.5px solid var(--thumb-color);
+                box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+                cursor: pointer;
+                transition: transform 0.1s, box-shadow 0.1s;
+            }
+
+            input[type="range"]::-moz-range-thumb {
+                width: 18px;
+                height: 18px;
+                border-radius: 50%;
+                background: #fff;
+                border: 2.5px solid var(--thumb-color);
+                box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+                cursor: pointer;
+            }
+
+            input[type="range"]::-webkit-slider-thumb:hover {
+                transform: scale(1.15);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            }
+
+            .slider-ticks {
+                display: flex;
+                justify-content: space-between;
+                font-size: 0.7rem;
+                color: #b0b7c3;
+                margin-top: 4px;
+                user-select: none;
+            }
+
+            /* Total score callout */
+            .total-score-row {
+                display: flex;
+                align-items: baseline;
+                gap: 8px;
+            }
+
+            .total-score-number {
+                font-size: 2rem;
+                font-weight: 800;
+                color: #1a1d2e;
+                line-height: 1;
+            }
+
+            .total-score-sub {
+                font-size: 0.8rem;
+                color: #b0b7c3;
+            }
+
+            .score-grade-actions {
+                display: flex;
+                justify-content: flex-end;
+                gap: 10px;
+                padding-top: 4px;
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Nav -->
+        <nav>
+            <div class="nav-logo">
+                Interview<span>Buddy</span
+                ><span class="nav-view-label">Recruiter</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="recruiter-interviews.html" class="active">Interviews</a></li>
+                <li><a href="recruiter-candidates.html">Candidate List</a></li>
+            </ul>
+            <div class="nav-right">
+                <div class="avatar" title="Sarah K.">SK</div>
+            </div>
+        </nav>
+
+        <!-- Page -->
+        <div class="report-page">
+
+            <!-- Page header -->
+            <div class="page-header" style="margin-bottom: 4px;">
+                <h1 style="font-size: 1.75rem; font-weight: 700; color: #1a1d2e;">Grade Interview</h1>
+                <span class="status-badge status-pending">Pending review</span>
+            </div>
+            <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 8px;">
+                Alex Martinez &nbsp;·&nbsp; Frontend Engineer
+            </p>
+
+            <!-- 1 — Question -->
+            <div class="report-card">
+                <div class="section-header">
+                    <div class="section-step">1</div>
+                    <h2>Interview Question</h2>
+                </div>
+
+                <p style="font-size: 1rem; font-weight: 600; color: #1a1d2e; margin-bottom: 16px;">
+                    Design a URL Shortener
+                </p>
+
+                <div class="requirements-grid">
+                    <div class="req-box req-box-functional">
+                        <div class="req-box-label">Functional Requirements</div>
+                        <ul class="req-list">
+                            <li>Users can submit a long URL and receive a shortened alias</li>
+                            <li>Visiting the short URL redirects to the original URL</li>
+                            <li>Users can optionally set a custom alias</li>
+                            <li>Links can have an optional expiry date</li>
+                            <li>Track click counts per shortened URL</li>
+                        </ul>
+                    </div>
+                    <div class="req-box req-box-nonfunctional">
+                        <div class="req-box-label">Non-Functional Requirements</div>
+                        <ul class="req-list">
+                            <li>System must handle 100M URL shortenings per day</li>
+                            <li>Redirect latency must be &lt;10ms at the 99th percentile</li>
+                            <li>High availability — 99.99% uptime</li>
+                            <li>URLs must remain valid for at least 5 years</li>
+                            <li>System should be horizontally scalable</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2 — Candidate Answer -->
+            <div class="report-card">
+                <div class="section-header">
+                    <div class="section-step">2</div>
+                    <h2>Candidate's Answer</h2>
+                    <span class="section-aside">Reasoning only — v0</span>
+                </div>
+
+                <div class="answer-block">I'd start by estimating scale: 100M writes/day is ~1,200 writes/sec and assuming a 100:1 read-write ratio, ~120,000 reads/sec.
+
+For the core service, I'd use a stateless app layer behind a load balancer. Short codes can be generated with Base62 encoding of an auto-incremented ID, which avoids hash collisions entirely. Alternatively, we could use a distributed ID generator like Snowflake if we need decentralised writes.
+
+Storage: a simple key-value store like DynamoDB or Redis for the short→long mapping works well here. The schema is flat (shortCode → { longUrl, createdAt, expiresAt, clicks }), which is a natural fit for NoSQL.
+
+For the redirect path (hot path), I'd put an in-memory cache (Redis) in front of the DB. Most URLs follow a power-law distribution — a small percentage get almost all the traffic — so a cache hit rate of 90%+ is realistic.
+
+Click tracking would be async: the redirect service fires a message to Kafka, and a consumer batch-updates the counter in a separate analytics store to avoid write contention on the main DB.
+
+Expiry can be handled by a TTL on the cache entry plus a background job that purges expired records from the DB daily.
+
+One tradeoff I'm making: custom aliases require a uniqueness check before write, which adds a DB round-trip. Under extreme write load this could be a bottleneck, but given that custom aliases are a minority of requests I'd accept that tradeoff.</div>
+            </div>
+
+            <!-- 3 — Guiding Questions -->
+            <div class="report-card">
+                <div class="section-header">
+                    <div class="section-step">3</div>
+                    <h2>Evaluation Guide</h2>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 14px;">
+                    <div class="guide-item">
+                        <div class="guide-num">1</div>
+                        Did the candidate identify all core functional requirements before diving into the design?
+                    </div>
+                    <div class="guide-item">
+                        <div class="guide-num">2</div>
+                        Is the proposed architecture sound and appropriate for the stated requirements?
+                    </div>
+                    <div class="guide-item">
+                        <div class="guide-num">3</div>
+                        Did the candidate address scalability concerns (e.g. horizontal scaling, sharding, caching)?
+                    </div>
+                    <div class="guide-item">
+                        <div class="guide-num">4</div>
+                        Were tradeoffs clearly articulated (e.g. consistency vs. availability, SQL vs. NoSQL)?
+                    </div>
+                    <div class="guide-item">
+                        <div class="guide-num">5</div>
+                        Did the candidate acknowledge limitations or areas for improvement in their design?
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4 — Scoring -->
+            <div class="report-card">
+                <div class="section-header">
+                    <div class="section-step">4</div>
+                    <h2>Score</h2>
+                    <div style="margin-left: auto;">
+                        <div class="total-score-row">
+                            <span class="total-score-number" id="total-pct">0%</span>
+                            <span class="total-score-sub" id="total-raw">0 / 20</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="score-criteria-list">
+                    <!-- Requirements Coverage -->
+                    <div class="score-row">
+                        <div class="score-row-header">
+                            <span class="score-row-label">Requirements Coverage</span>
+                            <span class="score-row-value" id="val-req" style="color: #b0b7c3;">0 / 5</span>
+                        </div>
+                        <div class="slider-track">
+                            <div class="slider-fill blue" id="fill-req" style="width: 0%;"></div>
+                            <input type="range" min="0" max="5" step="1" value="0"
+                                oninput="updateSlider('req', this.value)" />
+                        </div>
+                        <div class="slider-ticks">
+                            <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+                        </div>
+                    </div>
+
+                    <!-- System Architecture -->
+                    <div class="score-row">
+                        <div class="score-row-header">
+                            <span class="score-row-label">System Architecture</span>
+                            <span class="score-row-value" id="val-arch" style="color: #b0b7c3;">0 / 5</span>
+                        </div>
+                        <div class="slider-track">
+                            <div class="slider-fill blue" id="fill-arch" style="width: 0%;"></div>
+                            <input type="range" min="0" max="5" step="1" value="0"
+                                oninput="updateSlider('arch', this.value)" />
+                        </div>
+                        <div class="slider-ticks">
+                            <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+                        </div>
+                    </div>
+
+                    <!-- Scalability -->
+                    <div class="score-row">
+                        <div class="score-row-header">
+                            <span class="score-row-label">Scalability</span>
+                            <span class="score-row-value" id="val-scale" style="color: #b0b7c3;">0 / 5</span>
+                        </div>
+                        <div class="slider-track">
+                            <div class="slider-fill blue" id="fill-scale" style="width: 0%;"></div>
+                            <input type="range" min="0" max="5" step="1" value="0"
+                                oninput="updateSlider('scale', this.value)" />
+                        </div>
+                        <div class="slider-ticks">
+                            <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+                        </div>
+                    </div>
+
+                    <!-- Tradeoffs & Reasoning -->
+                    <div class="score-row">
+                        <div class="score-row-header">
+                            <span class="score-row-label">Tradeoffs &amp; Reasoning</span>
+                            <span class="score-row-value" id="val-trade" style="color: #b0b7c3;">0 / 5</span>
+                        </div>
+                        <div class="slider-track">
+                            <div class="slider-fill blue" id="fill-trade" style="width: 0%;"></div>
+                            <input type="range" min="0" max="5" step="1" value="0"
+                                oninput="updateSlider('trade', this.value)" />
+                        </div>
+                        <div class="slider-ticks">
+                            <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Personal Notes -->
+                <div class="form-group" style="margin-top: 28px; margin-bottom: 0;">
+                    <label for="notes">Personal Notes</label>
+                    <textarea id="notes" placeholder="Add your personal observations, strengths, areas for improvement…" style="min-height: 110px;"></textarea>
+                </div>
+
+                <div class="score-grade-actions">
+                    <button class="btn-cancel">Save draft</button>
+                    <button class="btn-primary btn-primary--compact">Submit grade</button>
+                </div>
+            </div>
+        </div>
+
+        <footer class="page-footer">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+        </footer>
+
+        <script>
+            const scores = { req: 0, arch: 0, scale: 0, trade: 0 };
+
+            function scoreColor(v) {
+                if (v <= 1) return "#ef4444";
+                if (v <= 2) return "#f59e0b";
+                if (v <= 3) return "#eab308";
+                if (v <= 4) return "#22c55e";
+                return "#4f6ef7";
+            }
+
+            function updateSlider(key, rawVal) {
+                const v = parseInt(rawVal);
+                scores[key] = v;
+
+                const pct = (v / 5) * 100;
+                const color = v === 0 ? "#b0b7c3" : scoreColor(v);
+
+                const fill = document.getElementById("fill-" + key);
+                fill.style.width = pct + "%";
+                fill.style.background = color;
+
+                // Move the thumb to match the fill color
+                const input = fill.nextElementSibling;
+                input.style.setProperty("--thumb-color", color);
+
+                const valEl = document.getElementById("val-" + key);
+                valEl.textContent = v + " / 5";
+                valEl.style.color = color;
+
+                updateTotal();
+            }
+
+            function updateTotal() {
+                const total = Object.values(scores).reduce((a, b) => a + b, 0);
+                const pct = Math.round((total / 20) * 100);
+                document.getElementById("total-pct").textContent = pct + "%";
+                document.getElementById("total-raw").textContent = total + " / 20";
+            }
+        </script>
+    </body>
+</html>

@@ -198,6 +198,36 @@ app.get("/interview/question/:question_id", async (req, res) => {
     }
 });
 
+app.get("/interview/:interview_id", async (req, res) => {
+    try {
+        const { interview_id } = req.params;
+        const userId = parseInt(req.query.user_id as string);
+        const tmp = req.query.permissions ?? {};
+        const permissions = Object.values(tmp) as string[];
+        if (!permissions.includes("readInterview")) {
+            return res.status(403).json({ error: "does not have the required permissions" });
+        }
+        const interview = await prisma.interviews.findUniqueOrThrow({
+            where: {
+                unique_interview_id: parseInt(interview_id),
+            },
+            include: { questions: true },
+        })
+        console.log(interview);
+        if (interview.candidate_id !== userId || interview.recruiter_id !== userId) {
+            return res.status(403).json({ error: "forbidden" });
+        }
+        res.status(200).json(interview);
+    } catch (error) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            return res
+                .status(400)
+                .json({ error: "Interview not found", code: error.code });
+        }
+        return res.status(500).json({ error: "internal error" });
+    }
+});
+
 app.listen(port, () => {
     console.log(`listening on port ${port}`);
 });

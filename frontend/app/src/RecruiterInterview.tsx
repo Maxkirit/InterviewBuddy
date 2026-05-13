@@ -93,7 +93,7 @@ export default function RecruiterInterviews() {
             ? `${candidate.firstname[0]}${candidate.lastname[0]}`.toUpperCase()
             : "??";
 
-        if (interview.status === "completed") {
+        if (interview.status === "graded") {
             return (
                 <div key={interview.id} className="bg-white border border-[#e4e8f0] rounded-[14px] px-6 py-5 flex items-center gap-6">
                     <div className="flex items-center gap-3.5 flex-[0_0_240px]">
@@ -150,6 +150,7 @@ export default function RecruiterInterviews() {
             );
         } else {
             const overDue = interview.dueDate < new Date();
+            const completed = interview.status === "completed";
             return (
                 <div key={interview.id} className="bg-white border border-[#e4e8f0] rounded-[14px] px-6 py-5 flex items-center gap-6">
                     <div className="flex items-center gap-3.5 flex-[0_0_240px]">
