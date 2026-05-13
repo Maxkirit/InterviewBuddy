@@ -44,7 +44,7 @@ export default function Interview() {
     async function handleSubmit(event: SubmitEvent) {
         event.preventDefault();
         try {
-            // authContext?.axiosInstance.patch(`/api/v1/interview/${interview_id}`, {
+            // await authContext?.axiosInstance.patch(`/api/v1/interview/${interview_id}`, {
             //     unfinised_text: reasoning,
             // });
             navigate('/candidate/official-interviews', {replace: true});
