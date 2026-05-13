@@ -143,7 +143,7 @@ export const getInterviewById = async (req: Request, res: Response) => {
             {
                 params: {
                     token_id: user_id,
-                    perm: permissions,
+                    permissions: permissions,
                 },
             },
         );

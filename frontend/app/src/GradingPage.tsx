@@ -190,7 +190,6 @@ export default function GradingPage() {
                 <div className="flex items-center gap-3 mb-5">
                     <div className="w-7 h-7 rounded-full bg-[#eef1ff] text-[#4f6ef7] text-[0.8rem] font-bold flex items-center justify-center shrink-0">2</div>
                     <h2 className="text-[1.05rem] font-bold text-[#1a1d2e]">Candidate's Answer</h2>
-                    <span className="ml-auto text-[0.775rem] text-[#b0b7c3]">Reasoning only — v0</span>
                 </div>
                 <div className="bg-[#f4f6fb] rounded-[10px] px-5 py-5 text-[0.9rem] text-[#374151] leading-relaxed whitespace-pre-line">
                     {interview?.unfinished_text}

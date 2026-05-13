@@ -200,7 +200,7 @@ app.get("/interview/question/:question_id", async (req, res) => {
 app.get("/interview/:interview_id", async (req, res) => {
     try {
         const { interview_id } = req.params;
-        const userId = parseInt(req.query.user_id as string);
+        const userId = parseInt(req.query.token_id as string);
         const tmp = req.query.permissions ?? {};
         const permissions = Object.values(tmp) as string[];
         if (!permissions.includes("readInterview")) {
@@ -213,7 +213,7 @@ app.get("/interview/:interview_id", async (req, res) => {
             include: { questions: true },
         })
         console.log(interview);
-        if (interview.candidate_id !== userId || interview.recruiter_id !== userId) {
+        if (interview.candidate_id != userId && interview.recruiter_id != userId) {
             return res.status(403).json({ error: "forbidden" });
         }
         res.status(200).json(interview);
