@@ -59,6 +59,7 @@
     .status-mock      { @apply bg-[#ede9fe] text-[#6d28d9]; }
     .status-candidate { @apply bg-[#eef1ff] text-[#4f6ef7]; }
     .status-recruiter { @apply bg-[#fdf4ff] text-[#9333ea]; }
+    .status-graded    { @apply bg-[#e0e7ff] text-[#3730a3]; }
 
     /* ── Avatar ── */
     .avatar {
