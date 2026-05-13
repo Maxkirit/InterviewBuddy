@@ -201,6 +201,11 @@ app.get("/interview/:interview_id/start", async (req, res) => {
     try {
         const { interview_id } = req.params;
         const userId = parseInt(req.query.user_id as string);
+        const tmp = req.query.permissions ?? {};
+        const permissions = Object.values(tmp) as string[];
+        if (!permissions.includes("takeInterview")) {
+            return res.status(403).json({ error: "does not have the required permissions" });
+        }
         const interview = await prisma.interviews.findUniqueOrThrow({
             where: {
                 unique_interview_id: parseInt(interview_id),
@@ -226,6 +231,10 @@ app.patch("/interview/:interview_id/submit", async (req, res) => {
     try {
         const { interview_id } = req.params;
         const userId = parseInt(req.body.user_id);
+        const permissions = req.body.permissions;
+        if (!permissions.includes("takeInterview")) {
+            return res.status(403).json({ error: "does not have the required permissions" });
+        }
         const interview = await prisma.interviews.findUniqueOrThrow({
             where: {
                 unique_interview_id: parseInt(interview_id),

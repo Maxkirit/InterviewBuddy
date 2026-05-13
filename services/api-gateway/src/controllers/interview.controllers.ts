@@ -137,6 +137,7 @@ export const startInterview = async (req: Request, res: Response) => {
         const result = await axios.get(`http://svc-interview-store:3000/interview/${interview_id}/start`,{
             params: {
                 user_id: (req as ReqWithUser).userId,
+                permissions: (req as ReqWithUser).permissions,
             }
         });
         res.status(200).json(result?.data);

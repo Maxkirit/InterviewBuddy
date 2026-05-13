@@ -213,6 +213,10 @@ INSERT INTO $TABLE_PERMISSIONS (name)
 SELECT 'readInterview'
 WHERE NOT EXISTS (SELECT 1 FROM $TABLE_PERMISSIONS WHERE name = 'readInterview');
 
+INSERT INTO $TABLE_PERMISSIONS (name)
+SELECT 'takeInterview'
+WHERE NOT EXISTS (SELECT 1 FROM $TABLE_PERMISSIONS WHERE name = 'takeInterview');
+
 -- Role-Permission Mappings for Recruiter
 INSERT INTO $TABLE_ROLE_PERMISSIONS (role_id, permission_id)
 SELECT
@@ -485,6 +489,15 @@ WHERE NOT EXISTS (
     AND permission_id = (SELECT permission_id FROM $TABLE_PERMISSIONS WHERE name = 'readQuestion')
 );
 
+INSERT INTO $TABLE_ROLE_PERMISSIONS (role_id, permission_id)
+SELECT
+    (SELECT role_id FROM $TABLE_ROLES WHERE name = 'candidate'),
+    (SELECT permission_id FROM $TABLE_PERMISSIONS WHERE name = 'takeInterview')
+WHERE NOT EXISTS (
+    SELECT 1 FROM $TABLE_ROLE_PERMISSIONS
+    WHERE role_id = (SELECT role_id FROM $TABLE_ROLES WHERE name = 'candidate')
+    AND permission_id = (SELECT permission_id FROM $TABLE_PERMISSIONS WHERE name = 'takeInterview')
+);
 
 INSERT INTO $TABLE_ROLE_PERMISSIONS (role_id, permission_id)
 SELECT
