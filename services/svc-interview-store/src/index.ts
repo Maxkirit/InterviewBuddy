@@ -2,7 +2,6 @@ import express, { Request } from "express";
 import { prisma, Prisma } from "./lib/prisma.js";
 import { int, z } from "zod";
 import axios from "axios";
-import { parseArgs } from "node:util";
 
 export interface ReqWithUser extends Request {
     userId: number;
@@ -223,6 +222,72 @@ app.get("/interview/:interview_id", async (req, res) => {
             return res
                 .status(400)
                 .json({ error: "Interview not found", code: error.code });
+        }
+        return res.status(500).json({ error: "internal error" });
+    }
+});
+
+app.get("/interview/:interview_id/start", async (req, res) => {
+    try {
+        const { interview_id } = req.params;
+        const userId = parseInt(req.query.user_id as string);
+        const tmp = req.query.permissions ?? {};
+        const permissions = Object.values(tmp) as string[];
+        if (!permissions.includes("takeInterview")) {
+            return res.status(403).json({ error: "does not have the required permissions" });
+        }
+        const interview = await prisma.interviews.findUniqueOrThrow({
+            where: {
+                unique_interview_id: parseInt(interview_id),
+            },
+            include: { questions: true },
+        })
+        console.log(interview);
+        if (interview.candidate_id !== userId || interview.status !== "scheduled") {
+            return res.status(403).json({ error: "forbidden" });
+        }
+        res.status(200).json(interview);
+    } catch (error) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            return res
+                .status(400)
+                .json({ error: "Interview not found", code: error.code });
+        }
+        return res.status(500).json({ error: "internal error" });
+    }
+});
+
+app.patch("/interview/:interview_id/submit", async (req, res) => {
+    try {
+        const { interview_id } = req.params;
+        const userId = parseInt(req.body.user_id);
+        const permissions = req.body.permissions;
+        if (!permissions.includes("takeInterview")) {
+            return res.status(403).json({ error: "does not have the required permissions" });
+        }
+        const interview = await prisma.interviews.findUniqueOrThrow({
+            where: {
+                unique_interview_id: parseInt(interview_id),
+            },
+        });
+        if (interview.candidate_id !== userId || interview.status !== "scheduled") {
+            return res.status(403).json({ error: "forbidden" });
+        }
+        const updated = await prisma.interviews.update({
+            where: {
+                unique_interview_id: parseInt(interview_id),
+            },
+            data: {
+                status: "completed",
+                unfinished_text: req.body.body.reasoning,
+            }
+        });
+        res.status(200).json(updated);
+    } catch (error) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            return res
+                .status(400)
+                .json({ error: "Error submitting interview", code: error.code });
         }
         return res.status(500).json({ error: "internal error" });
     }
