@@ -9,6 +9,10 @@ import { error, profile } from 'node:console';
 import { resolveSoa } from 'node:dns';
 import { addConnection } from "./connections/addConnection.js";
 import { read } from "node:fs";
+import { create } from "node:domain";
+import dotenv from 'dotenv'
+
+require('dotenv').config();
 
 const nameSurnameSchema = z
     .string()
@@ -508,6 +512,27 @@ app.get('/user/:userId/avatar', async(req, res) => {
         console.log(error);
         return res.status(502).json({error: "Bad gateway (svc-user)"});
     }
+})
+
+app.get('/user/link', async(req, res) =>{
+	const tmp = req.query.perm ?? {};
+    const permission = Object.values(tmp) as string[];
+	const token = crypto.randomUUID();
+	const user_id = req.query.token_id as string;
+	try{
+		const newlink = await prisma.invite_link.create({
+			data: {
+				recruiter_id: parseInt(user_id, 10),
+				link: token,
+			},
+	})
+	}
+	catch(e){
+		console.log("error adding link to the db");
+		return res.status(500).json(e);
+	}
+	const link= process.env.LINK_URL;
+	const url = `${link}/invite/${token}`
 })
 
 app.listen(port, () => {
