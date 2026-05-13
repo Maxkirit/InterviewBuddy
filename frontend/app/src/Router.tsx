@@ -12,6 +12,7 @@ import AppLayout from "./AppLayout";
 import AdminUsers from "./AdminUser";
 import CandidateListRecruiters from "./CandidateListConnections"
 import RecruiterListCandidates from "./RecruiterListConnections"
+import InviteLink from "./invite";
 
 
 export default function Router() {
@@ -23,6 +24,7 @@ export default function Router() {
                 <Route path="/register" element={<Register />} />
                 <Route element={<ProtectedLayout />}>
                     <Route element={<AppLayout />}>
+						<Route path="/invite" element={<InviteLink />} />
                         <Route path="/candidate" element={<CandidateView />}>
                             <Route
                                 path="/candidate/official-interviews"
