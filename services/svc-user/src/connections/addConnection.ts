@@ -5,8 +5,8 @@ import { prisma } from '../lib/prisma.js'
 export const addConnection =  async (req: Request, res: Response) => 
 {
 	const { userId, permissions } = req.body;
-
-	if (!permissions.includes("acceptConnection") || req.body.userId !== req.params.user_id) 
+	console.log(`try to add connections :${permissions}, id : ${req.body.userId} vs ${req.params.user_id}`)
+	if (!permissions.includes("acceptConnection") || req.body.userId !== Number (req.params.user_id)) 
         return res.status(403).json({error: "No permissions for this actions"});
 	try{
 		const invite = await prisma.invite_link.findUnique({

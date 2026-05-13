@@ -21,7 +21,7 @@ router.post(
     express.raw({ type: ["image/jpeg", "image/png"] }),
     uploadAvatar,
 ); //allows single file uploaded, called avatar
-router.get("/link", getLink);
+router.get("/link/generate", getLink);
 router.get("/avatar/:userId", getAvatarURL);
 router.post("/:user_id/connections/:link_id", addConnection);
 

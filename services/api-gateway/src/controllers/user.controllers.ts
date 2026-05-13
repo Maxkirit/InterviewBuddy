@@ -240,9 +240,10 @@ export const addConnection = async (req: Request, res: Response) => {
 export const getLink = async(req:Request, res: Response) =>{
 	try{
 		const response = await axios.get(
-            `http://svc-user:3000/user/link`,
+            `http://svc-user:3000/user/link/generate`,
             {
 				params:{
+					token_id : (req as ReqWithUser).userId,
 					permissions: (req as ReqWithUser).permissions,
 				}
             })
