@@ -6,6 +6,7 @@ import authRoute from './router/auth.route.js';
 import userRoute from './router/user.route.js'
 import protectedAuthRoute from './router/protected-auth.route.js';
 import interviewRoute from './router/interview.route.js';
+import gradingRoute from './router/grading.route.js';
 
 export type ApiError = {
   error: string,
@@ -32,6 +33,7 @@ app.use(validateAcccessToken);
 app.use('/api/v1/auth', protectedAuthRoute);
 app.use('/api/v1/user', userRoute);
 app.use('/api/v1/interview', interviewRoute);
+app.use('/api/v1/grading', gradingRoute);
 
 app.listen(port, () => {
     console.log(`Listening on port ${port}`);

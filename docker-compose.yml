@@ -116,6 +116,40 @@ services:
             - backend-network
         restart: unless-stopped
 
+    svc-grading:
+        profiles: ["app"]
+        container_name: svc-grading
+        build: services/svc-grading
+        networks:
+            - backend-network
+        volumes:
+            - svc_grading_secrets:/secrets:ro
+        depends_on:
+            grading-db:
+                condition: service_healthy
+            vault-agent-grading:
+                condition: service_started
+        restart: unless-stopped
+
+    vault-agent-grading:
+        profiles: ["app"]
+        container_name: vault-agent-grading
+        image: hashicorp/vault:2.0.0
+        user: "0:0"
+        entrypoint: ["/bin/vault"]
+        command: ["agent", "-config=/vault/agent/agent.hcl"]
+        environment:
+            VAULT_ADDR: "https://vault:8200"
+            VAULT_CACERT: "/vault/tls/ca.crt"
+        volumes:
+            - vault_tls:/vault/tls:ro
+            - svc_grading_vault_creds:/vault/creds:ro
+            - svc_grading_secrets:/secrets
+            - ./infrastructure/vault/agents/grading:/vault/agent:ro
+        networks:
+            - backend-network
+        restart: unless-stopped
+
     # # svc-serialization:
     # #     container_name: svc-serialization
     # #     build: services/svc-serialization
@@ -205,8 +239,8 @@ services:
         # profiles: ["app"]
         container_name: interview-store-db
         build: infrastructure/databases/interview-store-db
-        ports:
-            - "5432:5432"
+        # ports:
+        #     - "5432:5432"
         networks:
             - backend-network
         env_file:
@@ -221,18 +255,25 @@ services:
             - interview_store_db:/var/lib/postgresql
         restart: unless-stopped
 
-    # grading-db:
-    #     container_name: grading-db
-    #     build: infrastructure/databases/grading-db
-    #     env_file:
-    #         - infrastructure/databases/grading-db/.env_grading_db
-    #     networks:
-    #         - backend-network
-    #     secrets:
-    #         - grading_db_password
-    #     volumes:
-    #         - grading_db:/var/lib/postgresql
-    #     restart: unless-stopped
+    grading-db:
+        # profiles: ["app"]
+        container_name: grading-db
+        build: infrastructure/databases/grading-db
+        ports:
+            - "5432:5432"
+        networks:
+            - backend-network
+        env_file:
+            - infrastructure/databases/grading-db/.env_grading_db
+        environment:
+            POSTGRES_PASSWORD_FILE: /run/secrets/grading_db_superuser_password
+        secrets:
+            - grading_db_superuser_password
+            - grading_db_admin_password
+            - grading_db_app_password
+        volumes:
+            - grading_db:/var/lib/postgresql
+        restart: unless-stopped
 
     # serialization-db:
     #     container_name: serialization-db
@@ -384,10 +425,14 @@ secrets:
         file: ./infrastructure/secrets/interview_store_db_admin_password.txt
     interview_store_db_app_password:
         file: ./infrastructure/secrets/interview_store_db_app_password.txt
+    grading_db_superuser_password:
+        file: ./infrastructure/secrets/grading_db_superuser_password.txt
+    grading_db_admin_password:
+        file: ./infrastructure/secrets/grading_db_admin_password.txt
+    grading_db_app_password:
+        file: ./infrastructure/secrets/grading_db_app_password.txt
     serialization_db_password:
         file: ./infrastructure/secrets/serializationdb_superuser_password.txt
-    grading_db_password:
-        file: ./infrastructure/secrets/gradingdb_superuser_password.txt
     minio_root_password:
         file: ./infrastructure/secrets/minio_root_password.txt
     minio_app_password:
@@ -429,6 +474,10 @@ volumes:
         name: svc_interview_store_secrets_volume
     svc_interview_store_vault_creds:
         name: svc_interview_store_vault_creds_volume
+    svc_grading_secrets:
+        name: svc_grading_secrets_volume
+    svc_grading_vault_creds:
+        name: svc_grading_vault_creds_volume
     profile_pictures:
         name: profile_pictures_shared_volume
     vault_data:

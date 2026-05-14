@@ -20,3 +20,9 @@ interview-store kv/svc/interview-store/db port literal:5432
 interview-store kv/svc/interview-store/db database literal:interview_store_db
 interview-store kv/svc/interview-store/db user literal:app_interview
 interview-store kv/svc/interview-store/db password secret:interview_store_db_app_password
+
+grading kv/svc/grading/db host literal:grading-db
+grading kv/svc/grading/db port literal:5432
+grading kv/svc/grading/db database literal:grading_db
+grading kv/svc/grading/db user literal:app_grading
+grading kv/svc/grading/db password secret:grading_db_app_password
