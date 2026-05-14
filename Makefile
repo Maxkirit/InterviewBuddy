@@ -5,7 +5,7 @@ LOG_DIR := ./logs
 
 all: vault-up app-up
 
-re: reset-all all
+re: reset-all vault-up app-build
 
 
 # ---------------------------

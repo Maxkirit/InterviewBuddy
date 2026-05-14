@@ -21,7 +21,7 @@ app.post('/grading/grading-report', async (req: Request, res: Response) => {
             return res.status(403).json({error: "User does not have the required permissions"});
         }
         await prisma.grading_reports.create({
-            data: {unique_interview_id: parsed.data?.unique_interview_id, report: parsed.data?.report}
+            data: {unique_interview_id: parsed.data?.unique_interview_id as number, report: parsed.data?.report}
         });
     } catch (error) {
         console.error("new user error path:", error);
