@@ -9,6 +9,10 @@ import { error, profile } from 'node:console';
 import { resolveSoa } from 'node:dns';
 import { addConnection } from "./connections/addConnection.js";
 import { read } from "node:fs";
+import { create } from "node:domain";
+import dotenv from 'dotenv'
+
+dotenv.config();
 
 const nameSurnameSchema = z
     .string()
@@ -508,6 +512,35 @@ app.get('/user/:userId/avatar', async(req, res) => {
         console.log(error);
         return res.status(502).json({error: "Bad gateway (svc-user)"});
     }
+})
+
+app.get('/user/link/generate', async(req, res) =>{
+	const tmp = req.query.permissions ?? {};
+    const permission = Object.values(tmp) as string[];
+	const token = crypto.randomUUID();
+	const user_id = req.query.token_id as string;
+	console.log(`in getlink, perm: ${permission}`);
+	if (!permission.includes("createConnection")){
+		console.log("forbiden but why");
+		return res.status(403).json({error: "forbiden (create invite link)"})
+	}
+		
+	try{
+		const newlink = await prisma.invite_link.create({
+			data: {
+				recruiter_id: parseInt(user_id, 10),
+				link: token,
+			},
+	})
+		const link= process.env.LINK_URL;
+		const url = `${link}/invite?token=${token}`
+		console.log("lien generer et renvoyer")
+		return res.status(200).json({url : url})
+	}
+	catch(e){
+		console.log("error adding link to the db");
+		return res.status(500).json(e);
+	}
 })
 
 app.listen(port, () => {

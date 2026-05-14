@@ -236,3 +236,21 @@ export const addConnection = async (req: Request, res: Response) => {
         return res.status(502).json({ error: "Bad gateway" });
     }
 };
+
+export const getLink = async(req:Request, res: Response) =>{
+	try{
+		const response = await axios.get(
+            `http://svc-user:3000/user/link/generate`,
+            {
+				params:{
+					token_id : (req as ReqWithUser).userId,
+					permissions: (req as ReqWithUser).permissions,
+				}
+            })
+		return res.status(200).json(response.data);
+	}
+	catch(error){
+		console.log("error api-gateway getLink");
+		return res.status(502).json({error: "bad gateway"});
+	}
+};
