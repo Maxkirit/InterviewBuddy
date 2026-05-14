@@ -115,7 +115,7 @@ export default function SetupInterviewModal({
             };
             InterviewSchema.parse(input);
             await authContext?.axiosInstance.post(
-                "http://localhost:3000/api/v1/interview/real-interview",
+                "/api/v1/interview/real-interview",
                 input,
             );
             setPosition("");

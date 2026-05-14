@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "./AuthProvider";
 import { Navigate, Outlet, Link, NavLink } from "react-router-dom";
 
@@ -9,6 +9,7 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
 
 export default function AppLayout() {
     const authContext = useContext(AuthContext);
+    const [url, setUrl] = useState();
 
     if (authContext?.isLoading === true) {
         return (
@@ -21,6 +22,21 @@ export default function AppLayout() {
     if (authContext?.accessToken === null) {
         return <Navigate to="/login" replace />;
     }
+
+    useEffect(() => {
+        async function getUrl() {
+            try {
+                const res = await authContext?.axiosInstance.get(`/api/v1/user/avatar/${authContext.userId}`);
+                console.log(res?.data);
+                setUrl(res?.data.profile_pic_url);
+            } catch (error) {
+                // error
+                console.log("in error path");
+            }
+        }
+        
+        getUrl();
+    }, []);
 
     function renderNavbar() {
         if (authContext?.role === "candidate") {
@@ -51,12 +67,14 @@ export default function AppLayout() {
                         </li>
                     </ul>
                     <div className="flex items-center gap-3">
-                        <Link
-                            to="/profile"
-                            className="avatar no-underline"
-                            title="Tom Nguyen"
-                        >
-                            TN
+                        <Link to="/profile" className="avatar no-underline relative overflow-hidden">
+                            {url && (
+                                <img
+                                    src={`http://localhost:3000/avatars/${url}`}
+                                    className="absolute inset-0 w-full h-full object-cover rounded-full"
+                                    onError={(e) => e.currentTarget.remove()}
+                                />
+                            )}
                         </Link>
                     </div>
                 </nav>
@@ -90,12 +108,14 @@ export default function AppLayout() {
                         </li>
                     </ul>
                     <div className="flex items-center gap-3">
-                        <Link
-                            to="/profile"
-                            className="avatar no-underline"
-                            title="Tom Nguyen"
-                        >
-                            TN
+                        <Link to="/profile" className="avatar no-underline relative overflow-hidden">
+                            {url && (
+                                <img
+                                    src={`http://localhost:3000/avatars/${url}`}
+                                    className="absolute inset-0 w-full h-full object-cover rounded-full"
+                                    onError={(e) => e.currentTarget.remove()}
+                                />
+                            )}
                         </Link>
                     </div>
                 </nav>
@@ -129,12 +149,14 @@ export default function AppLayout() {
                         </li>
                     </ul>
                     <div className="flex items-center gap-3">
-                        <Link
-                            to="/profile"
-                            className="avatar no-underline"
-                            title="Tom Nguyen"
-                        >
-                            TN
+                        <Link to="/profile" className="avatar no-underline relative overflow-hidden">
+                            {url && (
+                                <img
+                                    src={`http://localhost:3000/avatars/${url}`}
+                                    className="absolute inset-0 w-full h-full object-cover rounded-full"
+                                    onError={(e) => e.currentTarget.remove()}
+                                />
+                            )}
                         </Link>
                     </div>
                 </nav>
