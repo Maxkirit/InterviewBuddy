@@ -13,7 +13,7 @@ export default function RecruiterListCandidates() {
 	const authContext = useContext(AuthContext);
 	const [connections, setConnections] = useState<ConnectionData[]>([]);
 	const modalRef = useRef<HTMLDialogElement>(null);
-	const [link, setlink] = useState(null);
+	const [link, setlink] = useState<string>("");
 
 	useEffect(() => {
 		async function getConnections() {

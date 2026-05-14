@@ -28,25 +28,6 @@ services:
                 condition: service_started
         restart: unless-stopped
 
-    vault-agent-auth:
-        profiles: ["app"]
-        container_name: vault-agent-auth
-        image: hashicorp/vault:2.0.0
-        user: "0:0"
-        entrypoint: ["/bin/vault"]
-        command: ["agent", "-config=/vault/agent/agent.hcl"]
-        environment:
-            VAULT_ADDR: "https://vault:8200"
-            VAULT_CACERT: "/vault/tls/ca.crt"
-        volumes:
-            - vault_tls:/vault/tls:ro
-            - svc_auth_vault_creds:/vault/creds:ro
-            - svc_auth_secrets:/secrets
-            - ./infrastructure/vault/agents/auth:/vault/agent:ro
-        networks:
-            - backend-network
-        restart: unless-stopped
-
     svc-user:
         profiles: ["app"]
         container_name: svc-user
@@ -61,25 +42,6 @@ services:
                 condition: service_healthy
             vault-agent-user:
                 condition: service_started
-        restart: unless-stopped
-
-    vault-agent-user:
-        profiles: ["app"]
-        container_name: vault-agent-user
-        image: hashicorp/vault:2.0.0
-        user: "0:0"
-        entrypoint: ["/bin/vault"]
-        command: ["agent", "-config=/vault/agent/agent.hcl"]
-        environment:
-            VAULT_ADDR: "https://vault:8200"
-            VAULT_CACERT: "/vault/tls/ca.crt"
-        volumes:
-            - vault_tls:/vault/tls:ro
-            - svc_user_vault_creds:/vault/creds:ro
-            - svc_user_secrets:/secrets
-            - ./infrastructure/vault/agents/user:/vault/agent:ro
-        networks:
-            - backend-network
         restart: unless-stopped
 
     svc-interview-store:
@@ -97,23 +59,19 @@ services:
                 condition: service_started
         restart: unless-stopped
 
-    vault-agent-interview-store:
+    svc-grading:
         profiles: ["app"]
-        container_name: vault-agent-interview-store
-        image: hashicorp/vault:2.0.0
-        user: "0:0"
-        entrypoint: ["/bin/vault"]
-        command: ["agent", "-config=/vault/agent/agent.hcl"]
-        environment:
-            VAULT_ADDR: "https://vault:8200"
-            VAULT_CACERT: "/vault/tls/ca.crt"
-        volumes:
-            - vault_tls:/vault/tls:ro
-            - svc_interview_store_vault_creds:/vault/creds:ro
-            - svc_interview_store_secrets:/secrets
-            - ./infrastructure/vault/agents/interview-store:/vault/agent:ro
+        container_name: svc-grading
+        build: services/svc-grading
         networks:
             - backend-network
+        volumes:
+            - svc_grading_secrets:/secrets:ro
+        depends_on:
+            grading-db:
+                condition: service_healthy
+            vault-agent-grading:
+                condition: service_started
         restart: unless-stopped
 
     # # svc-serialization:
@@ -129,32 +87,6 @@ services:
     # #     networks:
     # #         - backend-network
     # #     restart: unless-stopped
-
-
-    
-    vault-agent-grading:
-        profiles: ["app"]
-        container_name: vault-agent-grading
-        image: hashicorp/vault:2.0.0
-        user: "0:0"
-        entrypoint: ["/bin/vault"]
-        command: ["agent", "-config=/vault/agent/agent.hcl"]
-        environment:
-            VAULT_ADDR: "https://vault:8200"
-            VAULT_CACERT: "/vault/tls/ca.crt"
-        tmpfs:
-            - /vault/file
-            - /vault/logs
-        volumes:
-            - vault_tls:/vault/tls:ro
-            - svc_grading_vault_creds:/vault/creds:ro
-            - svc_grading_secrets:/secrets
-            - ./infrastructure/vault/agents/grading/agent.hcl:/vault/agent/agent.hcl:ro
-            - ./infrastructure/vault/agents/gradomg/templates:/vault/templates:ro
-        networks:
-            - backend-network
-        restart: "no"
-
 
     # dev-front:
     #     container_name: dev-front
@@ -209,28 +141,6 @@ services:
                 condition: service_completed_successfully
         restart: unless-stopped
 
-    vault-agent-auth-db:
-        profiles: ["app"]
-        container_name: vault-agent-auth-db
-        image: hashicorp/vault:2.0.0
-        user: "0:0"
-        entrypoint: ["/bin/vault"]
-        command: ["agent", "-config=/vault/agent/agent.hcl"]
-        environment:
-            VAULT_ADDR: "https://vault:8200"
-            VAULT_CACERT: "/vault/tls/ca.crt"
-        tmpfs:
-            - /vault/file
-            - /vault/logs
-        volumes:
-            - vault_tls:/vault/tls:ro
-            - auth_db_vault_creds:/vault/creds:ro
-            - auth_db_secrets:/secrets
-            - ./infrastructure/vault/agents/auth-db/agent.hcl:/vault/agent/agent.hcl:ro
-            - ./infrastructure/vault/agents/auth-db/templates:/vault/templates:ro
-        networks:
-            - backend-network
-        restart: "no"
 
     user-db:
         profiles: ["app"]
@@ -252,29 +162,6 @@ services:
                 condition: service_completed_successfully
         restart: unless-stopped
 
-    vault-agent-user-db:
-        profiles: ["app"]
-        container_name: vault-agent-user-db
-        image: hashicorp/vault:2.0.0
-        user: "0:0"
-        entrypoint: ["/bin/vault"]
-        command: ["agent", "-config=/vault/agent/agent.hcl"]
-        environment:
-            VAULT_ADDR: "https://vault:8200"
-            VAULT_CACERT: "/vault/tls/ca.crt"
-        tmpfs:
-            - /vault/file
-            - /vault/logs
-        volumes:
-            - vault_tls:/vault/tls:ro
-            - user_db_vault_creds:/vault/creds:ro
-            - user_db_secrets:/secrets
-            - ./infrastructure/vault/agents/user-db/agent.hcl:/vault/agent/agent.hcl:ro
-            - ./infrastructure/vault/agents/user-db/templates:/vault/templates:ro
-        networks:
-            - backend-network
-        restart: "no"
-
     interview-store-db:
         profiles: ["app"]
         container_name: interview-store-db
@@ -295,40 +182,23 @@ services:
                 condition: service_completed_successfully
         restart: unless-stopped
 
-    vault-agent-interview-store-db:
+    grading-db:
         profiles: ["app"]
-        container_name: vault-agent-interview-store-db
-        image: hashicorp/vault:2.0.0
-        user: "0:0"
-        entrypoint: ["/bin/vault"]
-        command: ["agent", "-config=/vault/agent/agent.hcl"]
-        environment:
-            VAULT_ADDR: "https://vault:8200"
-            VAULT_CACERT: "/vault/tls/ca.crt"
-        tmpfs:
-            - /vault/file
-            - /vault/logs
-        volumes:
-            - vault_tls:/vault/tls:ro
-            - interview_store_db_vault_creds:/vault/creds:ro
-            - interview_store_db_secrets:/secrets
-            - ./infrastructure/vault/agents/interview-store-db/agent.hcl:/vault/agent/agent.hcl:ro
-            - ./infrastructure/vault/agents/interview-store-db/templates:/vault/templates:ro
+        container_name: grading-db
+        build: infrastructure/databases/grading-db
         networks:
             - backend-network
-        restart: "no"
-    # grading-db:
-    #     container_name: grading-db
-    #     build: infrastructure/databases/grading-db
-    #     env_file:
-    #         - infrastructure/databases/grading-db/.env_grading_db
-    #     networks:
-    #         - backend-network
-    #     secrets:
-    #         - grading_db_password
-    #     volumes:
-    #         - grading_db:/var/lib/postgresql
-    #     restart: unless-stopped
+        env_file:
+            - infrastructure/databases/grading-db/.env_grading_db
+        environment:
+            POSTGRES_PASSWORD_FILE: /run/secrets/grading_db_superuser_password
+        volumes:
+            - grading_db:/var/lib/postgresql/data
+            - grading_db_secrets:/run/secrets:ro
+        depends_on:
+            vault-agent-grading-db:
+                condition: service_completed_successfully
+        restart: unless-stopped
 
     # serialization-db:
     #     container_name: serialization-db
@@ -413,9 +283,11 @@ services:
             - svc_auth_vault_creds:/vault/bootstrap/creds-out/auth
             - svc_user_vault_creds:/vault/bootstrap/creds-out/user
             - svc_interview_store_vault_creds:/vault/bootstrap/creds-out/interview-store
+            - svc_grading_vault_creds:/vault/bootstrap/creds-out/grading
             - auth_db_vault_creds:/vault/bootstrap/creds-out/auth-db
             - user_db_vault_creds:/vault/bootstrap/creds-out/user-db
             - interview_store_db_vault_creds:/vault/bootstrap/creds-out/interview-store-db
+            - grading_db_vault_creds:/vault/bootstrap/creds-out/grading-db
 
             - ./infrastructure/vault/tools/scripts/bootstrap.sh:/vault/bootstrap/scripts/bootstrap.sh
             - ./infrastructure/vault/updates/services.txt:/vault/bootstrap/services_updates/services.txt
@@ -454,48 +326,178 @@ services:
             - vault-bootstrap
         restart: "no"
 
-    # minio:
-    #   container_name: minio
-    #   build: infrastructure/minio
-    #   networks:
-    #     - backend-network
-    #   volumes:
-    #     - minio:/data
-    #   secrets:
-    #     - minio_app_password
-    #     - minio_root_password
-    #   env_file: ./infrastructure/minio/.env
-    #   restart: unless-stopped
 
-secrets:
-    auth_db_superuser_password:
-        file: ./infrastructure/secrets/auth_db_superuser_password.txt
-    auth_db_admin_password:
-        file: ./infrastructure/secrets/auth_db_admin_password.txt
-    auth_db_app_password:
-        file: ./infrastructure/secrets/auth_db_app_password.txt
-    user_db_superuser_password:
-        file: ./infrastructure/secrets/user_db_superuser_password.txt
-    user_db_admin_password:
-        file: ./infrastructure/secrets/user_db_admin_password.txt
-    user_db_app_password:
-        file: ./infrastructure/secrets/user_db_app_password.txt
-    interview_store_db_superuser_password:
-        file: ./infrastructure/secrets/interview_store_db_superuser_password.txt
-    interview_store_db_admin_password:
-        file: ./infrastructure/secrets/interview_store_db_admin_password.txt
-    interview_store_db_app_password:
-        file: ./infrastructure/secrets/interview_store_db_app_password.txt
-    serialization_db_password:
-        file: ./infrastructure/secrets/serializationdb_superuser_password.txt
-    grading_db_password:
-        file: ./infrastructure/secrets/gradingdb_superuser_password.txt
-    minio_root_password:
-        file: ./infrastructure/secrets/minio_root_password.txt
-    minio_app_password:
-        file: ./infrastructure/secrets/minio_app_password.txt
-    svc_auth_jwt_private_key:
-        file: ./infrastructure/secrets/svc_auth_jwt_private_key.pem
+    vault-agent-auth:
+        profiles: ["app"]
+        container_name: vault-agent-auth
+        image: hashicorp/vault:2.0.0
+        user: "0:0"
+        entrypoint: ["/bin/vault"]
+        command: ["agent", "-config=/vault/agent/agent.hcl"]
+        environment:
+            VAULT_ADDR: "https://vault:8200"
+            VAULT_CACERT: "/vault/tls/ca.crt"
+        volumes:
+            - vault_tls:/vault/tls:ro
+            - svc_auth_vault_creds:/vault/creds:ro
+            - svc_auth_secrets:/secrets
+            - ./infrastructure/vault/agents/auth:/vault/agent:ro
+        networks:
+            - backend-network
+        restart: unless-stopped
+
+    vault-agent-user:
+        profiles: ["app"]
+        container_name: vault-agent-user
+        image: hashicorp/vault:2.0.0
+        user: "0:0"
+        entrypoint: ["/bin/vault"]
+        command: ["agent", "-config=/vault/agent/agent.hcl"]
+        environment:
+            VAULT_ADDR: "https://vault:8200"
+            VAULT_CACERT: "/vault/tls/ca.crt"
+        volumes:
+            - vault_tls:/vault/tls:ro
+            - svc_user_vault_creds:/vault/creds:ro
+            - svc_user_secrets:/secrets
+            - ./infrastructure/vault/agents/user:/vault/agent:ro
+        networks:
+            - backend-network
+        restart: unless-stopped
+
+    vault-agent-interview-store:
+        profiles: ["app"]
+        container_name: vault-agent-interview-store
+        image: hashicorp/vault:2.0.0
+        user: "0:0"
+        entrypoint: ["/bin/vault"]
+        command: ["agent", "-config=/vault/agent/agent.hcl"]
+        environment:
+            VAULT_ADDR: "https://vault:8200"
+            VAULT_CACERT: "/vault/tls/ca.crt"
+        volumes:
+            - vault_tls:/vault/tls:ro
+            - svc_interview_store_vault_creds:/vault/creds:ro
+            - svc_interview_store_secrets:/secrets
+            - ./infrastructure/vault/agents/interview-store:/vault/agent:ro
+        networks:
+            - backend-network
+        restart: unless-stopped
+
+    vault-agent-grading:
+        profiles: ["app"]
+        container_name: vault-agent-grading
+        image: hashicorp/vault:2.0.0
+        user: "0:0"
+        entrypoint: ["/bin/vault"]
+        command: ["agent", "-config=/vault/agent/agent.hcl"]
+        environment:
+            VAULT_ADDR: "https://vault:8200"
+            VAULT_CACERT: "/vault/tls/ca.crt"
+        tmpfs:
+            - /vault/file
+            - /vault/logs
+        volumes:
+            - vault_tls:/vault/tls:ro
+            - svc_grading_vault_creds:/vault/creds:ro
+            - svc_grading_secrets:/secrets
+            - ./infrastructure/vault/agents/grading/agent.hcl:/vault/agent/agent.hcl:ro
+            - ./infrastructure/vault/agents/grading/templates:/vault/templates:ro
+        networks:
+            - backend-network
+        restart: "no"
+
+    vault-agent-auth-db:
+        profiles: ["app"]
+        container_name: vault-agent-auth-db
+        image: hashicorp/vault:2.0.0
+        user: "0:0"
+        entrypoint: ["/bin/vault"]
+        command: ["agent", "-config=/vault/agent/agent.hcl"]
+        environment:
+            VAULT_ADDR: "https://vault:8200"
+            VAULT_CACERT: "/vault/tls/ca.crt"
+        tmpfs:
+            - /vault/file
+            - /vault/logs
+        volumes:
+            - vault_tls:/vault/tls:ro
+            - auth_db_vault_creds:/vault/creds:ro
+            - auth_db_secrets:/secrets
+            - ./infrastructure/vault/agents/auth-db/agent.hcl:/vault/agent/agent.hcl:ro
+            - ./infrastructure/vault/agents/auth-db/templates:/vault/templates:ro
+        networks:
+            - backend-network
+        restart: "no"
+
+    vault-agent-user-db:
+        profiles: ["app"]
+        container_name: vault-agent-user-db
+        image: hashicorp/vault:2.0.0
+        user: "0:0"
+        entrypoint: ["/bin/vault"]
+        command: ["agent", "-config=/vault/agent/agent.hcl"]
+        environment:
+            VAULT_ADDR: "https://vault:8200"
+            VAULT_CACERT: "/vault/tls/ca.crt"
+        tmpfs:
+            - /vault/file
+            - /vault/logs
+        volumes:
+            - vault_tls:/vault/tls:ro
+            - user_db_vault_creds:/vault/creds:ro
+            - user_db_secrets:/secrets
+            - ./infrastructure/vault/agents/user-db/agent.hcl:/vault/agent/agent.hcl:ro
+            - ./infrastructure/vault/agents/user-db/templates:/vault/templates:ro
+        networks:
+            - backend-network
+        restart: "no"
+    
+    vault-agent-interview-store-db:
+        profiles: ["app"]
+        container_name: vault-agent-interview-store-db
+        image: hashicorp/vault:2.0.0
+        user: "0:0"
+        entrypoint: ["/bin/vault"]
+        command: ["agent", "-config=/vault/agent/agent.hcl"]
+        environment:
+            VAULT_ADDR: "https://vault:8200"
+            VAULT_CACERT: "/vault/tls/ca.crt"
+        tmpfs:
+            - /vault/file
+            - /vault/logs
+        volumes:
+            - vault_tls:/vault/tls:ro
+            - interview_store_db_vault_creds:/vault/creds:ro
+            - interview_store_db_secrets:/secrets
+            - ./infrastructure/vault/agents/interview-store-db/agent.hcl:/vault/agent/agent.hcl:ro
+            - ./infrastructure/vault/agents/interview-store-db/templates:/vault/templates:ro
+        networks:
+            - backend-network
+        restart: "no"
+
+    vault-agent-grading-db:
+        profiles: ["app"]
+        container_name: vault-agent-grading-db
+        image: hashicorp/vault:2.0.0
+        user: "0:0"
+        entrypoint: ["/bin/vault"]
+        command: ["agent", "-config=/vault/agent/agent.hcl"]
+        environment:
+            VAULT_ADDR: "https://vault:8200"
+            VAULT_CACERT: "/vault/tls/ca.crt"
+        tmpfs:
+            - /vault/file
+            - /vault/logs
+        volumes:
+            - vault_tls:/vault/tls:ro
+            - grading_db_vault_creds:/vault/creds:ro
+            - grading_db_secrets:/run/secrets
+            - ./infrastructure/vault/agents/grading-db/agent.hcl:/vault/agent/agent.hcl:ro
+            - ./infrastructure/vault/agents/grading-db/templates:/vault/templates:ro
+        networks:
+            - backend-network
+        restart: "no"
 
 networks:
     frontend-network:
@@ -517,8 +519,6 @@ volumes:
         name: monitoring_volume
     ingress:
         name: ingress_volume
-    minio:
-        name: minio_volume
     profile_pictures:
         name: profile_pictures_shared_volume
     
@@ -537,7 +537,8 @@ volumes:
         name: user_db_secrets_volume
     interview_store_db_secrets:
         name: interview_store_db_secrets_volume
-
+    grading_db_secrets:
+        name: grading_db_secrets_volume
 
     # VAULT CREDS VOLUMES
     svc_auth_vault_creds:
@@ -547,13 +548,15 @@ volumes:
     svc_interview_store_vault_creds:
         name: svc_interview_store_vault_creds_volume
     svc_grading_vault_creds:
-        name: svc_grade_vault_creds_volume
+        name: svc_grading_vault_creds_volume
     auth_db_vault_creds:
         name: auth_db_creds_volume
     user_db_vault_creds:
         name: user_db_creds_volume
     interview_store_db_vault_creds:
         name: svc_interview_store_db_creds_volume
+    grading_db_vault_creds:
+        name: grading_db_vault_creds_volume
 
     # VAULT VOLUMES
     vault_data:

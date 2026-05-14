@@ -23,7 +23,8 @@ auto_auth {
 }
 
 template {
-  source      = "/vault/agent/templates/db.env.tpl"
+  source = "/vault/templates/db.env.tpl"
   destination = "/secrets/db.env"
-  perms       = "0640"
+  perms = "0444"
+  error_on_missing_key = true
 }
