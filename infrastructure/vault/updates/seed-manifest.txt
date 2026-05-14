@@ -20,3 +20,33 @@ interview-store kv/svc/interview-store/db port literal:5432
 interview-store kv/svc/interview-store/db database literal:interview_store_db
 interview-store kv/svc/interview-store/db user literal:app_interview
 interview-store kv/svc/interview-store/db password secret:interview_store_db_app_password
+
+grading kv/svc/grading/db host literal:grading-db
+grading kv/svc/grading/db port literal:5432
+grading kv/svc/grading/db database literal:grading_db
+grading kv/svc/grading/db user literal:app_grading
+grading kv/svc/grading/db password secret:grading_db_app_password
+
+auth-db kv/svc/auth-db/db host literal:auth-db
+auth-db kv/svc/auth-db/db port literal:5432
+auth-db kv/svc/auth-db/db database literal:auth_db
+auth-db kv/svc/auth-db/db user literal:app_auth
+auth-db kv/svc/auth-db/db superuser_password secret:auth_db_superuser_password
+auth-db kv/svc/auth-db/db admin_password secret:auth_db_admin_password
+auth-db kv/svc/auth-db/db app_password secret:auth_db_app_password
+
+user-db kv/svc/user-db/db host literal:user-db
+user-db kv/svc/user-db/db port literal:5432
+user-db kv/svc/user-db/db database literal:user_db
+user-db kv/svc/user-db/db user literal:app_user
+user-db kv/svc/user-db/db superuser_password secret:user_db_superuser_password
+user-db kv/svc/user-db/db admin_password secret:user_db_admin_password
+user-db kv/svc/user-db/db app_password secret:user_db_app_password
+
+interview-store-db kv/svc/interview-store-db/db host literal:interview-store-db
+interview-store-db kv/svc/interview-store-db/db port literal:5432
+interview-store-db kv/svc/interview-store-db/db database literal:interview_store_db
+interview-store-db kv/svc/interview-store-db/db user literal:app_interview
+interview-store-db kv/svc/interview-store-db/db superuser_password secret:interview_store_db_superuser_password
+interview-store-db kv/svc/interview-store-db/db admin_password secret:interview_store_db_admin_password
+interview-store-db kv/svc/interview-store-db/db app_password secret:interview_store_db_app_password

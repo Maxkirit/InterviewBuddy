@@ -2,6 +2,20 @@
 
 set -e
 
+for file in \
+  /run/secrets/user_db_superuser_password \
+  /run/secrets/user_db_admin_password \
+  /run/secrets/user_db_app_password
+do
+  if [ ! -r "$file" ]; then
+    echo "[user-db] ERROR: missing or unreadable secret file: $file"
+    exit 1
+  fi
+  echo "[user-db] Found $file"
+done
+echo "[user-db] Found all secrets. Starting init..."
+
+
 until pg_isready -U postgres; do
   echo "Waiting for PostgreSQL to start"
   sleep 1
