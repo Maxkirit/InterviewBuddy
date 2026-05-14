@@ -10,6 +10,7 @@ import AdminView from "./AdminView";
 import RecruiterInterviews from "./RecruiterInterview";
 import AppLayout from "./AppLayout";
 import AdminUsers from "./AdminUser";
+import Interview from "./Interview";
 import CandidateListRecruiters from "./CandidateListConnections"
 import RecruiterListCandidates from "./RecruiterListConnections"
 import InviteLink from "./invite";
@@ -46,6 +47,7 @@ export default function Router() {
                         </Route>
                         <Route path="/profile" element={<MyProfile />} />
                     </Route>
+                    <Route path="/candidate/interview/:interview_id" element={<Interview />} />
                 </Route>
             </Routes>
         </BrowserRouter>

@@ -1,6 +1,5 @@
 import { useEffect, useState, useContext, useRef } from "react";
 import { AuthContext } from "./AuthProvider";
-import "./styles/Candidates.css";
 
 type ConnectionData = {
 	user_id: number;
@@ -22,7 +21,7 @@ export default function RecruiterListCandidates() {
 				const result = await authContext?.axiosInstance.get(
 					`/api/v1/user/${authContext.userId}/connections`
 				);
-				const parsed = (result?.data.connections).map((item) => ({
+				const parsed = (result?.data.connections).map((item: ConnectionData) => ({
 					user_id: item.user_id,
 					firstname: item.firstname,
 					lastname: item.lastname,
@@ -74,8 +73,8 @@ export default function RecruiterListCandidates() {
 					<p>No connections yet</p>
 				) : (
 					connections.map((conn) => (
-						<div className="candidate-row" key={conn.user_id}>
-							<div className="candidate-row-left">
+						<div key={conn.user_id} className="bg-white border border-[#e4e8f0] rounded-[12px] px-5 py-3.5 flex items-center justify-between">
+							<div className="flex items-center gap-3">
 								{/* checks for picture url, if none, puts letters as avatar */}
 								{/* {conn.profile_pic_url ? (
 									<img
@@ -89,10 +88,10 @@ export default function RecruiterListCandidates() {
 									</div>
 								)} */}
 								<div className="avatar">
-										{conn.firstname[0]}{conn.lastname[0]}
-									</div>
+									{conn.firstname[0]}{conn.lastname[0]}
+								</div>
 								<div className="flex flex-col gap-0.5">
-									<span className="candidate-name">
+									<span className="text-[0.975rem] font-semibold text-[#1a1d2e]">
 										{conn.firstname} {conn.lastname}
 									</span>
 									<span className="text-[0.8rem] text-gray-500">

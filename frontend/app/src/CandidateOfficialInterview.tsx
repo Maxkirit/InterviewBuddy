@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useContext } from "react";
+import { Link } from "react-router-dom";
 import { AuthContext } from "./AuthProvider";
 
 export type InterviewData = {
@@ -37,7 +38,7 @@ export default function CandidateOfficialInterview() {
     const authContext = useContext(AuthContext);
     const [interviews, setInterviews] = useState<Interview[]>([]);
     const [recruiterMap, setRecruiterMap] = useState<Record<string, RecruiterData>>({});
-    const [isOpen, setIsOpen] = useState(false);
+    const [selectedInterview, setSelectedInterview] = useState<number | null>(null);
     const ref = useRef<HTMLDialogElement>(null);
 
     useEffect(() => {
@@ -82,28 +83,20 @@ export default function CandidateOfficialInterview() {
     }, [interviews]);
 
     useEffect(() => {
-        if (isOpen) {
+        if (selectedInterview !== null) {
             ref.current?.showModal();
         } else {
             ref.current?.close();
         }
-    }, [isOpen]);
+    }, [selectedInterview]);
 
     function handleBackdropClick(e: React.MouseEvent<HTMLDialogElement>) {
         if (e.target === ref.current) {
-            setIsOpen(false);
+            setSelectedInterview(null);
         }
     }
 
     function renderInterviews(interview: Interview) {
-        // let recruiter;
-        // try {
-        //     recruiter = await authContext?.axiosInstance.get(
-        //         `api/v1/user/${interview.recruiterId}/public`
-        //     );
-        // } catch (error) {
-        //     // error banner or default value
-        // }
         if (interview.status === "completed") {
             return (
                 <div
@@ -223,7 +216,7 @@ export default function CandidateOfficialInterview() {
                         </span>
                         <button
                             className="border-0 bg-[#4f6ef7] text-white font-semibold cursor-pointer transition hover:bg-[#3d5ce6] disabled:bg-[#e4e8f0] disabled:text-gray-400 disabled:cursor-not-allowed px-[18px] py-[7px] rounded-lg text-sm"
-                            onClick={() => setIsOpen(true)}
+                            onClick={() => setSelectedInterview(interview.id)}
                             disabled={overDue}
                         >
                             Start
@@ -255,7 +248,7 @@ export default function CandidateOfficialInterview() {
                         </h2>
                         <button
                             className="w-[30px] h-[30px] rounded-lg border border-[#e4e8f0] bg-white text-gray-400 text-xs cursor-pointer flex items-center justify-center transition hover:border-[#ef4444] hover:text-[#ef4444]"
-                            onClick={() => setIsOpen(false)}
+                            onClick={() => setSelectedInterview(null)}
                         >
                             &#10005;
                         </button>
@@ -272,15 +265,15 @@ export default function CandidateOfficialInterview() {
                     <div className="flex justify-end gap-2.5 mt-6">
                         <button
                             className="btn-cancel"
-                            onClick={() => setIsOpen(false)}
+                            onClick={() => setSelectedInterview(null)}
                         >
                             Go back
                         </button>
-                        <a href="">
+                        <Link to={`/candidate/interview/${selectedInterview}`}>
                             <button className="btn-primary px-6 py-[9px]">
                                 Start interview
                             </button>
-                        </a>
+                        </Link>
                     </div>
                 </div>
             </dialog>
