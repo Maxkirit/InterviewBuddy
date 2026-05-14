@@ -50,3 +50,11 @@ interview-store-db kv/svc/interview-store-db/db user literal:app_interview
 interview-store-db kv/svc/interview-store-db/db superuser_password secret:interview_store_db_superuser_password
 interview-store-db kv/svc/interview-store-db/db admin_password secret:interview_store_db_admin_password
 interview-store-db kv/svc/interview-store-db/db app_password secret:interview_store_db_app_password
+
+grading-db kv/svc/grading-db/db host literal:grading-db
+grading-db kv/svc/grading-db/db port literal:5432
+grading-db kv/svc/grading-db/db database literal:grading_db
+grading-db kv/svc/grading-db/db user literal:app_grading
+grading-db kv/svc/grading-db/db superuser_password secret:grading_db_superuser_password
+grading-db kv/svc/grading-db/db admin_password secret:grading_db_admin_password
+grading-db kv/svc/grading-db/db app_password secret:grading_db_app_password
