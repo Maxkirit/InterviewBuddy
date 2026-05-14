@@ -70,8 +70,10 @@ export default function Login() {
             );
             navigate(from || "/", {replace: true});
         } catch (error) {
+            console.log(`in error path: ${error}`);
             if (error instanceof ZodError) {
                 // error banner
+                console.log(`zod error`);
             } else {
                 // add try again banner to form
             }

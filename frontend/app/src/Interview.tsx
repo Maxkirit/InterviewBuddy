@@ -40,6 +40,7 @@ export default function Interview() {
                 setInterview(res?.data);
             } catch (error) {
                 // error banner
+                console.log(`in error path: ${error}`);
             }
         }
 
@@ -56,6 +57,7 @@ export default function Interview() {
             navigate('/candidate/official-interviews', {replace: true});
         } catch (error) {
             // error banner
+            console.log(`in error path: ${error}`);
         }
     }
 
