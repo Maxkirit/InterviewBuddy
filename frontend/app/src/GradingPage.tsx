@@ -115,6 +115,7 @@ export default function GradingPage() {
                 setCandidate(candidateData?.data);
             } catch (error) {
                 // error banner
+                console.log(`in error path: ${error}`);
             }
         }
 
@@ -127,6 +128,7 @@ export default function GradingPage() {
 
         } catch (error) {
             // error banner
+            console.log(`in error path: ${error}`);
         }
     }
 

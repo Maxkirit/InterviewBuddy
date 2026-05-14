@@ -92,6 +92,7 @@ export default function CandidateOfficialInterview() {
                 const res = await authContext?.axiosInstance.get(`api/v1/user/${recruiterId}/public`);
                 setRecruiterMap((prev) => ({ ...prev, [recruiterId]: res?.data }));
             } catch (error) {
+                console.log(`in error path: ${error}`);
                 // handle error
             }
         });

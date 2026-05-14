@@ -93,6 +93,7 @@ export default function RecruiterInterviews() {
                 setCandidateMap((prev) => ({ ...prev, [candidateId]: res?.data }));
             } catch (error) {
                 // handle error
+                console.log(`in error path: ${error}`);
             }
         });
     }, [interviews]);
