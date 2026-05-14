@@ -13,6 +13,7 @@ import AdminUsers from "./AdminUser";
 import Interview from "./Interview";
 import CandidateListRecruiters from "./CandidateListConnections"
 import RecruiterListCandidates from "./RecruiterListConnections"
+import GradingPage from "./GradingPage";
 
 
 export default function Router() {
@@ -39,6 +40,9 @@ export default function Router() {
 							<Route
                             	path="/recruiter/candidates"
                             	element={<RecruiterListCandidates />}/>
+                            <Route
+                                path="/recruiter/grading/:interview_id"
+                                element={<GradingPage />}/>
                         </Route>
                         <Route path="/admin" element={<AdminView />}>
                             <Route path="/admin/users" element={<AdminUsers />} />

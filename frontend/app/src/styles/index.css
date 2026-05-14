@@ -59,9 +59,40 @@
     .status-mock      { @apply bg-[#ede9fe] text-[#6d28d9]; }
     .status-candidate { @apply bg-[#eef1ff] text-[#4f6ef7]; }
     .status-recruiter { @apply bg-[#fdf4ff] text-[#9333ea]; }
+    .status-graded    { @apply bg-[#e0e7ff] text-[#3730a3]; }
 
     /* ── Avatar ── */
     .avatar {
         @apply w-9 h-9 rounded-full bg-gradient-to-br from-[#4f6ef7] to-[#7c3aed] flex items-center justify-center text-white text-[0.8rem] font-semibold shrink-0 cursor-pointer;
+    }
+
+    /* ── Score slider thumb (pseudo-elements, can't be done with Tailwind) ── */
+    .score-slider {
+        @apply absolute inset-0 w-full h-2 cursor-pointer appearance-none bg-transparent;
+        --thumb-color: #b0b7c3;
+    }
+    .score-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        border: 2.5px solid var(--thumb-color);
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+        cursor: pointer;
+        transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .score-slider::-moz-range-thumb {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        border: 2.5px solid var(--thumb-color);
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+        cursor: pointer;
+    }
+    .score-slider::-webkit-slider-thumb:hover {
+        transform: scale(1.15);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     }
 }

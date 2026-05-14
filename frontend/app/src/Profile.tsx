@@ -62,6 +62,7 @@ export default function MyProfile() {
                 setDob(userInfo?.data.date_of_birth ?? "");
             } catch (error) {
                 // display error banner
+                console.log(`in error path: ${error}`);
             }
         }
 

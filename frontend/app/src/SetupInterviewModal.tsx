@@ -64,6 +64,7 @@ export default function SetupInterviewModal({
                 setConnections(res?.data.connections);
             } catch (error) {
                 // error banner
+                console.log(`in error path: ${error}`);
             }
         }
 
@@ -80,6 +81,7 @@ export default function SetupInterviewModal({
                 setQuestionList(res?.data);
             } catch (error) {
                 // error banner
+                console.log(`in error path: ${error}`);
             }
         }
 
