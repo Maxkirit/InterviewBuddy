@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState, useContext } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { AuthContext } from "./AuthProvider";
-import { createConnection } from "net";
 
 export default function InviteLink(){
 	const [searchparam]= useSearchParams();
@@ -23,6 +22,7 @@ export default function InviteLink(){
     			);
 			}
 		}
+		createConnection();
 	})
-	createConnection();
+	
 }

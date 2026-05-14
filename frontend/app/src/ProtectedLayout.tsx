@@ -1,10 +1,10 @@
 import { useContext } from "react";
 import { AuthContext } from "./AuthProvider";
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 
 export default function ProtectedLayout() {
     const authContext = useContext(AuthContext);
-
+	const location = useLocation();
     if (authContext?.isLoading === true) {
         return (
             <div>
@@ -14,7 +14,7 @@ export default function ProtectedLayout() {
     }
 
     if (authContext?.accessToken === null) {
-        return <Navigate to="/login" replace />;
+        return <Navigate to="/login" state={{from: location}} replace />;
     }
 
     return <Outlet />;

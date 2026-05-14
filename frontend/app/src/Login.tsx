@@ -2,7 +2,7 @@ import { useState, useContext, type SubmitEvent } from "react";
 import { z, ZodError } from "zod";
 import axios from "axios";
 import { AuthContext, decodeJwt } from "./AuthProvider";
-import { Navigate, Link, useNavigate } from "react-router-dom";
+import { Navigate, Link, useNavigate, useLocation} from "react-router-dom";
 
 export const passwordSchema = z
     .string()
@@ -31,6 +31,8 @@ export default function Login() {
     const [password, setPassword] = useState("");
     const authContext = useContext(AuthContext);
     const navigate = useNavigate();
+	const location= useLocation();
+	const from= location.state?.from?.pathname + location.state?.from?.search;
 
     if (authContext?.isLoading === true) {
         return (
@@ -66,7 +68,7 @@ export default function Login() {
                 parseInt(decoded.userId),
                 decoded.role,
             );
-            navigate("/");
+            navigate(from || "/", {replace: true});
         } catch (error) {
             if (error instanceof ZodError) {
                 // error banner
