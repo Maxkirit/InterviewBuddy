@@ -2,29 +2,30 @@ import { Request, Response, } from 'express'
 import { prisma } from '../lib/prisma.js'
 
 export const DeleteConnection= async (req: Request, res: Response) =>{
-	const {userId, role, permissions} = req.body;
-	const user_id = Number (req.params?.userId);
+	const {userId, permissions, role} = req.body;
+	const user_id = Number (req.params?.user_id);
 	const connectionId = Number (req.params?.connectionId);
 	
+	console.log(`in Delete connection : ${req.body.role}`)
 	let recruiter_id : number;
 	let candidate_id : number;
-	if (role == "admin"){
-		recruiter_id = user_id;
+	if (role === "admin"){
+		recruiter_id = userId;
 		candidate_id = connectionId;
 	}
-	else if (role == "recruiter"){
-		recruiter_id = user_id;
+	else if (role === "recruiter"){
+		recruiter_id = userId;
 		candidate_id = connectionId;
 	}
 	else{
 		recruiter_id = connectionId;
-		candidate_id = user_id;
+		candidate_id = userId;
 	}
 
-	const isParticipant = (userId === recruiter_id || userId === candidate_id);
+	const isParticipant = ((user_id === recruiter_id) || (user_id === candidate_id));
 
-	if (!permissions?.includes("deleteConnection") || !isParticipant && !permissions?.includes("manageConnection")){
-		console.log("no permission for delete connection ");
+	if (!permissions?.includes("deleteConnection") || (!isParticipant && !permissions?.includes("manageConnection"))){
+		console.log(`no permission for delete connection: user : ${isParticipant} `);
 		return res.status(403).json({error :"forbiden"});
 	}
 	try{

@@ -264,14 +264,11 @@ export const deleteConnection = async(req: Request, res: Response) =>{
 				role: (req as ReqWithUser).role,
 		})
 		console.log("delete in api gatway ok");
-		return res.status(200).json(response);
+		return res.status(200).json(response.data);
 	}
 	catch(error){
-		if (axios.isAxiosError<ApiError>(error) && error.response?.status)
-            return res
-                .status(error.response.status)
-                .json({ error: error.response.data?.error ?? error.message });
-        return res.status(502).json({ error: "Bad gateway (api gateway)" });
+		console.log("error axios response for delete connection")
+		return res.status(502).json({error: "bad gateway"})
 	}
 
-};
+}
