@@ -1,4 +1,5 @@
 import { useEffect, useState, useContext } from "react";
+import { Link } from "react-router-dom";
 import { AuthContext } from "./AuthProvider";
 
 type ConnectionData = {
@@ -45,12 +46,12 @@ export default function CandidateListRecruiters() {
 					<p>No connections yet</p>
 				) : (
 					connections.map((conn) => (
-						<div key={conn.user_id} className="bg-white border border-[#e4e8f0] rounded-[12px] px-5 py-3.5 flex items-center justify-between">
+						<Link key={conn.user_id} to={`/profile/${conn.user_id}`} className="no-underline bg-white border border-[#e4e8f0] rounded-[12px] px-5 py-3.5 flex items-center justify-between hover:border-[#4f6ef7] transition">
 							<div className="flex items-center gap-3">
 								<div className="avatar relative overflow-hidden">
 									{conn?.profile_pic_url && (
 										<img
-											src={`http://localhost:3000/avatars/${conn.profile_pic_url}`}
+											src={`https://localhost/avatars/${conn.profile_pic_url}`}
 											className="absolute inset-0 w-full h-full object-cover rounded-full"
 											onError={(e) => e.currentTarget.remove()}
 										/>
@@ -66,7 +67,7 @@ export default function CandidateListRecruiters() {
 									</span>
 								</div>
 							</div>
-						</div>
+						</Link>
 					))
 				)}
 			</div>
