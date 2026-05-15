@@ -12,7 +12,7 @@ type Question = {
 };
 
 type Interview = {
-        unique_interview_id: number,
+    unique_interview_id: number,
     recruiter_id: number,
     candidate_id: number,
     question_id: number,
