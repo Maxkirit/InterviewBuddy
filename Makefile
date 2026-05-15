@@ -3,7 +3,7 @@ LOG_DIR := ./logs
 
 .PHONY: vault-up vault-reset app-up app-build reset-all
 
-all: vault-up app-up
+all: vault-up app-build
 
 re: reset-all vault-up app-build
 

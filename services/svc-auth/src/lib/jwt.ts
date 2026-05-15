@@ -4,7 +4,7 @@ import { prisma } from "./prisma.js";
 import { readFileSync } from 'fs';
 
 const PRIVATE_KEY = readFileSync('/secrets/jwt_private.pem', 'utf-8');
-const REFRESH_SECRET = "changewhenvaultisup";
+const REFRESH_SECRET = readFileSync("/secrets/refresh_secret").toString("utf8").trim();
 const REFRESH_MAX_AGE = 604800; //7 days in seconds === 604800
 
 // will take permissions and userId as a parameter
