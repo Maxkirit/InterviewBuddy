@@ -9,11 +9,18 @@ type ConnectionData = {
 	profile_pic_url: string;
 }
 
+type ConfirmState = {
+	open: boolean;
+	candidateId: number | null;
+}
+
 export default function RecruiterListCandidates() {
 	const authContext = useContext(AuthContext);
 	const [connections, setConnections] = useState<ConnectionData[]>([]);
 	const modalRef = useRef<HTMLDialogElement>(null);
+	const confirmRef = useRef<HTMLDialogElement>(null);
 	const [link, setlink] = useState<string>("");
+	const [confirm, setConfirm] = useState<ConfirmState>({ open: false, candidateId: null });
 
 	useEffect(() => {
 		async function getConnections() {
@@ -47,6 +54,25 @@ export default function RecruiterListCandidates() {
 		catch(e){
 			console.log("can't get share link");
 		}
+	}
+
+	async function handleDeleteConnection(candidateId: number) {
+		try {
+			await authContext?.axiosInstance.patch(
+				`/api/v1/user/connections/${authContext.userId}/${candidateId}`
+			);
+			setConnections((prev) => prev.filter((c) => c.user_id !== candidateId));
+		} catch (e) {
+			console.log("error deleting connection");
+		} finally {
+			setConfirm({ open: false, candidateId: null });
+			confirmRef.current?.close();
+		}
+	}
+
+	function openConfirm(candidateId: number) {
+		setConfirm({ open: true, candidateId });
+		confirmRef.current?.showModal();
 	}
 
 	function copyLink() {
@@ -94,12 +120,43 @@ export default function RecruiterListCandidates() {
 									</span>
 								</div>
 							</div>
-							
+							<button
+								className="px-4 py-[7px] rounded-lg bg-white text-[0.85rem] font-medium cursor-pointer whitespace-nowrap transition border border-[#ef4444] text-[#ef4444] hover:bg-[#ef4444] hover:text-white"
+								onClick={() => openConfirm(conn.user_id)}
+							>
+								Delete
+							</button>
 						</div>
 					))
 				)}
 			</div>
-			      <dialog ref={modalRef} className="rounded-xl p-0 w-[480px] shadow-xl backdrop:bg-black/50">
+				<dialog ref={confirmRef} className="rounded-xl p-0 w-[420px] shadow-xl backdrop:bg-black/50">
+			<div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-gray-100">
+				<h2 className="text-[1.1rem] font-bold text-[#1a1d2e]">Delete connection</h2>
+				<button
+					onClick={() => confirmRef.current?.close()}
+					className="w-[30px] h-[30px] rounded-lg border border-[#e4e8f0] bg-white text-[#9ca3af] text-xs cursor-pointer flex items-center justify-center hover:border-red-400 hover:text-red-400 transition"
+				>
+					✕
+				</button>
+			</div>
+			<div className="px-6 py-5">
+				<p className="text-sm text-gray-600">Are you sure you want to remove this candidate from your connections?</p>
+			</div>
+			<div className="flex justify-end gap-2.5 px-6 py-4 border-t border-gray-100">
+				<button className="btn-cancel" onClick={() => confirmRef.current?.close()}>
+					Cancel
+				</button>
+				<button
+					className="px-4 py-[7px] rounded-lg bg-white text-[0.85rem] font-medium cursor-pointer whitespace-nowrap transition border border-[#ef4444] text-[#ef4444] hover:bg-[#ef4444] hover:text-white"
+					onClick={() => confirm.candidateId !== null && handleDeleteConnection(confirm.candidateId)}
+				>
+					Delete
+				</button>
+			</div>
+		</dialog>
+
+	      <dialog ref={modalRef} className="rounded-xl p-0 w-[480px] shadow-xl backdrop:bg-black/50">
         {/* Header */}
         <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-gray-100">
           <h2 className="text-[1.1rem] font-bold text-[#1a1d2e]">Share invite link</h2>
