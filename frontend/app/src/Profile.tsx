@@ -155,7 +155,7 @@ export default function MyProfile() {
                             <div className="w-[100px] h-[100px] rounded-full bg-gradient-to-br from-[#4f6ef7] to-[#7c3aed] flex items-center justify-center text-white text-[2rem] font-bold overflow-hidden">
                                 {profilePic && (
                                     <img
-                                        src={`https://localhost/avatars/${profilePic}`}
+                                        src={`http://localhost:3000/avatars/${profilePic}`}
                                         className="absolute inset-0 w-full h-full object-cover rounded-full"
                                         onError={(e) => e.currentTarget.remove()}
                                     />

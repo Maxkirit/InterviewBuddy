@@ -56,7 +56,7 @@ export default function CandidateOfficialInterview() {
     const navigate = useNavigate();
     const [interviews, setInterviews] = useState<Interview[]>([]);
     const [recruiterMap, setRecruiterMap] = useState<Record<string, RecruiterData>>({});
-    const [gradeMap] = useState<Record<number, Grade>>({});
+    const [gradeMap, setGradeMap] = useState<Record<number, Grade>>({});
     const [selectedInterview, setSelectedInterview] = useState<Interview | null>(null);
     const ref = useRef<HTMLDialogElement>(null);
 
@@ -98,8 +98,31 @@ export default function CandidateOfficialInterview() {
         });
     }, [interviews]);
 
-    // TODO: fetch grade data for graded interviews and populate gradeMap
-    // useEffect(() => { ... }, [interviews]);
+    useEffect(() => {
+        const gradedInterviews = [...new Set(interviews.filter((i) => i.status === "graded").map((i) => i.id))];
+        gradedInterviews.forEach(async (interviewId) => {
+            if (gradeMap[interviewId] || !interviewId) return;
+            try {
+                const res = await authContext?.axiosInstance.get(`api/v1/grading/grading-report`, {
+                    params: {
+                        interview_id: interviewId,
+                    }
+                });
+                const splitted = res?.data.report.split('\n\n');
+                const grade: Grade = {
+                    req: parseInt(splitted[0]),
+                    archi: parseInt(splitted[1]),
+                    scale: parseInt(splitted[2]),
+                    res: parseInt(splitted[3]),
+                    note: splitted[4],
+                };
+                setGradeMap((prev) => ({ ...prev, [interviewId]: grade }));
+            } catch (error) {
+                // handle error
+                console.log(`in error path: ${error}`);
+            }
+        });
+    }, [interviews]);
 
     useEffect(() => {
         if (selectedInterview) ref.current?.showModal();
@@ -183,12 +206,6 @@ export default function CandidateOfficialInterview() {
                                         </div>
                                     ))}
                                 </div>
-                                <button
-                                    className="px-4 py-[7px] rounded-lg bg-white text-[0.85rem] font-medium cursor-pointer whitespace-nowrap transition border border-[#4f6ef7] text-[#4f6ef7] hover:bg-[#4f6ef7] hover:text-white"
-                                    onClick={() => navigate(`/candidate/report/${interview.id}`)}
-                                >
-                                    See report
-                                </button>
                             </div>
                         )}
                     </div>
@@ -208,7 +225,7 @@ export default function CandidateOfficialInterview() {
                     <div className="avatar relative overflow-hidden">
                         {recruiter?.profile_pic_url && (
                             <img
-                                src={`https://localhost/avatars/${recruiter.profile_pic_url}`}
+                                src={`http://localhost:3000/avatars/${recruiter.profile_pic_url}`}
                                 className="absolute inset-0 w-full h-full object-cover rounded-full"
                                 onError={(e) => e.currentTarget.remove()}
                             />
