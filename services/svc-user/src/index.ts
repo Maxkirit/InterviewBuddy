@@ -421,17 +421,17 @@ app.put('/user/:userId/avatar', async(req, res) => {
     if (!userId)
         return res.status(400).json({error: "invalid userId in request params"});
     if ((!req.body.permissions.includes("modifyOwnUser") && !req.body.permissions.includes("manageUserInfo")) ||
-            (req.body.permissions.includes("modifyOwnUser") && userId !== req.body.userId)) {
+            (req.body.permissions.includes("modifyOwnUser") && userId !== parseInt(req.body.userId))) {
                 return res.status(403).json({error: "Permissions denied on PUT /user/:userId/avatar"});
             }
     console.log("permissions validated");
 
     const filename = `${req.params.userId}_${randomBytes(16).toString('hex')}`;
-    // const filesystemLocation = `/var/www/avatars/${filename}`; //comment out and replace with filename in file below if you want it local
+    const filesystemLocation = `/var/www/avatars/${filename}`; //comment out and replace with filename in file below if you want it local
     console.log(filename);
     try {
         //this calls writes directly to filesystem
-        const file = await sharp(Buffer.from(req.body.imageContent, 'base64')).toFile(filename); //Buffer.from() interprets buffer as base64 encoding
+        const file = await sharp(Buffer.from(req.body.imageContent, 'base64')).toFile(filesystemLocation); //Buffer.from() interprets buffer as base64 encoding
     } catch (error) {
         return res.status(400).json({error: "Bad image sent"});
     }
@@ -497,7 +497,7 @@ app.get('/user/:userId/avatar', async(req, res) => {
             where: {user_id: targetId},
             select: {profile_pic_url: true},
         });
-        return res.status(200).json({data: url});
+        return res.status(200).json(url);
     } catch (error) {
         console.log("in error path\n");
         console.log(error);
