@@ -46,7 +46,7 @@ export default function Register() {
             };
             RegisterSchema.parse(input);
             const result = await axios.post(
-                "https://localhost/api/v1/auth/register",
+                "http://localhost:3000/api/v1/auth/register",
                 {
                     name: firstname,
                     surname: lastname,

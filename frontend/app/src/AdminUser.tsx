@@ -109,7 +109,7 @@ export default function AdminUsers(){
                             <div className="avatar relative overflow-hidden">
                                 {user?.profile_pic_url && (
                                     <img
-                                        src={`https://localhost/avatars/${user.profile_pic_url}`}
+                                        src={`http://localhost:3000/avatars/${user.profile_pic_url}`}
                                         className="absolute inset-0 w-full h-full object-cover rounded-full"
                                         onError={(e) => e.currentTarget.remove()}
                                     />

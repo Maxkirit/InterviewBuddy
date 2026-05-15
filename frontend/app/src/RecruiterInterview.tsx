@@ -9,6 +9,7 @@ export type Grade = {
     archi: number;
     scale: number;
     res: number;
+    note: string;
 };
 
 type Interview = {
@@ -54,7 +55,7 @@ export default function RecruiterInterviews() {
     const navigate = useNavigate();
     const [interviews, setInterviews] = useState<Interview[]>([]);
     const [candidateMap, setCandidateMap] = useState<Record<string, CandidateData>>({});
-    const [gradeMap] = useState<Record<number, Grade>>({});
+    const [gradeMap, setGradeMap] = useState<Record<number, Grade>>({});
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const [isSetupOpen, setIsSetupOpen] = useState(false);
     const [refreshKey, setRefreshKey] = useState(0);
@@ -98,8 +99,31 @@ export default function RecruiterInterviews() {
         });
     }, [interviews]);
 
-    // TODO: fetch grade data for graded interviews and populate gradeMap
-    // useEffect(() => { ... }, [interviews]);
+    useEffect(() => {
+        const gradedInterviews = [...new Set(interviews.filter((i) => i.status === "graded").map((i) => i.id))];
+        gradedInterviews.forEach(async (interviewId) => {
+            if (gradeMap[interviewId] || !interviewId) return;
+            try {
+                const res = await authContext?.axiosInstance.get(`api/v1/grading/grading-report`, {
+                    params: {
+                        interview_id: interviewId,
+                    }
+                });
+                const splitted = res?.data.report.split('\n\n');
+                const grade: Grade = {
+                    req: parseInt(splitted[0]),
+                    archi: parseInt(splitted[1]),
+                    scale: parseInt(splitted[2]),
+                    res: parseInt(splitted[3]),
+                    note: splitted[4],
+                };
+                setGradeMap((prev) => ({ ...prev, [interviewId]: grade }));
+            } catch (error) {
+                // handle error
+                console.log(`in error path: ${error}`);
+            }
+        });
+    }, [interviews]);
 
     useEffect(() => {
         if (isConfirmOpen) confirmRef.current?.showModal();
@@ -190,12 +214,12 @@ export default function RecruiterInterviews() {
                                         </div>
                                     ))}
                                 </div>
-                                <button
+                                {/* <button
                                     className="px-4 py-[7px] rounded-lg bg-white text-[0.85rem] font-medium cursor-pointer whitespace-nowrap transition border border-[#4f6ef7] text-[#4f6ef7] hover:bg-[#4f6ef7] hover:text-white"
                                     onClick={() => navigate(`/recruiter/report/${interview.id}`)}
                                 >
                                     See report
-                                </button>
+                                </button> */}
                             </div>
                         )}
                     </div>
@@ -215,7 +239,7 @@ export default function RecruiterInterviews() {
                     <div className="avatar relative overflow-hidden">
                         {candidate?.profile_pic_url && (
                             <img
-                                src={`https://localhost/avatars/${candidate.profile_pic_url}`}
+                                src={`http://localhost:3000/avatars/${candidate.profile_pic_url}`}
                                 className="absolute inset-0 w-full h-full object-cover rounded-full"
                                 onError={(e) => e.currentTarget.remove()}
                             />
