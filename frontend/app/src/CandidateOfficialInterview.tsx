@@ -201,14 +201,20 @@ export default function CandidateOfficialInterview() {
         const displayStatus = getDisplayStatus(interview);
         const recruiter = recruiterMap[interview.recruiterId];
         const name = recruiter ? `${recruiter.firstname} ${recruiter.lastname}` : "-";
-        const initials = recruiter
-            ? `${recruiter.firstname[0]}${recruiter.lastname[0]}`.toUpperCase()
-            : "??";
 
         return (
             <div key={interview.id} className="bg-white border border-[#e4e8f0] rounded-[14px] px-6 py-5 flex items-center gap-6">
                 <div className="flex items-center gap-3.5 flex-[0_0_240px]">
-                    <div className="avatar">{initials}</div>
+                    <div className="avatar relative overflow-hidden">
+                        {recruiter?.profile_pic_url && (
+                            <img
+                                src={`https://localhost/avatars/${recruiter.profile_pic_url}`}
+                                className="absolute inset-0 w-full h-full object-cover rounded-full"
+                                onError={(e) => e.currentTarget.remove()}
+                            />
+                        )}
+                        {recruiter ? `${recruiter.firstname[0]}${recruiter.lastname[0]}` : "??"}
+                    </div>
                     <div className="flex flex-col gap-0.5">
                         <div className="text-[0.95rem] font-semibold text-[#1a1d2e]">{name}</div>
                         <div className="text-[0.8rem] text-gray-500">

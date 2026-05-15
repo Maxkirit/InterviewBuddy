@@ -55,7 +55,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     const axiosInstance = axios.create({
-        baseURL: "http://localhost:3000",
+        baseURL: "https://localhost",
         withCredentials: true,
     });
 
@@ -150,7 +150,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
         async function restoreSession() {
             try {
                 const result = await axios.post(
-                    "http://localhost:3000/api/v1/auth/refresh",
+                    "https://localhost/api/v1/auth/refresh",
                     null,
                     { withCredentials: true, signal: controller.signal },
                 );

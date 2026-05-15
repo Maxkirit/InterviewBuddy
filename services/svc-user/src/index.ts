@@ -417,7 +417,7 @@ app.put('/user/:userId/avatar', async(req, res) => {
     if (!userId)
         return res.status(400).json({error: "invalid userId in request params"});
     if ((!req.body.permissions.includes("modifyOwnUser") && !req.body.permissions.includes("manageUserInfo")) ||
-            (req.body.permissions.includes("modifyOwnUser") && userId !== req.body.userId)) {
+            (req.body.permissions.includes("modifyOwnUser") && userId !== parseInt(req.body.userId))) {
                 return res.status(403).json({error: "Permissions denied on PUT /user/:userId/avatar"});
             }
     console.log("permissions validated");

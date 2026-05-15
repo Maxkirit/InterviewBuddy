@@ -6,7 +6,7 @@ type ConnectionData = {
 	firstname: string;
 	lastname: string;
 	organization: string;
-	profile_pic_url: string | null;
+	profile_pic_url: string;
 }
 
 export default function RecruiterListCandidates() {
@@ -59,8 +59,15 @@ export default function RecruiterListCandidates() {
 										{conn.firstname[0]}{conn.lastname[0]}
 									</div>
 								)} */}
-								<div className="avatar">
-									{conn.firstname[0]}{conn.lastname[0]}
+								<div className="avatar relative overflow-hidden">
+									{conn?.profile_pic_url && (
+										<img
+											src={`https://localhost/avatars/${conn.profile_pic_url}`}
+											className="absolute inset-0 w-full h-full object-cover rounded-full"
+											onError={(e) => e.currentTarget.remove()}
+										/>
+									)}
+									{conn ? `${conn.firstname[0]}${conn.lastname[0]}` : "??"}
 								</div>
 								<div className="flex flex-col gap-0.5">
 									<span className="text-[0.975rem] font-semibold text-[#1a1d2e]">

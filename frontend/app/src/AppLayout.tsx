@@ -70,7 +70,7 @@ export default function AppLayout() {
                         <Link to="/profile" className="avatar no-underline relative overflow-hidden">
                             {url && (
                                 <img
-                                    src={`http://localhost:3000/avatars/${url}`}
+                                    src={`https://localhost/avatars/${url}`}
                                     className="absolute inset-0 w-full h-full object-cover rounded-full"
                                     onError={(e) => e.currentTarget.remove()}
                                 />
@@ -111,7 +111,7 @@ export default function AppLayout() {
                         <Link to="/profile" className="avatar no-underline relative overflow-hidden">
                             {url && (
                                 <img
-                                    src={`http://localhost:3000/avatars/${url}`}
+                                    src={`https://localhost/avatars/${url}`}
                                     className="absolute inset-0 w-full h-full object-cover rounded-full"
                                     onError={(e) => e.currentTarget.remove()}
                                 />
@@ -152,7 +152,7 @@ export default function AppLayout() {
                         <Link to="/profile" className="avatar no-underline relative overflow-hidden">
                             {url && (
                                 <img
-                                    src={`http://localhost:3000/avatars/${url}`}
+                                    src={`https://localhost/avatars/${url}`}
                                     className="absolute inset-0 w-full h-full object-cover rounded-full"
                                     onError={(e) => e.currentTarget.remove()}
                                 />

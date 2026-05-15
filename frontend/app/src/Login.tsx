@@ -54,7 +54,7 @@ export default function Login() {
             };
             LoginSchema.parse(input);
             const result = await axios.post(
-                "http://localhost:3000/api/v1/auth/login",
+                "https://localhost/api/v1/auth/login",
                 {
                     email: email,
                     password: password,
