@@ -21,8 +21,17 @@ export const addConnection =  async (req: Request, res: Response) =>
 		if (invite.expiry_date < new Date() )
 			return res.status(410).json({error : "link has expired"});
 		try {
-		await prisma.connections.create({
-			data: {
+		await prisma.connections.upsert({
+			where:{
+				recruiter_id_candidate_id : {
+					recruiter_id: invite.recruiter_id,
+					candidate_id: userId,
+				}
+			},
+			update:{
+				is_active : true
+			},
+			create: {
 				recruiter_id: invite.recruiter_id,
 				candidate_id: userId,
 				status: 'accepted',
@@ -31,7 +40,7 @@ export const addConnection =  async (req: Request, res: Response) =>
 		});
 			return res.status(201).json({message: "Connection successful"});
 		} catch {
-			return res.status(400).json({error: "connection already exists"});
+			return res.status(500).json({error: "internal serveur error"});
 		}
 	}
 	catch(e){

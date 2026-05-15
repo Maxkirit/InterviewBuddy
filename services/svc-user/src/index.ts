@@ -11,6 +11,7 @@ import { addConnection } from "./connections/addConnection.js";
 import { read } from "node:fs";
 import { create } from "node:domain";
 import dotenv from 'dotenv'
+import { DeleteConnection } from "./connections/deleteConnection.js";
 
 dotenv.config();
 
@@ -414,6 +415,7 @@ app.get(
 );
 
 app.post("/user/:user_id/connections/:link_id", addConnection);
+app.patch("/user/connections/:user_id/:connectionId", DeleteConnection)
 
 app.put('/user/:userId/avatar', async(req, res) => {
     //check perm for admin and self

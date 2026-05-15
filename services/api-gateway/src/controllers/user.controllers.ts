@@ -254,3 +254,24 @@ export const getLink = async(req:Request, res: Response) =>{
 		return res.status(502).json({error: "bad gateway"});
 	}
 };
+
+export const deleteConnection = async(req: Request, res: Response) =>{
+	const { user_id, connectionId } = req.params;
+	try{
+		const response = await axios.patch(`http://svc-user:3000/user/connections/${user_id}/${connectionId}`, {
+			    userId: (req as ReqWithUser).userId,
+                permissions: (req as ReqWithUser).permissions,
+				role: (req as ReqWithUser).role,
+		})
+		console.log("delete in api gatway ok");
+		return res.status(200).json(response);
+	}
+	catch(error){
+		if (axios.isAxiosError<ApiError>(error) && error.response?.status)
+            return res
+                .status(error.response.status)
+                .json({ error: error.response.data?.error ?? error.message });
+        return res.status(502).json({ error: "Bad gateway (api gateway)" });
+	}
+
+};

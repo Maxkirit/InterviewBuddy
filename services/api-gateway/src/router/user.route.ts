@@ -7,7 +7,8 @@ import {
     getAvatarURL,
     uploadAvatar,
     getUserPublic,
-	getLink
+	getLink,
+	deleteConnection
 } from "../controllers/user.controllers.js";
 
 const router = Router();
@@ -24,5 +25,6 @@ router.post(
 router.get("/link/generate", getLink);
 router.get("/avatar/:userId", getAvatarURL);
 router.post("/:user_id/connections/:link_id", addConnection);
+router.patch("/connections/:user_id/:connectionId", deleteConnection);
 
 export default router;
