@@ -95,7 +95,11 @@ export default function CandidateListRecruiters() {
 							</div>
 							<button
 								className="px-4 py-[7px] rounded-lg bg-white text-[0.85rem] font-medium cursor-pointer whitespace-nowrap transition border border-[#ef4444] text-[#ef4444] hover:bg-[#ef4444] hover:text-white"
-								onClick={() => openConfirm(conn.user_id)}
+								onClick={(e) => {
+									e.preventDefault();
+									e.stopPropagation();
+									openConfirm(conn.user_id)}
+								}
 							>
 								Delete
 							</button>
