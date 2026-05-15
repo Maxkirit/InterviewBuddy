@@ -15,6 +15,7 @@ import CandidateListRecruiters from "./CandidateListConnections"
 import RecruiterListCandidates from "./RecruiterListConnections"
 import InviteLink from "./invite";
 import GradingPage from "./GradingPage";
+import ViewProfile from "./ViewProfile";
 
 
 export default function Router() {
@@ -34,7 +35,7 @@ export default function Router() {
     						<Route
                             	path="/candidate/recruiters"
                             	element={<CandidateListRecruiters />}/>
-                    </Route>
+                        </Route>
                         <Route path="/recruiter" element={<RecruiterView />}>
                             <Route 
 								path="/recruiter/interviews" 
@@ -50,6 +51,7 @@ export default function Router() {
                             <Route path="/admin/users" element={<AdminUsers />} />
                         </Route>
                         <Route path="/profile" element={<MyProfile />} />
+                        <Route path="/profile/:user_id" element={<ViewProfile />} />
                     </Route>
                     <Route path="/candidate/interview/:interview_id" element={<Interview />} />
                 </Route>
