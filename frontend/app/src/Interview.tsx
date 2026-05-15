@@ -50,9 +50,9 @@ export default function Interview() {
     async function handleSubmit(event: SubmitEvent) {
         event.preventDefault();
         try {
-            const parsed = AnswerSchema.safeParse({reasoning});
+            const parsed = AnswerSchema.parse({reasoning});
             await authContext?.axiosInstance.patch(`/api/v1/interview/${interview_id}/submit`, {
-                reasoning: parsed.data?.reasoning,
+                reasoning: parsed.reasoning,
             });
             navigate('/candidate/official-interviews', {replace: true});
         } catch (error) {

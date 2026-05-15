@@ -1,6 +1,7 @@
 import { useEffect, useState, useContext, type SubmitEvent } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { AuthContext } from "./AuthProvider";
+import z from "zod";
 
 type Question = {
     question_id: number,
@@ -35,6 +36,10 @@ type CandidateData = {
     bio: string;
     linkedin_link: string;
 };
+
+const ReportSchema = z.object({
+    report: z.string().min(1),
+});
 
 function sliderColor(v: number): string {
     if (v === 0) return "#b0b7c3";
@@ -125,7 +130,13 @@ export default function GradingPage() {
     async function handleSubmit(event: SubmitEvent) {
         event.preventDefault();
         try {
-
+            const report  = `${reqScore}\n\n${archiScore}\n\n${scaleScore}\n\n${resScore}\n\n${note}`;
+            const parsed = ReportSchema.parse({report: report});
+            await authContext?.axiosInstance.post(`api/v1/grading/grading-report`, {
+                unique_interview_id: interview?.unique_interview_id,
+                report: parsed.report,
+            });
+            navigate("/recruiter/interviews");
         } catch (error) {
             // error banner
             console.log(`in error path: ${error}`);

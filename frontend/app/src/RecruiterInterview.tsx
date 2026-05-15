@@ -9,6 +9,7 @@ export type Grade = {
     archi: number;
     scale: number;
     res: number;
+    note: string;
 };
 
 type Interview = {
@@ -54,7 +55,7 @@ export default function RecruiterInterviews() {
     const navigate = useNavigate();
     const [interviews, setInterviews] = useState<Interview[]>([]);
     const [candidateMap, setCandidateMap] = useState<Record<string, CandidateData>>({});
-    const [gradeMap] = useState<Record<number, Grade>>({});
+    const [gradeMap, setGradeMap] = useState<Record<number, Grade>>({});
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const [isSetupOpen, setIsSetupOpen] = useState(false);
     const [refreshKey, setRefreshKey] = useState(0);
@@ -98,8 +99,31 @@ export default function RecruiterInterviews() {
         });
     }, [interviews]);
 
-    // TODO: fetch grade data for graded interviews and populate gradeMap
-    // useEffect(() => { ... }, [interviews]);
+    useEffect(() => {
+        const gradedInterviews = [...new Set(interviews.filter((i) => i.status === "graded").map((i) => i.id))];
+        gradedInterviews.forEach(async (interviewId) => {
+            if (gradeMap[interviewId] || !interviewId) return;
+            try {
+                const res = await authContext?.axiosInstance.get(`api/v1/grading/grading-report`, {
+                    params: {
+                        interview_id: interviewId,
+                    }
+                });
+                const splitted = res?.data.report.split('\n\n');
+                const grade: Grade = {
+                    req: parseInt(splitted[0]),
+                    archi: parseInt(splitted[1]),
+                    scale: parseInt(splitted[2]),
+                    res: parseInt(splitted[3]),
+                    note: splitted[4],
+                };
+                setGradeMap((prev) => ({ ...prev, [interviewId]: grade }));
+            } catch (error) {
+                // handle error
+                console.log(`in error path: ${error}`);
+            }
+        });
+    }, [interviews]);
 
     useEffect(() => {
         if (isConfirmOpen) confirmRef.current?.showModal();
@@ -190,12 +214,12 @@ export default function RecruiterInterviews() {
                                         </div>
                                     ))}
                                 </div>
-                                <button
+                                {/* <button
                                     className="px-4 py-[7px] rounded-lg bg-white text-[0.85rem] font-medium cursor-pointer whitespace-nowrap transition border border-[#4f6ef7] text-[#4f6ef7] hover:bg-[#4f6ef7] hover:text-white"
                                     onClick={() => navigate(`/recruiter/report/${interview.id}`)}
                                 >
                                     See report
-                                </button>
+                                </button> */}
                             </div>
                         )}
                     </div>
@@ -208,14 +232,20 @@ export default function RecruiterInterviews() {
         const displayStatus = getDisplayStatus(interview);
         const candidate = candidateMap[interview.candidateId];
         const name = candidate ? `${candidate.firstname} ${candidate.lastname}` : "-";
-        const initials = candidate
-            ? `${candidate.firstname[0]}${candidate.lastname[0]}`.toUpperCase()
-            : "??";
 
         return (
             <div key={interview.id} className="bg-white border border-[#e4e8f0] rounded-[14px] px-6 py-5 flex items-center gap-6">
                 <div className="flex items-center gap-3.5 flex-[0_0_240px]">
-                    <div className="avatar">{initials}</div>
+                    <div className="avatar relative overflow-hidden">
+                        {candidate?.profile_pic_url && (
+                            <img
+                                src={`http://localhost:3000/avatars/${candidate.profile_pic_url}`}
+                                className="absolute inset-0 w-full h-full object-cover rounded-full"
+                                onError={(e) => e.currentTarget.remove()}
+                            />
+                        )}
+                        {candidate ? `${candidate.firstname[0]}${candidate.lastname[0]}` : "??"}
+                    </div>
                     <div className="flex flex-col gap-0.5">
                         <div className="text-[0.95rem] font-semibold text-[#1a1d2e]">{name}</div>
                         <div className="text-[0.8rem] text-gray-500">{interview.jobTitle}</div>

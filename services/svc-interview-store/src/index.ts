@@ -29,6 +29,7 @@ const RealInterviewSchema = z.object({
     question_id: z.int().min(1),
     job_title: z.string(),
     due_date: z.date(),
+    status: z.literal(["scheduled", "past_due_date", "completed", "graded"]),
 });
 
 app.set("query parser", "extended");
@@ -73,6 +74,7 @@ app.post("/interview/real-interview", async (req, res) => {
             question_id: parseInt(req.body.body.question_id),
             job_title: req.body.body.job_title ? req.body.body.job_title : null,
             due_date: req.body.body.due_date ? new Date(req.body.body.due_date) : null,
+            status: "scheduled",
         });
         console.log("input parsed");
         if (
@@ -199,6 +201,7 @@ app.get("/interview/question/:question_id", async (req, res) => {
 
 app.get("/interview/:interview_id", async (req, res) => {
     try {
+        console.log(req.params);
         const { interview_id } = req.params;
         const userId = parseInt(req.query.token_id as string);
         const tmp = req.query.permissions ?? {};
@@ -218,6 +221,7 @@ app.get("/interview/:interview_id", async (req, res) => {
         }
         res.status(200).json(interview);
     } catch (error) {
+        console.log(`in error path: ${error}`);
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
             return res
                 .status(400)
@@ -281,6 +285,48 @@ app.patch("/interview/:interview_id/submit", async (req, res) => {
                 status: "completed",
                 unfinished_text: req.body.body.reasoning,
             }
+        });
+        res.status(200).json(updated);
+    } catch (error) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            return res
+                .status(400)
+                .json({ error: "Error submitting interview", code: error.code });
+        }
+        return res.status(500).json({ error: "internal error" });
+    }
+});
+
+app.patch("/interview/:interview_id", async (req, res) => {
+    try {
+        const { interview_id } = req.params;
+        const userId = parseInt(req.body.userId);
+        const permissions = req.body.permissions;
+        if (!permissions.includes("updateInterview")) {
+            return res.status(403).json({ error: "does not have the required permissions" });
+        }
+        const interview = await prisma.interviews.findUniqueOrThrow({
+            where: {
+                unique_interview_id: parseInt(interview_id),
+            },
+        });
+        if (interview.recruiter_id !== userId) {
+            return res.status(403).json({ error: "forbidden" });
+        }
+        const input = {
+            recruiter_id: req.body.body.recruiter_id ?? interview.recruiter_id,
+            candidate_id: req.body.body.candidate_id ?? interview.candidate_id,
+            question_id: req.body.body.question_id ?? interview.question_id,
+            job_title: req.body.body.job_title ?? interview.job_title,
+            due_date: req.body.body.due_date ?? interview.due_date,
+            status: req.body.body.status ?? interview.status,
+        };
+        const parsed = RealInterviewSchema.parse(input);
+        const updated = await prisma.interviews.update({
+            where: {
+                unique_interview_id: parseInt(interview_id),
+            },
+            data: parsed,
         });
         res.status(200).json(updated);
     } catch (error) {

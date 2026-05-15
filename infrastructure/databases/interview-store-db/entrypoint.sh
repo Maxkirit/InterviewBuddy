@@ -2,6 +2,19 @@
 
 set -e
 
+for file in \
+  /run/secrets/interview_store_db_superuser_password \
+  /run/secrets/interview_store_db_admin_password \
+  /run/secrets/interview_store_db_app_password
+do
+  if [ ! -r "$file" ]; then
+    echo "[interview-store-db] ERROR: missing or unreadable secret file: $file"
+    exit 1
+  fi
+  echo "[interview-store-db] Found $file"
+done
+echo "[interview-store-db] Found all secrets. Starting init..."
+
 until pg_isready -U postgres; do
   echo "Waiting for PostgreSQL to start"
   sleep 1

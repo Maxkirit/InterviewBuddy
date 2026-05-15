@@ -19,7 +19,7 @@ router.get("/:user_id/public", getUserPublic);
 router.patch("/profile/:user_id", updateUserInfo);
 router.post(
     "/avatar/:userId",
-    express.raw({ type: ["image/jpeg", "image/png"] }),
+    express.raw({ type: ["image/jpeg", "image/png"], limit: "5mb" }),
     uploadAvatar,
 ); //allows single file uploaded, called avatar
 router.get("/link/generate", getLink);

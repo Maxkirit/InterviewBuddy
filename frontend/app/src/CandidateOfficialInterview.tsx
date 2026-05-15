@@ -56,7 +56,7 @@ export default function CandidateOfficialInterview() {
     const navigate = useNavigate();
     const [interviews, setInterviews] = useState<Interview[]>([]);
     const [recruiterMap, setRecruiterMap] = useState<Record<string, RecruiterData>>({});
-    const [gradeMap] = useState<Record<number, Grade>>({});
+    const [gradeMap, setGradeMap] = useState<Record<number, Grade>>({});
     const [selectedInterview, setSelectedInterview] = useState<Interview | null>(null);
     const ref = useRef<HTMLDialogElement>(null);
 
@@ -98,8 +98,31 @@ export default function CandidateOfficialInterview() {
         });
     }, [interviews]);
 
-    // TODO: fetch grade data for graded interviews and populate gradeMap
-    // useEffect(() => { ... }, [interviews]);
+    useEffect(() => {
+        const gradedInterviews = [...new Set(interviews.filter((i) => i.status === "graded").map((i) => i.id))];
+        gradedInterviews.forEach(async (interviewId) => {
+            if (gradeMap[interviewId] || !interviewId) return;
+            try {
+                const res = await authContext?.axiosInstance.get(`api/v1/grading/grading-report`, {
+                    params: {
+                        interview_id: interviewId,
+                    }
+                });
+                const splitted = res?.data.report.split('\n\n');
+                const grade: Grade = {
+                    req: parseInt(splitted[0]),
+                    archi: parseInt(splitted[1]),
+                    scale: parseInt(splitted[2]),
+                    res: parseInt(splitted[3]),
+                    note: splitted[4],
+                };
+                setGradeMap((prev) => ({ ...prev, [interviewId]: grade }));
+            } catch (error) {
+                // handle error
+                console.log(`in error path: ${error}`);
+            }
+        });
+    }, [interviews]);
 
     useEffect(() => {
         if (selectedInterview) ref.current?.showModal();
@@ -183,12 +206,6 @@ export default function CandidateOfficialInterview() {
                                         </div>
                                     ))}
                                 </div>
-                                <button
-                                    className="px-4 py-[7px] rounded-lg bg-white text-[0.85rem] font-medium cursor-pointer whitespace-nowrap transition border border-[#4f6ef7] text-[#4f6ef7] hover:bg-[#4f6ef7] hover:text-white"
-                                    onClick={() => navigate(`/candidate/report/${interview.id}`)}
-                                >
-                                    See report
-                                </button>
                             </div>
                         )}
                     </div>
@@ -201,14 +218,20 @@ export default function CandidateOfficialInterview() {
         const displayStatus = getDisplayStatus(interview);
         const recruiter = recruiterMap[interview.recruiterId];
         const name = recruiter ? `${recruiter.firstname} ${recruiter.lastname}` : "-";
-        const initials = recruiter
-            ? `${recruiter.firstname[0]}${recruiter.lastname[0]}`.toUpperCase()
-            : "??";
 
         return (
             <div key={interview.id} className="bg-white border border-[#e4e8f0] rounded-[14px] px-6 py-5 flex items-center gap-6">
                 <div className="flex items-center gap-3.5 flex-[0_0_240px]">
-                    <div className="avatar">{initials}</div>
+                    <div className="avatar relative overflow-hidden">
+                        {recruiter?.profile_pic_url && (
+                            <img
+                                src={`http://localhost:3000/avatars/${recruiter.profile_pic_url}`}
+                                className="absolute inset-0 w-full h-full object-cover rounded-full"
+                                onError={(e) => e.currentTarget.remove()}
+                            />
+                        )}
+                        {recruiter ? `${recruiter.firstname[0]}${recruiter.lastname[0]}` : "??"}
+                    </div>
                     <div className="flex flex-col gap-0.5">
                         <div className="text-[0.95rem] font-semibold text-[#1a1d2e]">{name}</div>
                         <div className="text-[0.8rem] text-gray-500">

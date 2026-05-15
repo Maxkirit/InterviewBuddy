@@ -47,20 +47,15 @@ export default function CandidateListRecruiters() {
 					connections.map((conn) => (
 						<div key={conn.user_id} className="bg-white border border-[#e4e8f0] rounded-[12px] px-5 py-3.5 flex items-center justify-between">
 							<div className="flex items-center gap-3">
-								{/* checks for picture url, if none, puts letters as avatar */}
-								{/* {conn.profile_pic_url ? (
-									<img
-										src={conn.profile_pic_url}
-										alt={`${conn.firstname} ${conn.lastname}`}
-										className="avatar"
-									/>
-								) : (
-									<div className="avatar">
-										{conn.firstname[0]}{conn.lastname[0]}
-									</div>
-								)} */}
-								<div className="avatar">
-									{conn.firstname[0]}{conn.lastname[0]}
+								<div className="avatar relative overflow-hidden">
+									{conn?.profile_pic_url && (
+										<img
+											src={`http://localhost:3000/avatars/${conn.profile_pic_url}`}
+											className="absolute inset-0 w-full h-full object-cover rounded-full"
+											onError={(e) => e.currentTarget.remove()}
+										/>
+									)}
+									{conn ? `${conn.firstname[0]}${conn.lastname[0]}` : "??"}
 								</div>
 								<div className="flex flex-col gap-0.5">
 									<span className="text-[0.975rem] font-semibold text-[#1a1d2e]">

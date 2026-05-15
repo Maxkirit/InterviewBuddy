@@ -5,11 +5,11 @@ LOG_DIR := ./logs
 
 all: vault-up app-up
 
-re: reset-all all
+re: reset-all vault-up app-build
 
 
 # ---------------------------
-# VAULT STACK (profile=vault)
+# VAULT STACK (profile=vault)ker 
 # ---------------------------
 
 # Bring up the Vault stack in the correct order (certgen -> vault -> bootstrap -> seed),
