@@ -116,7 +116,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
                 try {
                     const { data } = await axios.post(
-                        "/api/v1/auth/refresh",
+                        "http://localhost:3000/api/v1/auth/refresh",
                         null,
                         { withCredentials: true },
                     );
