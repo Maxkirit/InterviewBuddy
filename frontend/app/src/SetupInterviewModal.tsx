@@ -6,6 +6,7 @@ import {
     type SubmitEvent,
 } from "react";
 import { AuthContext } from "./AuthProvider";
+import { ZodError } from "zod";
 import z from "zod";
 
 type Connection = {
@@ -54,6 +55,8 @@ export default function SetupInterviewModal({
     const [candidate, setCandidate] = useState<number>(0);
     const [question, setQuestion] = useState<number>(0);
     const [dueDate, setDueDate] = useState<string>("");
+    const [modalError, setModalError] = useState<string | null>(null);
+    const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
     useEffect(() => {
         async function getConnections() {
@@ -63,8 +66,7 @@ export default function SetupInterviewModal({
                 );
                 setConnections(res?.data.connections);
             } catch (error) {
-                // error banner
-                console.log(`in error path: ${error}`);
+                setModalError("Failed to load candidates. Please close and try again.");
             }
         }
 
@@ -80,8 +82,7 @@ export default function SetupInterviewModal({
                 );
                 setQuestionList(res?.data);
             } catch (error) {
-                // error banner
-                console.log(`in error path: ${error}`);
+                setModalError("Failed to load questions. Please close and try again.");
             }
         }
 
@@ -105,6 +106,8 @@ export default function SetupInterviewModal({
 
     async function handleSubmit(event: SubmitEvent) {
         event.preventDefault();
+        setModalError(null);
+        setFieldErrors({});
         try {
             const input = {
                 recruiter_id: authContext?.userId,
@@ -125,9 +128,15 @@ export default function SetupInterviewModal({
             setRefreshKey(refreshKey + 1);
             setIsOpen(false);
         } catch (error) {
-            console.log("in error path");
-            console.log(error);
-            // display error banner
+            if (error instanceof ZodError) {
+                const errs: Record<string, string> = {};
+                error.issues.forEach((issue) => {
+                    if (issue.path[0]) errs[issue.path[0] as string] = issue.message;
+                });
+                setFieldErrors(errs);
+            } else {
+                setModalError("Failed to schedule interview. Please try again.");
+            }
         }
     }
 
@@ -171,13 +180,14 @@ export default function SetupInterviewModal({
                                 Position
                             </label>
                             <input
-                                className="form-input"
+                                className={`form-input ${fieldErrors.job_title ? "border-[#ef4444] focus:border-[#ef4444]" : ""}`}
                                 type="text"
                                 id="modal-position"
                                 placeholder="e.g. Backend Engineer"
                                 value={position}
                                 onChange={(e) => setPosition(e.target.value)}
                             />
+                            {fieldErrors.job_title && <span className="text-xs text-[#ef4444] mt-0.5">{fieldErrors.job_title}</span>}
                         </div>
                         <div className="form-field">
                             <label
@@ -200,6 +210,7 @@ export default function SetupInterviewModal({
                                 </option>
                                 {connections.map(renderCandidateOptions)}
                             </select>
+                            {fieldErrors.candidate_id && <span className="text-xs text-[#ef4444] mt-0.5">{fieldErrors.candidate_id}</span>}
                         </div>
                         <div className="form-field">
                             <label
@@ -222,6 +233,7 @@ export default function SetupInterviewModal({
                                 </option>
                                 {questionList.map(renderQuestionOptions)}
                             </select>
+                            {fieldErrors.question_id && <span className="text-xs text-[#ef4444] mt-0.5">{fieldErrors.question_id}</span>}
                         </div>
                         <div className="form-field">
                             <label
@@ -237,8 +249,10 @@ export default function SetupInterviewModal({
                                 value={dueDate}
                                 onChange={(e) => setDueDate(e.target.value)}
                             />
+                            {fieldErrors.due_date && <span className="text-xs text-[#ef4444] mt-0.5">{fieldErrors.due_date}</span>}
                         </div>
                     </div>
+                    {modalError && <p className="text-xs text-[#ef4444] mt-4">{modalError}</p>}
                     <div className="flex justify-end gap-2.5 mt-6">
                         <button
                             type="button"

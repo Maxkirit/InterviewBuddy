@@ -1,6 +1,8 @@
 import { useEffect, useState, useContext, type SubmitEvent, useRef } from "react";
 import { AuthContext } from "./AuthProvider";
+import { ZodError } from "zod";
 import z from "zod";
+import ErrorBanner from "./ErrorBanner";
 
 export const ProfileSchema = z.object({
     firstname: z.string().min(1),
@@ -45,6 +47,9 @@ export default function MyProfile() {
     const [isOpen, setIsOpen] = useState(false);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
+    const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+    const [picError, setPicError] = useState<string | null>(null);
     const ref = useRef<HTMLDialogElement>(null);
     
 
@@ -68,8 +73,8 @@ export default function MyProfile() {
                 setDob(userInfo?.data.date_of_birth ?? "");
                 setProfilePic(userInfo?.data.profile_pic_url ?? "");
             } catch (error) {
-                // display error banner
                 console.log(`in error path: ${error}`);
+                setError("Failed to load profile information. Please try again.");
             }
         }
 
@@ -81,12 +86,13 @@ export default function MyProfile() {
             await authContext?.axiosInstance.get('/api/v1/auth/logout/everywhere');
             authContext?.logout();
         } catch (error) {
-            console.log(`in error path: ${error}`);
+            setError("Failed to logout everywhere. Please try again.");
         }
     }
 
     async function handleSubmit(event: SubmitEvent) {
         event.preventDefault();
+        setFieldErrors({});
         try {
             const input = {
                 firstname: firstname ?? "",
@@ -106,9 +112,15 @@ export default function MyProfile() {
                 input,
             );
         } catch (error) {
-            console.log("in error path");
-            console.log(error);
-            // display error banner
+            if (error instanceof ZodError) {
+                const errs: Record<string, string> = {};
+                error.issues.forEach((issue) => {
+                    if (issue.path[0]) errs[issue.path[0] as string] = issue.message;
+                });
+                setFieldErrors(errs);
+            } else {
+                setError("Failed to save profile. Please try again.");
+            }
         }
     }
 
@@ -128,6 +140,7 @@ export default function MyProfile() {
         setIsOpen(false);
         setSelectedFile(null);
         setPreviewUrl(null);
+        setPicError(null);
     }
 
     function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -149,13 +162,13 @@ export default function MyProfile() {
             setProfilePic(res?.data.profile_pic_url ?? "");
             closeDialog();
         } catch (error) {
-            console.log(`in error path ${error}`);
-            // error banner
+            setPicError("Failed to upload photo. Please try again.");
         }
     }
 
     return (
         <>
+            {error && <ErrorBanner message={error} onDismiss={() => setError(null)} />}
             <div className="max-w-[720px] mx-auto py-10 px-6">
                 <div className="grid grid-cols-[220px_1fr] gap-10 items-start">
                     {/* Left column */}
@@ -313,13 +326,14 @@ export default function MyProfile() {
                                     LinkedIn
                                 </label>
                                 <input
-                                    className="form-input"
+                                    className={`form-input ${fieldErrors.linkedin_link ? "border-[#ef4444] focus:border-[#ef4444]" : ""}`}
                                     type="url"
                                     id="socials"
                                     placeholder="https://linkedin.com/in/yourname"
                                     value={linkedin}
                                     onChange={(e) => setLinkedin(e.target.value)}
                                 />
+                                {fieldErrors.linkedin_link && <span className="text-xs text-[#ef4444] mt-0.5">{fieldErrors.linkedin_link}</span>}
                             </div>
                             <div className="flex justify-between items-center mt-1">
                                 <button
@@ -372,6 +386,7 @@ export default function MyProfile() {
                                 />
                             </label>
                             <p className="text-[0.775rem] text-[#b0b7c3]">JPEG or PNG · max 5 MB</p>
+                            {picError && <p className="text-xs text-[#ef4444]">{picError}</p>}
                         </div>
                         <div className="flex justify-end gap-2.5">
                             <button type="button" className="btn-cancel" onClick={closeDialog}>Cancel</button>
