@@ -255,6 +255,20 @@ export const getLink = async(req:Request, res: Response) =>{
 	}
 };
 
+export const heartbeat = async(req:Request, res: Response) =>{
+    try {
+        await axios.patch(`http://svc-user:3000/user/${(req as ReqWithUser).userId}/heartbeat`);
+        res.status(201).json({message: "heartbeat recorded"});
+    } catch (error) {
+        if (error instanceof AxiosError && error.response?.status) {
+            return res
+                .status(error.response.status)
+                .json({ error: error.response.data?.error ?? error.message });
+        }
+        return res.status(502).json({ error: "Bad gateway" });
+    }
+};
+
 export const deleteConnection = async(req: Request, res: Response) =>{
 	const { user_id, connectionId } = req.params;
 	try{
@@ -271,4 +285,4 @@ export const deleteConnection = async(req: Request, res: Response) =>{
 		return res.status(502).json({error: "bad gateway"})
 	}
 
-}
+};
