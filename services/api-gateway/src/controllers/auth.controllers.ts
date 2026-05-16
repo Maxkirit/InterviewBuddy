@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import axios from 'axios';
 import { z } from 'zod';
 import { ApiError } from '../index.js';
+import { ReqWithUser } from '../validateToken.js';
+import { permission } from 'node:process';
 
 const LoginSchema = z.object({
   email: z.email(),
@@ -116,17 +118,93 @@ export const registrationFlow = async (req: Request, res: Response) => {
     }
 }
 
-export const intializeExternalAuth= async (req: Request, res: Response) => {
+export const intializeExternalAuth = async (req: Request, res: Response) => {
     try {
-        const response = await axios.get('http://svc-auth/auth/google/init');
-        const body = {
-            message: "Redirect link for Google 3rd party auth",
-            link: response.data.link,
-        };
-        return res.status(302).json(body);
+        console.log("in intializeExternalAuth\n");
+        const response = await axios.get('http://svc-auth:3000/auth/google/init');
+        return res.status(302).setHeader("Location", response.data.link).json({message: "Redirect link for Google 3rd party auth"});
     } catch (error) {
+        console.log("in intializeExternalAuth error path\n");
         if (axios.isAxiosError<ApiError>(error) && error.response?.status)
             return res.status(error.response.status).json({error: error.response.data?.error ?? error.message});
         return res.status(502).json({error: "Bad gateway (svc-auth)"});
     }    
+}
+
+//
+export const validateExternalAuth = async (req: Request, res: Response) => {
+    try{
+        console.log("in validateExternalAuth\n");
+        const { code, state } = req.query;
+        console.log(`code: ${code}, state: ${state}`);
+        const response = await axios.post('http://svc-auth:3000/auth/google/validate', {
+            code: code,
+            state: state,
+        });
+        let message: string;
+        if (response.status === 200)
+            message = "User logged in from 3rd party";
+        else
+            message = "User registered from 3rd party";
+        console.log("path extracted from response, building response\n");
+        const urlParams = new URLSearchParams({
+            status: response.status === 200 ? 'login' : 'signup',
+            accessToken: response.data.accessToken,
+        })
+        return res.status(302)
+                        .cookie('refreshToken', response.data.refreshToken, {
+                                                    httpOnly: true,
+                                                    secure: false,
+                                                    sameSite: 'strict',
+                                                    maxAge: response.data.maxAge,
+                                                })
+                        .location(`http://localhost:5173/auth/callback?${urlParams.toString()}`)
+                        .end();
+    } catch (error) {
+        console.log("in validateExternalAuth error path");
+        if (axios.isAxiosError<ApiError>(error) && error.response?.status){
+            return res.status(error.response.status).json({error: error.response.data?.error ?? error.message});
+        }
+        return res.status(502).json({error: "Bad gateway (svc-auth)"});
+    }
+}
+
+export const chooseUserRole = async (req: Request, res: Response) => {
+    try {
+        console.log("in update user role");
+        const update = await axios.patch(`http://svc-user:3000/user/${(req as ReqWithUser).userId}/role`, {
+            newRole: req.body.newRole,
+            tokenId: (req as ReqWithUser).userId,
+            permissions: (req as ReqWithUser).permissions,
+        });
+        console.log("svc-user updated, wiping auth tables");
+        //wipe old role in auth tables
+        //create new tokens and return them
+        const authUpdate = await axios.patch(`http://svc-auth:3000/auth/${(req as ReqWithUser).userId}/role`, {
+            newRole: req.body.newRole,
+            tokenId: (req as ReqWithUser).userId,
+            permissions: (req as ReqWithUser).permissions,
+        });
+        console.log("revoking refresh tokens");
+        const oldTokens = await axios.patch(`http://svc-auth:3000/auth/revoke/refresh-token/${(req as ReqWithUser).userId}`, {
+            tokenId: (req as ReqWithUser).userId,
+            permissions: ['manageLogout'], //hardcoded permissions no to have to decode key, inelegant but fine 
+        });
+        console.log("revoked tokens, route done");
+        return res.status(201).cookie('refreshToken', authUpdate.data.refreshToken, {
+                                                                httpOnly: true,
+                                                                secure: false,
+                                                                sameSite: 'strict',
+                                                                maxAge: authUpdate.data.maxAge,
+                                                            })
+                            .json({message: "Role updated succesfully",
+                                    accessToken: authUpdate.data.accessToken
+                                })
+    } catch (error) {
+        console.log("in chooseUserRole error path");
+        if (axios.isAxiosError<ApiError>(error) && error.response?.status){
+            return res.status(error.response.status).json({error: error.response.data?.error ?? error.message});
+        }
+        return res.status(502).json({error: "Bad gateway (svc-auth)"});
+    }
 }

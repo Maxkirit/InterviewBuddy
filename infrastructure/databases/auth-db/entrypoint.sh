@@ -46,7 +46,7 @@ psql -U postgres -d $DB_NAME <<EOF
 CREATE TABLE IF NOT EXISTS $TABLE_AUTHS (
 	auth_id			INT				GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 	email			VARCHAR(255)	NOT NULL UNIQUE,
-	hashed_password	TEXT			NOT NULL,
+	hashed_password	TEXT,
 	sub				TEXT,
 	created_at		TIMESTAMPTZ		NOT NULL DEFAULT NOW(),
 	updated_at		TIMESTAMPTZ		NOT NULL DEFAULT NOW()
@@ -124,6 +124,10 @@ WHERE NOT EXISTS (SELECT 1 FROM $TABLE_ROLES WHERE name = 'recruiter');
 INSERT INTO $TABLE_ROLES (name)
 SELECT 'candidate'
 WHERE NOT EXISTS (SELECT 1 FROM $TABLE_ROLES WHERE name = 'candidate');
+
+INSERT INTO $TABLE_ROLES (name)
+SELECT 'pending'
+WHERE NOT EXISTS (SELECT 1 FROM $TABLE_ROLES WHERE name = 'pending');
 
 INSERT INTO $TABLE_PERMISSIONS (name)
 SELECT 'readModelAnswer'
@@ -216,6 +220,10 @@ WHERE NOT EXISTS (SELECT 1 FROM $TABLE_PERMISSIONS WHERE name = 'readInterview')
 INSERT INTO $TABLE_PERMISSIONS (name)
 SELECT 'takeInterview'
 WHERE NOT EXISTS (SELECT 1 FROM $TABLE_PERMISSIONS WHERE name = 'takeInterview');
+
+INSERT INTO $TABLE_PERMISSIONS (name)
+SELECT 'modifyUserRole'
+WHERE NOT EXISTS (SELECT 1 FROM $TABLE_PERMISSIONS WHERE name = 'modifyUserRole');
 
 -- Role-Permission Mappings for Recruiter
 INSERT INTO $TABLE_ROLE_PERMISSIONS (role_id, permission_id)
@@ -509,6 +517,17 @@ WHERE NOT EXISTS (
     FROM $TABLE_ROLE_PERMISSIONS rp
     WHERE rp.role_id = (SELECT role_id FROM $TABLE_ROLES WHERE name = 'admin')
     AND rp.permission_id = p.permission_id
+);
+
+-- Role-Permission Mappings for pending
+INSERT INTO $TABLE_ROLE_PERMISSIONS (role_id, permission_id)
+SELECT
+    (SELECT role_id FROM $TABLE_ROLES WHERE name = 'pending'),
+    (SELECT permission_id FROM $TABLE_PERMISSIONS WHERE name = 'modifyUserRole')
+WHERE NOT EXISTS (
+    SELECT 1 FROM $TABLE_ROLE_PERMISSIONS
+    WHERE role_id = (SELECT role_id FROM $TABLE_ROLES WHERE name = 'pending')
+    AND permission_id = (SELECT permission_id FROM $TABLE_PERMISSIONS WHERE name = 'modifyUserRole')
 );
 
 

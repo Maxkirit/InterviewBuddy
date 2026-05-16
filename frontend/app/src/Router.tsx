@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./Login";
 import Register from "./Register";
+import AuthCallback from "./3rdPartyAuthCallback";
+import PickRole from "./PickRole";
 import ProtectedLayout from "./ProtectedLayout";
 import MyProfile from "./Profile";
 import CandidateOfficialInterview from "./CandidateOfficialInterview";
@@ -22,7 +24,9 @@ export default function Router() {
                 <Route path="/" element={<Navigate to="/profile" replace />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/auth/callback" element={<AuthCallback />}/>
                 <Route element={<ProtectedLayout />}>
+                <Route path="/pick-role" element={<PickRole />}/>
                     <Route element={<AppLayout />}>
                         <Route path="/candidate" element={<CandidateView />}>
                             <Route

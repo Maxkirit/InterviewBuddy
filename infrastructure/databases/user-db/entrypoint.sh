@@ -50,7 +50,8 @@ psql -U postgres -d $DB_NAME <<EOF
 CREATE TYPE role_type AS ENUM (
     'admin',
     'recruiter',
-    'candidate'
+    'candidate',
+    'pending'
 );
 
 -- Genres possibles (optionnel, rempli par l'utilisateur)
