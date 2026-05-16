@@ -8,6 +8,7 @@ import {
     getInterviewById,
     startInterview,
     submitInterview,
+	deleteInterview
 } from "../controllers/interview.controllers.js";
 
 const router = Router();
@@ -20,4 +21,5 @@ router.get("/question/:question_id", getQuestion);
 router.get("/:interview_id", getInterviewById);
 router.get("/:interview_id/start", startInterview);
 router.patch("/:interview_id/submit", submitInterview);
+router.patch("/:interview_id/delete", deleteInterview);
 export default router;

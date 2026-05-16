@@ -85,6 +85,7 @@ CREATE TABLE IF NOT EXISTS $TABLE_INTERVIEWS (
     unfinished_diagram	JSON,
     unfinished_text		TEXT,
     status				interview_status NOT NULL,
+	deleted				BOOLEAN			NOT NULL DEFAULT FALSE,
     due_date			TIMESTAMPTZ,
     created_at			TIMESTAMPTZ		NOT NULL DEFAULT NOW(),
     updated_at			TIMESTAMPTZ		NOT NULL DEFAULT NOW()
