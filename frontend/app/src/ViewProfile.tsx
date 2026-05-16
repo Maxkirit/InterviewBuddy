@@ -57,7 +57,7 @@ export default function ViewProfile() {
                             <div className="w-[100px] h-[100px] rounded-full bg-gradient-to-br from-[#4f6ef7] to-[#7c3aed] flex items-center justify-center text-white text-[2rem] font-bold overflow-hidden">
                                 {user?.profile_pic_url && (
                                     <img
-                                        src={`https://localhost/avatars/${user.profile_pic_url}`}
+                                        src={`/avatars/${user.profile_pic_url}`}
                                         className="absolute inset-0 w-full h-full object-cover rounded-full"
                                         onError={(e) => e.currentTarget.remove()}
                                     />

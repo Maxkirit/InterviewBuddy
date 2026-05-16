@@ -86,7 +86,7 @@ export default function CandidateListRecruiters() {
 										<div className="avatar relative overflow-hidden">
 											{conn?.profile_pic_url && (
 												<img
-													src={`https://localhost/avatars/${conn.profile_pic_url}`}
+													src={`/avatars/${conn.profile_pic_url}`}
 													className="absolute inset-0 w-full h-full object-cover rounded-full"
 													onError={(e) => e.currentTarget.remove()}
 												/>

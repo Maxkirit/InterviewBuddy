@@ -55,8 +55,11 @@ export default function Login() {
             const input = { email, password };
             LoginSchema.parse(input);
             const result = await axios.post(
-                "http://localhost:3000/api/v1/auth/login",
-                { email, password },
+                "/api/v1/auth/login",
+                {
+                    email: email,
+                    password: password,
+                },
             );
             const decoded = decodeJwt(result.data.accessToken);
             authContext?.login(
@@ -78,6 +81,13 @@ export default function Login() {
                 setFieldErrors({ form: "Something went wrong. Please try again" });
             }
         }
+    }
+
+    async function continueGoogle() {
+        window.location.href = "http://localhost:3000/api/v1/auth/google/init";
+        //new component mounted when final 202 returned
+        //mount in router
+        //check invite.tsx for pop up 
     }
 
     return (
@@ -139,7 +149,8 @@ export default function Login() {
                     <span className="flex-1 h-px bg-[#e4e8f0]" />
                 </div>
 
-                <button className="w-full py-[10px] rounded-[10px] border border-[#e4e8f0] bg-white text-[#374151] text-[0.9rem] font-medium cursor-pointer flex items-center justify-center gap-2.5 hover:bg-gray-50 hover:border-gray-300 transition">
+                <button className="w-full py-[10px] rounded-[10px] border border-[#e4e8f0] bg-white text-[#374151] text-[0.9rem] font-medium cursor-pointer flex items-center justify-center gap-2.5 hover:bg-gray-50 hover:border-gray-300 transition"
+                        onClick={continueGoogle}>
                     <svg
                         className="w-[18px] h-[18px] shrink-0"
                         viewBox="0 0 24 24"

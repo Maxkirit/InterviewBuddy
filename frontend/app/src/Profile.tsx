@@ -166,6 +166,32 @@ export default function MyProfile() {
         }
     }
 
+    
+    // async function handlePicSubmit(e: SubmitEvent) {
+    //     e.preventDefault();
+    //     if (!selectedFile) return;
+
+    //     try {
+    //         const formData = new FormData();
+    //         formData.append("avatar", selectedFile);
+
+    //         await authContext?.axiosInstance.post(
+    //             `/api/v1/user/avatar/${authContext?.userId}`,
+    //             formData,
+    //         );
+
+    //         const res = await authContext?.axiosInstance.get(
+    //             `/api/v1/user/avatar/${authContext?.userId}`,
+    //         );
+
+    //         setProfilePic(res?.data.profile_pic_url ?? "");
+    //         closeDialog();
+    //     } catch (error) {
+    //         console.log(`in error path ${error}`);
+    //         // error banner
+    //     }
+    // }
+
     return (
         <>
             {error && <ErrorBanner message={error} onDismiss={() => setError(null)} />}
@@ -177,7 +203,7 @@ export default function MyProfile() {
                             <div className="w-[100px] h-[100px] rounded-full bg-gradient-to-br from-[#4f6ef7] to-[#7c3aed] flex items-center justify-center text-white text-[2rem] font-bold overflow-hidden">
                                 {profilePic && (
                                     <img
-                                        src={`http://localhost:3000/avatars/${profilePic}`}
+                                        src={`/avatars/${profilePic}`}
                                         className="absolute inset-0 w-full h-full object-cover rounded-full"
                                         onError={(e) => e.currentTarget.remove()}
                                     />
