@@ -6,6 +6,7 @@ import { Request, Response, NextFunction } from "express";
 export interface ReqWithUser extends Request {
     userId: number;
     permissions: string[];
+	role: string;
 }
 
 
@@ -35,6 +36,7 @@ export async function validateAcccessToken(
     	const { payload } = await jwtVerify(access_token, publicKey);
         (req as ReqWithUser).userId = payload.userId as number;
         (req as ReqWithUser).permissions = payload.permissions as string[];
+		(req as ReqWithUser).role = payload.role as string;
         return next(); //valid access_token
     } catch (error) {
         console.log("validateaccesstoken error path\n");
