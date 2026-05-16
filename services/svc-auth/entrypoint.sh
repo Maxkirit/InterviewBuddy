@@ -27,4 +27,5 @@ fi
 npx prisma db pull --force
 npx prisma generate
 npm run build
+node dist/seed-admin.js
 npm run start
