@@ -88,16 +88,14 @@ export default function RecruiterListCandidates() {
 		<>
 			{error && <ErrorBanner message={error} onDismiss={() => setError(null)} />}
 			<div className="max-w-[900px] mx-auto py-10 px-6">
-				<h1 className="text-[1.75rem] font-bold text-[#1a1d2e] mb-7">
-					Candidates
-				</h1>
-				<div className="flex justify-end mt-1">
+				<div className="flex items-baseline gap-3 mb-7">
+					<h1 className="text-[1.75rem] font-bold text-[#1a1d2e]">Candidates</h1>
 					<button
-							className="btn-primary px-7 py-[10px]"
-							type="submit"
-							onClick={handleSharelink}
-						>
-							share invite link
+						className="btn-primary px-5 py-[9px] text-sm"
+						type="button"
+						onClick={handleSharelink}
+					>
+						Share invite link
 					</button>
 				</div>
 				<div className="flex flex-col gap-2">
@@ -128,26 +126,20 @@ export default function RecruiterListCandidates() {
 											</span>
 										</div>
 									</div>
-									<div className="flex flex-col gap-0.5">
-										<span className="text-[0.975rem] font-semibold text-[#1a1d2e]">
-											{conn.firstname} {conn.lastname}
-										</span>
-										<span className="text-[0.8rem] text-gray-500">
-											{conn.organization ?? "—"}
-										</span>
+									<div className="flex items-center gap-3">
+										<div className="w-3 h-3 rounded-full shrink-0"
+											style={{ background: isOnline ? "#22c55e" : "#d1d5db" }} />
+										<button
+											className="px-4 py-[7px] rounded-lg bg-white text-[0.85rem] font-medium cursor-pointer whitespace-nowrap transition border border-[#ef4444] text-[#ef4444] hover:bg-[#ef4444] hover:text-white"
+											onClick={(e) => {
+												e.preventDefault();
+												e.stopPropagation();
+												openConfirm(conn.user_id);
+											}}
+										>
+											Delete
+										</button>
 									</div>
-									<div className="w-3 h-3 rounded-full shrink-0"
-										style={{ background: isOnline ? "#22c55e" : "#d1d5db" }} />
-									<button
-										className="px-4 py-[7px] rounded-lg bg-white text-[0.85rem] font-medium cursor-pointer whitespace-nowrap transition border border-[#ef4444] text-[#ef4444] hover:bg-[#ef4444] hover:text-white"
-										onClick={(e) => {
-											e.preventDefault();
-											e.stopPropagation();
-											openConfirm(conn.user_id)}
-										}
-									>
-										Delete
-									</button>
 								</Link>
 							)
 						})

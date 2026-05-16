@@ -102,26 +102,20 @@ export default function CandidateListRecruiters() {
 											</span>
 										</div>
 									</div>
-									<div className="flex flex-col gap-0.5">
-										<span className="text-[0.975rem] font-semibold text-[#1a1d2e]">
-											{conn.firstname} {conn.lastname}
-										</span>
-										<span className="text-[0.8rem] text-gray-500">
-											{conn.organization ?? "—"}
-										</span>
+									<div className="flex items-center gap-3">
+										<div className="w-3 h-3 rounded-full shrink-0"
+											style={{ background: isOnline ? "#22c55e" : "#d1d5db" }} />
+										<button
+											className="px-4 py-[7px] rounded-lg bg-white text-[0.85rem] font-medium cursor-pointer whitespace-nowrap transition border border-[#ef4444] text-[#ef4444] hover:bg-[#ef4444] hover:text-white"
+											onClick={(e) => {
+												e.preventDefault();
+												e.stopPropagation();
+												openConfirm(conn.user_id);
+											}}
+										>
+											Delete
+										</button>
 									</div>
-									<div className="w-3 h-3 rounded-full shrink-0"
-										style={{ background: isOnline ? "#22c55e" : "#d1d5db" }} />
-									<button
-										className="px-4 py-[7px] rounded-lg bg-white text-[0.85rem] font-medium cursor-pointer whitespace-nowrap transition border border-[#ef4444] text-[#ef4444] hover:bg-[#ef4444] hover:text-white"
-										onClick={(e) => {
-											e.preventDefault();
-											e.stopPropagation();
-											openConfirm(conn.user_id)}
-										}
-									>
-										Delete
-									</button>
 								</Link>
 							)
 						})
