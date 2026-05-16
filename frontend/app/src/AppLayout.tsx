@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "./AuthProvider";
-import { Navigate, Outlet, Link, NavLink } from "react-router-dom";
+import { Navigate, Outlet, Link, NavLink, useNavigate } from "react-router-dom";
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
     isActive
@@ -10,6 +10,20 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
 export default function AppLayout() {
     const authContext = useContext(AuthContext);
     const [url, setUrl] = useState();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!authContext?.accessToken) return;
+        async function getUrl() {
+            try {
+                const res = await authContext?.axiosInstance.get(`/api/v1/user/avatar/${authContext.userId}`);
+                setUrl(res?.data.profile_pic_url);
+            } catch (error) {
+                console.log("in error path");
+            }
+        }
+        getUrl();
+    }, [authContext?.accessToken]);
 
     if (authContext?.isLoading === true) {
         return (
@@ -23,20 +37,15 @@ export default function AppLayout() {
         return <Navigate to="/login" replace />;
     }
 
-    useEffect(() => {
-        async function getUrl() {
-            try {
-                const res = await authContext?.axiosInstance.get(`/api/v1/user/avatar/${authContext.userId}`);
-                console.log(res?.data);
-                setUrl(res?.data.profile_pic_url);
-            } catch (error) {
-                // error
-                console.log("in error path");
-            }
+    async function handleLogout() {
+        try {
+            await authContext?.axiosInstance.get('/api/v1/auth/logout');
+            authContext?.logout();
+            navigate("/login", {replace: true}); // likely redundant
+        } catch (error) {
+            console.log(`in error path: ${error}`);
         }
-        
-        getUrl();
-    }, []);
+    }
 
     function renderNavbar() {
         if (authContext?.role === "candidate") {
@@ -70,12 +79,18 @@ export default function AppLayout() {
                         <Link to="/profile" className="avatar no-underline relative overflow-hidden">
                             {url && (
                                 <img
-                                    src={`https://localhost/avatars/${url}`}
+                                    src={`http://localhost:3000/avatars/${url}`}
                                     className="absolute inset-0 w-full h-full object-cover rounded-full"
                                     onError={(e) => e.currentTarget.remove()}
                                 />
                             )}
                         </Link>
+                        <button
+                            onClick={handleLogout}
+                            className="text-sm font-medium text-gray-500 px-3.5 py-1.5 rounded-lg hover:bg-[#fff0f0] hover:text-[#ef4444] transition cursor-pointer"
+                        >
+                            Logout
+                        </button>
                     </div>
                 </nav>
             );
@@ -111,12 +126,18 @@ export default function AppLayout() {
                         <Link to="/profile" className="avatar no-underline relative overflow-hidden">
                             {url && (
                                 <img
-                                    src={`https://localhost/avatars/${url}`}
+                                    src={`http://localhost:3000/avatars/${url}`}
                                     className="absolute inset-0 w-full h-full object-cover rounded-full"
                                     onError={(e) => e.currentTarget.remove()}
                                 />
                             )}
                         </Link>
+                        <button
+                            onClick={handleLogout}
+                            className="text-sm font-medium text-gray-500 px-3.5 py-1.5 rounded-lg hover:bg-[#fff0f0] hover:text-[#ef4444] transition cursor-pointer"
+                        >
+                            Logout
+                        </button>
                     </div>
                 </nav>
             );
@@ -152,12 +173,18 @@ export default function AppLayout() {
                         <Link to="/profile" className="avatar no-underline relative overflow-hidden">
                             {url && (
                                 <img
-                                    src={`https://localhost/avatars/${url}`}
+                                    src={`http://localhost:3000/avatars/${url}`}
                                     className="absolute inset-0 w-full h-full object-cover rounded-full"
                                     onError={(e) => e.currentTarget.remove()}
                                 />
                             )}
                         </Link>
+                        <button
+                            onClick={handleLogout}
+                            className="text-sm font-medium text-gray-500 px-3.5 py-1.5 rounded-lg hover:bg-[#fff0f0] hover:text-[#ef4444] transition cursor-pointer"
+                        >
+                            Logout
+                        </button>
                     </div>
                 </nav>
             );

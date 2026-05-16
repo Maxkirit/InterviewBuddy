@@ -26,7 +26,7 @@ const Login = z.object({
     password: passwordSchema,
 });
 
-const REFRESH_SECRET = "changewhenvaultisup";
+const REFRESH_SECRET = readFileSync("/secrets/refresh_secret").toString("utf8").trim();
 
 
 // dotenv.config() // {path: '...'} pour personnailiser ou est la cles
@@ -146,20 +146,47 @@ app.patch("/auth/revoke/refresh-token", async (req, res) =>{
     } catch(error) {
         return res.status(401).json({error: "Invalid refresh token"});
     }
-try {
+    try {
         const revoke = await prisma.refresh_tokens.update({
-        where: {
-            jti: decoded.jti,
-        },
-        data: {
-            updated_at: new Date(),
-            revoked_at: new Date(),
-        },
-    });
+            where: {
+                jti: decoded.jti,
+            },
+            data: {
+                updated_at: new Date(),
+                revoked_at: new Date(),
+            },
+        });
     } catch (error) {
         return res.status(404).json({error: "Refresh Token non existent in database"});
     }
     return res.status(200).json({message: "refresh token revoked", userId: decoded.userId});
+})
+
+app.patch("/auth/revoke/refresh-token/everywhere", async (req, res) =>{
+    const oldRefreshToken = req.body?.refreshToken;
+    if (!oldRefreshToken) {
+        return res.status(404).json({error: "No refresh token"});
+    }
+    let decoded;
+    try {
+        decoded = jwt.verify(oldRefreshToken, REFRESH_SECRET, {ignoreExpiration: true}) as jwt.JwtPayload;
+    } catch(error) {
+        return res.status(401).json({error: "Invalid refresh token"});
+    }
+    try {
+        const revoke = await prisma.refresh_tokens.updateMany({
+            where: {
+                user_id: decoded.user_id,
+            },
+            data: {
+                updated_at: new Date(),
+                revoked_at: new Date(),
+            },
+        });
+    } catch (error) {
+        return res.status(404).json({error: "Refresh Token non existent in database"});
+    }
+    return res.status(200).json({message: "refresh tokens revoked", userId: decoded.userId});
 })
 
 app.post("/auth/user", async (req, res) => {

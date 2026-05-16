@@ -76,6 +76,15 @@ export default function MyProfile() {
         getUserInfo();
     }, []);
 
+    async function handleLogoutEverywhere() {
+        try {
+            await authContext?.axiosInstance.get('/api/v1/auth/logout/everywhere');
+            authContext?.logout();
+        } catch (error) {
+            console.log(`in error path: ${error}`);
+        }
+    }
+
     async function handleSubmit(event: SubmitEvent) {
         event.preventDefault();
         try {
@@ -155,7 +164,7 @@ export default function MyProfile() {
                             <div className="w-[100px] h-[100px] rounded-full bg-gradient-to-br from-[#4f6ef7] to-[#7c3aed] flex items-center justify-center text-white text-[2rem] font-bold overflow-hidden">
                                 {profilePic && (
                                     <img
-                                        src={`https://localhost/avatars/${profilePic}`}
+                                        src={`http://localhost:3000/avatars/${profilePic}`}
                                         className="absolute inset-0 w-full h-full object-cover rounded-full"
                                         onError={(e) => e.currentTarget.remove()}
                                     />
@@ -312,7 +321,14 @@ export default function MyProfile() {
                                     onChange={(e) => setLinkedin(e.target.value)}
                                 />
                             </div>
-                            <div className="flex justify-end mt-1">
+                            <div className="flex justify-between items-center mt-1">
+                                <button
+                                    type="button"
+                                    onClick={handleLogoutEverywhere}
+                                    className="px-4 py-[10px] rounded-lg border border-[#ef4444] text-[#ef4444] text-sm font-medium cursor-pointer hover:bg-[#ef4444] hover:text-white transition"
+                                >
+                                    Logout everywhere
+                                </button>
                                 <button
                                     className="btn-primary px-7 py-[10px]"
                                     type="submit"

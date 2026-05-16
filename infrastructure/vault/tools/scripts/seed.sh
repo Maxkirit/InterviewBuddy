@@ -165,6 +165,32 @@ get_or_create_secret_value() {
   echo "$value"
 }
 
+get_env_value_or_existing() {
+  env_name="$1"
+  api_path="$2"
+  field="$3"
+
+  env_value="$(printenv "$env_name" || true)"
+
+  if [ -n "$env_value" ]; then
+    echo "[seed] loaded env-backed secret:$env_name from environment" >&2
+    printf '%s' "$env_value"
+    return
+  fi
+
+  existing_value="$(read_kv_field_or_empty "$api_path" "$field")"
+
+  if [ -n "$existing_value" ]; then
+    echo "[seed] reused existing env-backed secret:$env_name from Vault" >&2
+    printf '%s' "$existing_value"
+    return
+  fi
+
+  echo "[seed] ERROR: missing required environment variable '$env_name'" >&2
+  echo "[seed]        no existing Vault value found at $api_path field=$field" >&2
+  exit 1
+}
+
 init_store_path_if_needed() {
   api_path="$1"
 
@@ -283,9 +309,12 @@ while IFS= read -r line || [ -n "$line" ]; do
     literal:*)
       :
       ;;
+    env:*)
+      :
+      ;;
     *)
       echo "[seed] ERROR: unsupported source '$source' in line: $line" >&2
-      echo "[seed]        expected literal:<value> or secret:<name>" >&2
+      echo "[seed]        expected literal:<value>, secret:<name>, or env:<VAR_NAME>" >&2
       exit 1
       ;;
   esac
@@ -325,6 +354,11 @@ while IFS= read -r line || [ -n "$line" ]; do
         echo "[seed] ERROR: internal cache failure for $secret_name" >&2
         exit 1
       fi
+      ;;
+    env:*)
+      env_name="${source#env:}"
+      value="$(get_env_value_or_existing "$env_name" "$api_path" "$field")"
+      display="$source"
       ;;
     *)
       echo "[seed] ERROR: unsupported source '$source' in line: $line" >&2
