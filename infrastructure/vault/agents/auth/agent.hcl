@@ -1,3 +1,4 @@
+exit_after_auth = true
 pid_file = "/tmp/vault-agent-auth.pid"
 
 vault {
@@ -14,22 +15,36 @@ auto_auth {
       remove_secret_id_file_after_reading = false
     }
   }
+}
 
-  sink "file" {
-    config = {
-      path = "/tmp/vault-token"
-    }
-  }
+template_config {
+  exit_on_retry_failure = true
 }
 
 template {
   source      = "/vault/agent/templates/db.env.tpl"
   destination = "/secrets/db.env"
   perms       = "0640"
+  error_on_missing_key = true
 }
 
 template {
   source      = "/vault/agent/templates/jwt_private.pem.tpl"
   destination = "/secrets/jwt_private.pem"
   perms       = "0600"
+  error_on_missing_key = true
+}
+
+template {
+  source      = "/vault/agent/templates/refresh_secret.tpl"
+  destination = "/secrets/refresh_secret"
+  perms       = "0600"
+  error_on_missing_key = true
+}
+
+template {
+  source      = "/vault/agent/templates/google_client_secret.tpl"
+  destination = "/secrets/google_client_secret"
+  perms       = "0600"
+  error_on_missing_key = true
 }

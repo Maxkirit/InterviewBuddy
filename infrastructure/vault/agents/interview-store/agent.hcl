@@ -1,3 +1,4 @@
+exit_after_auth = true
 pid_file = "/tmp/vault-agent-interview-store.pid"
 
 vault {
@@ -14,16 +15,16 @@ auto_auth {
       remove_secret_id_file_after_reading = false
     }
   }
-
-  sink "file" {
-    config = {
-      path = "/tmp/vault-token"
-    }
-  }
 }
+
+template_config {
+  exit_on_retry_failure = true
+}
+
 
 template {
   source      = "/vault/agent/templates/db.env.tpl"
   destination = "/secrets/db.env"
   perms       = "0640"
+  error_on_missing_key = true
 }

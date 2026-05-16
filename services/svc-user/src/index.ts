@@ -9,6 +9,11 @@ import { error, profile } from 'node:console';
 import { resolveSoa } from 'node:dns';
 import { addConnection } from "./connections/addConnection.js";
 import { read } from "node:fs";
+import { create } from "node:domain";
+import dotenv from 'dotenv'
+import { DeleteConnection } from "./connections/deleteConnection.js";
+
+dotenv.config();
 
 const nameSurnameSchema = z
     .string()
@@ -266,6 +271,7 @@ app.get("/user/:userId/connections", async (req, res) => {
             where: {
                 OR: [{ candidate_id: userId }, { recruiter_id: userId }],
                 status: "accepted",
+				is_active: true,
             },
             select: {
                 // When this user is the candidate, select the recruiter's info
@@ -276,6 +282,7 @@ app.get("/user/:userId/connections", async (req, res) => {
                         lastname: true,
                         profile_pic_url: true,
                         organization: true,
+                        last_seen: true,
                     },
                 },
                 // When this user is the recruiter, select the candidate's info
@@ -285,6 +292,7 @@ app.get("/user/:userId/connections", async (req, res) => {
                         firstname: true,
                         lastname: true,
                         profile_pic_url: true,
+                        last_seen: true,
                     },
                 },
             },
@@ -410,6 +418,7 @@ app.get(
 );
 
 app.post("/user/:user_id/connections/:link_id", addConnection);
+app.patch("/user/connections/:user_id/:connectionId", DeleteConnection)
 
 app.put('/user/:userId/avatar', async(req, res) => {
     //check perm for admin and self
@@ -417,17 +426,17 @@ app.put('/user/:userId/avatar', async(req, res) => {
     if (!userId)
         return res.status(400).json({error: "invalid userId in request params"});
     if ((!req.body.permissions.includes("modifyOwnUser") && !req.body.permissions.includes("manageUserInfo")) ||
-            (req.body.permissions.includes("modifyOwnUser") && userId !== req.body.userId)) {
+            (req.body.permissions.includes("modifyOwnUser") && userId !== parseInt(req.body.userId))) {
                 return res.status(403).json({error: "Permissions denied on PUT /user/:userId/avatar"});
             }
     console.log("permissions validated");
 
     const filename = `${req.params.userId}_${randomBytes(16).toString('hex')}`;
-    // const filesystemLocation = `/var/www/avatars/${filename}`; //comment out and replace with filename in file below if you want it local
+    const filesystemLocation = `/var/www/avatars/${filename}`; //comment out and replace with filename in file below if you want it local
     console.log(filename);
     try {
         //this calls writes directly to filesystem
-        const file = await sharp(Buffer.from(req.body.imageContent, 'base64')).toFile(filename); //Buffer.from() interprets buffer as base64 encoding
+        const file = await sharp(Buffer.from(req.body.imageContent, 'base64')).toFile(filesystemLocation); //Buffer.from() interprets buffer as base64 encoding
     } catch (error) {
         return res.status(400).json({error: "Bad image sent"});
     }
@@ -493,7 +502,7 @@ app.get('/user/:userId/avatar', async(req, res) => {
             where: {user_id: targetId},
             select: {profile_pic_url: true},
         });
-        return res.status(200).json({data: url});
+        return res.status(200).json(url);
     } catch (error) {
         console.log("in error path\n");
         console.log(error);
@@ -544,6 +553,60 @@ app.patch('/user/:userId/role', async(req, res) => {
         return res.status(502).json({error: "Bad gateway (svc-user)"});
     }
 })
+app.get('/user/link/generate', async(req, res) =>{
+	const tmp = req.query.permissions ?? {};
+    const permission = Object.values(tmp) as string[];
+	const token = crypto.randomUUID();
+	const user_id = req.query.token_id as string;
+	console.log(`in getlink, perm: ${permission}`);
+	if (!permission.includes("createConnection")){
+		console.log("forbiden but why");
+		return res.status(403).json({error: "forbiden (create invite link)"})
+	}
+		
+	try{
+		const newlink = await prisma.invite_link.create({
+			data: {
+				recruiter_id: parseInt(user_id, 10),
+				link: token,
+			},
+	})
+		const link= process.env.LINK_URL;
+		const url = `${link}/invite?token=${token}`
+		console.log("lien generer et renvoyer")
+		return res.status(200).json({url : url})
+	}
+	catch(e){
+		console.log("error adding link to the db");
+		return res.status(500).json(e);
+	}
+})
+
+app.patch('/user/:user_id/heartbeat', async (req, res) => {
+    try {
+        await prisma.users.update({
+            where: {
+                user_id: parseInt(req.params.user_id),
+            },
+            data: {
+                last_seen: new Date(),
+            }
+        });
+        res.status(201).json({message: "Heatbeat recorded"});
+    } catch (error) {
+        console.log("in error path\n");
+        if (error instanceof Prisma.PrismaClientInitializationError)
+            return res.status(503).json({ error: "Database unavailable" });
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            if (error.code === 'P2025') {
+                return res.status(404).json({error: "User not found"});
+            }
+            return res.status(502).json({error: error.message});
+        }
+        return res.status(502).json({error: "Bad gateway (svc-user)"});
+    }
+});
+
 
 app.listen(port, () => {
     console.log(`listening on port ${port}`);

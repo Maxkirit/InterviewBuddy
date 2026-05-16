@@ -3,13 +3,13 @@ LOG_DIR := ./logs
 
 .PHONY: vault-up vault-reset app-up app-build reset-all
 
-all: vault-up app-up
+all: vault-up app-build
 
-re: reset-all all
+re: reset-all vault-up app-build
 
 
 # ---------------------------
-# VAULT STACK (profile=vault)
+# VAULT STACK (profile=vault)ker 
 # ---------------------------
 
 # Bring up the Vault stack in the correct order (certgen -> vault -> bootstrap -> seed),

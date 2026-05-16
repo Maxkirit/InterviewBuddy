@@ -18,6 +18,7 @@ type User = {
     job_title: string | null;
     gender: string | null;
     date_of_birth: string | null;
+    profile_pic_url: string;
 };
 
 export default function AdminUsers(){
@@ -105,7 +106,16 @@ export default function AdminUsers(){
 
                         {/* Gauche */}
                         <div className="flex items-center gap-3.5 flex-[0_0_240px]">
-                            <div className="avatar">{user.firstname[0]}{user.lastname[0]}</div>
+                            <div className="avatar relative overflow-hidden">
+                                {user?.profile_pic_url && (
+                                    <img
+                                        src={`http://localhost:3000/avatars/${user.profile_pic_url}`}
+                                        className="absolute inset-0 w-full h-full object-cover rounded-full"
+                                        onError={(e) => e.currentTarget.remove()}
+                                    />
+                                )}
+                                {user ? `${user.firstname[0]}${user.lastname[0]}` : "??"}
+                            </div>
                             <div className="flex flex-col gap-0.5">
                                 <div className="text-[0.95rem] font-semibold text-[#1a1d2e]">{user.firstname} {user.lastname}</div>
                                 <div className="text-[0.8rem] text-[#6b7280]">{user.email}</div>

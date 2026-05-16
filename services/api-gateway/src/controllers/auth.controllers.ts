@@ -68,6 +68,30 @@ export const logout = async (req: Request, res: Response) =>{
 	try{
 		const response = await axios.patch("http://svc-auth:3000/auth/revoke/refresh-token", { //returns userId
 			refreshToken: refreshToken,
+            permissions: (req as ReqWithUser).permissions,
+		});
+		//post message to RabbitMQ
+		res.cookie("refreshToken", refreshToken, {httpOnly: true, secure: false, sameSite: "strict", maxAge: -1});
+		return res.status(200).json({message: 'Logout successful'});
+	} catch (error) {
+		if (axios.isAxiosError<ApiError>(error) && error.response?.status){
+			return res.status(error.response.status).json({error: error.response.data?.error ?? error.message});
+		} else {
+			return res.status(502).json({error: "Bad gateway"});
+		} 
+	}
+}
+
+export const logoutEverywhere = async (req: Request, res: Response) => {
+	// use expired refresh token for identity. That's why we should only send a maxAge == -1 AFTER logout or with another refresh token.
+	if (Object.keys(req.cookies).length === 0 || !req.cookies['refreshToken']){ 
+		return res.status(404).json({error: "refresh token not found"});
+	}
+	const refreshToken = req.cookies['refreshToken'];
+	try{
+		const response = await axios.patch(`http://svc-auth:3000/auth/revoke/refresh-token/${(req as ReqWithUser).userId}`, { //returns userId
+			tokenId: (req as ReqWithUser).userId,
+            permissions: (req as ReqWithUser).permissions,
 		});
 		//post message to RabbitMQ
 		res.cookie("refreshToken", refreshToken, {httpOnly: true, secure: false, sameSite: "strict", maxAge: -1});

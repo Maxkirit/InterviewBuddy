@@ -1,10 +1,10 @@
 #!/bin/bash
 set -e
 
-echo "[svc-user] waiting for /secrets/db.env..."
-while [ ! -f /secrets/db.env ]; do
-  sleep 1
-done
+if [ ! -r /secrets/db.env ]; then
+  echo "[svc-auth] ERROR: missing or unreadable /secrets/db.env"
+  exit 1
+fi
 
 set -a
 . /secrets/db.env
@@ -15,7 +15,8 @@ if [ -z "${DATABASE_URL:-}" ]; then
   exit 1
 fi
 
-mv base_avatar.jpg /var/www/avatars/base_avatar.jpg
+mkdir -p /var/www/avatars
+cp base_avatar.jpg /var/www/avatars/base_avatar.jpg
 
 npx prisma db pull --force
 npx prisma generate

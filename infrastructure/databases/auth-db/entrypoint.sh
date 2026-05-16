@@ -2,6 +2,19 @@
 
 set -e
 
+for file in \
+  /run/secrets/auth_db_superuser_password \
+  /run/secrets/auth_db_admin_password \
+  /run/secrets/auth_db_app_password
+do
+  if [ ! -r "$file" ]; then
+    echo "[auth-db] ERROR: missing or unreadable secret file: $file"
+    exit 1
+  fi
+  echo "[auth-db] Found $file"
+done
+echo "[auth-db] Found all secrets. Starting init..."
+
 until pg_isready -U postgres; do
   echo "Waiting for PostgreSQL to start"
   sleep 1
@@ -210,6 +223,10 @@ SELECT 'readGradingReport'
 WHERE NOT EXISTS (SELECT 1 FROM $TABLE_PERMISSIONS WHERE name = 'readGradingReport');
 
 INSERT INTO $TABLE_PERMISSIONS (name)
+SELECT 'createGradingReport'
+WHERE NOT EXISTS (SELECT 1 FROM $TABLE_PERMISSIONS WHERE name = 'createGradingReport');
+
+INSERT INTO $TABLE_PERMISSIONS (name)
 SELECT 'updateInterview'
 WHERE NOT EXISTS (SELECT 1 FROM $TABLE_PERMISSIONS WHERE name = 'updateInterview');
 
@@ -224,6 +241,10 @@ WHERE NOT EXISTS (SELECT 1 FROM $TABLE_PERMISSIONS WHERE name = 'takeInterview')
 INSERT INTO $TABLE_PERMISSIONS (name)
 SELECT 'modifyUserRole'
 WHERE NOT EXISTS (SELECT 1 FROM $TABLE_PERMISSIONS WHERE name = 'modifyUserRole');
+
+INSERT INTO $TABLE_PERMISSIONS (name)
+SELECT 'logoutSelf'
+WHERE NOT EXISTS (SELECT 1 FROM $TABLE_PERMISSIONS WHERE name = 'logoutSelf');
 
 -- Role-Permission Mappings for Recruiter
 INSERT INTO $TABLE_ROLE_PERMISSIONS (role_id, permission_id)
@@ -254,6 +275,16 @@ WHERE NOT EXISTS (
     SELECT 1 FROM $TABLE_ROLE_PERMISSIONS
     WHERE role_id = (SELECT role_id FROM $TABLE_ROLES WHERE name = 'recruiter')
     AND permission_id = (SELECT permission_id FROM $TABLE_PERMISSIONS WHERE name = 'readGradingReport')
+);
+
+INSERT INTO $TABLE_ROLE_PERMISSIONS (role_id, permission_id)
+SELECT
+    (SELECT role_id FROM $TABLE_ROLES WHERE name = 'recruiter'),
+    (SELECT permission_id FROM $TABLE_PERMISSIONS WHERE name = 'createGradingReport')
+WHERE NOT EXISTS (
+    SELECT 1 FROM $TABLE_ROLE_PERMISSIONS
+    WHERE role_id = (SELECT role_id FROM $TABLE_ROLES WHERE name = 'recruiter')
+    AND permission_id = (SELECT permission_id FROM $TABLE_PERMISSIONS WHERE name = 'createGradingReport')
 );
 
 INSERT INTO $TABLE_ROLE_PERMISSIONS (role_id, permission_id)
@@ -364,6 +395,16 @@ WHERE NOT EXISTS (
     SELECT 1 FROM $TABLE_ROLE_PERMISSIONS
     WHERE role_id = (SELECT role_id FROM $TABLE_ROLES WHERE name = 'recruiter')
     AND permission_id = (SELECT permission_id FROM $TABLE_PERMISSIONS WHERE name = 'readQuestion')
+);
+
+INSERT INTO $TABLE_ROLE_PERMISSIONS (role_id, permission_id)
+SELECT
+    (SELECT role_id FROM $TABLE_ROLES WHERE name = 'recruiter'),
+    (SELECT permission_id FROM $TABLE_PERMISSIONS WHERE name = 'logoutSelf')
+WHERE NOT EXISTS (
+    SELECT 1 FROM $TABLE_ROLE_PERMISSIONS
+    WHERE role_id = (SELECT role_id FROM $TABLE_ROLES WHERE name = 'recruiter')
+    AND permission_id = (SELECT permission_id FROM $TABLE_PERMISSIONS WHERE name = 'logoutSelf')
 );
 
 -- Role-Permission Mappings for Candidate
@@ -517,6 +558,16 @@ WHERE NOT EXISTS (
     FROM $TABLE_ROLE_PERMISSIONS rp
     WHERE rp.role_id = (SELECT role_id FROM $TABLE_ROLES WHERE name = 'admin')
     AND rp.permission_id = p.permission_id
+);
+
+INSERT INTO $TABLE_ROLE_PERMISSIONS (role_id, permission_id)
+SELECT
+    (SELECT role_id FROM $TABLE_ROLES WHERE name = 'candidate'),
+    (SELECT permission_id FROM $TABLE_PERMISSIONS WHERE name = 'logoutSelf')
+WHERE NOT EXISTS (
+    SELECT 1 FROM $TABLE_ROLE_PERMISSIONS
+    WHERE role_id = (SELECT role_id FROM $TABLE_ROLES WHERE name = 'candidate')
+    AND permission_id = (SELECT permission_id FROM $TABLE_PERMISSIONS WHERE name = 'logoutSelf')
 );
 
 -- Role-Permission Mappings for pending

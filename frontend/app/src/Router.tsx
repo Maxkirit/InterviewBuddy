@@ -15,6 +15,9 @@ import AdminUsers from "./AdminUser";
 import Interview from "./Interview";
 import CandidateListRecruiters from "./CandidateListConnections"
 import RecruiterListCandidates from "./RecruiterListConnections"
+import InviteLink from "./invite";
+import GradingPage from "./GradingPage";
+import ViewProfile from "./ViewProfile";
 
 
 export default function Router() {
@@ -28,6 +31,7 @@ export default function Router() {
                 <Route element={<ProtectedLayout />}>
                 <Route path="/pick-role" element={<PickRole />}/>
                     <Route element={<AppLayout />}>
+						<Route path="/invite" element={<InviteLink />} />
                         <Route path="/candidate" element={<CandidateView />}>
                             <Route
                                 path="/candidate/official-interviews"
@@ -35,7 +39,7 @@ export default function Router() {
     						<Route
                             	path="/candidate/recruiters"
                             	element={<CandidateListRecruiters />}/>
-                    </Route>
+                        </Route>
                         <Route path="/recruiter" element={<RecruiterView />}>
                             <Route 
 								path="/recruiter/interviews" 
@@ -43,11 +47,15 @@ export default function Router() {
 							<Route
                             	path="/recruiter/candidates"
                             	element={<RecruiterListCandidates />}/>
+                            <Route
+                                path="/recruiter/grading/:interview_id"
+                                element={<GradingPage />}/>
                         </Route>
                         <Route path="/admin" element={<AdminView />}>
                             <Route path="/admin/users" element={<AdminUsers />} />
                         </Route>
                         <Route path="/profile" element={<MyProfile />} />
+                        <Route path="/profile/:user_id" element={<ViewProfile />} />
                     </Route>
                     <Route path="/candidate/interview/:interview_id" element={<Interview />} />
                 </Route>

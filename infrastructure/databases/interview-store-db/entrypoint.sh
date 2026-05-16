@@ -2,6 +2,19 @@
 
 set -e
 
+for file in \
+  /run/secrets/interview_store_db_superuser_password \
+  /run/secrets/interview_store_db_admin_password \
+  /run/secrets/interview_store_db_app_password
+do
+  if [ ! -r "$file" ]; then
+    echo "[interview-store-db] ERROR: missing or unreadable secret file: $file"
+    exit 1
+  fi
+  echo "[interview-store-db] Found $file"
+done
+echo "[interview-store-db] Found all secrets. Starting init..."
+
 until pg_isready -U postgres; do
   echo "Waiting for PostgreSQL to start"
   sleep 1
@@ -48,6 +61,7 @@ CREATE TYPE interview_status AS ENUM (
     'scheduled',
     'past_due_date',
     'completed',
+    'graded',
     'mock'
 );
 
@@ -57,6 +71,7 @@ CREATE TABLE IF NOT EXISTS $TABLE_QUESTIONS (
     context				TEXT,
     functional_req		TEXT			NOT NULL,
     non_functional_req	TEXT			NOT NULL,
+    grading_guide	TEXT,
     created_at 			TIMESTAMPTZ		NOT NULL DEFAULT NOW(),
     updated_at 			TIMESTAMPTZ		NOT NULL DEFAULT NOW()
 );
@@ -87,10 +102,11 @@ CREATE TABLE IF NOT EXISTS $TABLE_MODEL_ANSWERS (
 
 ALTER TABLE questions ADD CONSTRAINT questions_name_unique UNIQUE (name);
 
-INSERT INTO questions (name, context, functional_req, non_functional_req)
+INSERT INTO questions (name, context, functional_req, non_functional_req, grading_guide)
 VALUES (
     'URL Shortener',
     'Design a URL Shortener',
+
     'Given a URL, our service should generate a shorter and unique alias of it. This is called a short link. This link should be short enough to be easily copied and pasted into applications.'
     || E'\n\n' ||
     'When users access a short link, our service should redirect them to the original link.'
@@ -103,24 +119,34 @@ VALUES (
     || E'\n\n' ||
     'URL redirection should happen in real-time with minimal latency.'
     || E'\n\n' ||
-    'Shortened links should not be guessable (not predictable).'
+    'Shortened links should not be guessable (not predictable).',
+
+    'How robust is their short key generation strategy?'
+    || E'\n\n' ||
+    'How well does the candidate prioritize the read path over the write path?'
+    || E'\n\n' ||
+    'How do they handle the database bottleneck at scale?'
+    || E'\n\n' ||
+    'How clean is their API design?'
+    || E'\n\n' ||
+    'Can they calculate back-of-the-envelope estimations?'
 )
 ON CONFLICT (name) DO NOTHING;
 
-INSERT INTO questions (name, context, functional_req, non_functional_req)
+INSERT INTO questions (name, context, functional_req, non_functional_req, grading_guide)
 VALUES (
     'Design Dropbox or Google Drive',
     'Design a cloud file storage and sync service like Dropbox or Google Drive.',
 
-    'Users should be able to upload a file from any device'
+    'Users should be able to upload a file from any device.'
     || E'\n\n' ||
-    'Users should be able to download a file from any device'
+    'Users should be able to download a file from any device.'
     || E'\n\n' ||
-    'Users should be able to share a file with other users and view the files shared with them'
+    'Users should be able to share a file with other users and view the files shared with them.'
     || E'\n\n' ||
-    'Users can automatically sync files across devices'
+    'Users can automatically sync files across devices.'
     || E'\n\n' ||
-    'Editing files is out of scope',
+    'Editing files is out of scope.',
 
     'The system should be highly available (prioritizing availability over consistency).'
     || E'\n\n' ||
@@ -128,11 +154,21 @@ VALUES (
     || E'\n\n' ||
     'The system should be secure and reliable. We should be able to recover files if they are lost or corrupted.'
     || E'\n\n' ||
-    'The system should make upload, download, and sync times as fast as possible (low latency).'
+    'The system should make upload, download, and sync times as fast as possible (low latency).',
+
+    'How has the candidate handled the differences between file content and metadata storage?'
+    || E'\n\n' ||
+    'How does the candidate''s answer handle file uploads at scale?'
+    || E'\n\n' ||
+    'What is the candidate''s understanding of caching opportunities for file download?'
+    || E'\n\n' ||
+    'What solution has the candidate proposed for the remote-to-local sync?'
+    || E'\n\n' ||
+    'Has the candidate understood the database query implications of file sharing?'
 )
 ON CONFLICT (name) DO NOTHING;
 
-INSERT INTO questions (name, context, functional_req, non_functional_req)
+INSERT INTO questions (name, context, functional_req, non_functional_req, grading_guide)
 VALUES (
     'Distributed Counter',
     'Design a distributed counter system.',
@@ -153,7 +189,17 @@ VALUES (
     || E'\n\n' ||
     'Scalable.'
     || E'\n\n' ||
-    'Low latency.'
+    'Low latency.',
+
+    'How do they solve the write contention problem?'
+    || E'\n\n' ||
+    'How do they think about exact vs approximate counting in the context of stability?'
+    || E'\n\n' ||
+    'How do they handle network partitions and consistency?'
+    || E'\n\n' ||
+    'What is their strategy for real time data delivery?'
+    || E'\n\n' ||
+    'Do they address idempotency and double-counting problem?'
 )
 ON CONFLICT (name) DO NOTHING;
 

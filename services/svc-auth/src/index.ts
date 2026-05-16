@@ -34,10 +34,9 @@ const Login = z.object({
     password: passwordSchema,
 });
 
-const REFRESH_SECRET = "changewhenvaultisup";
-//global scope necessary as it lives with the duration of the process
-const oauthSessions= new Map<string, PendingOAuthSession>(); //map holding the "state":PendingOAuthSession() key value pairs,
+const REFRESH_SECRET = readFileSync("/secrets/refresh_secret").toString("utf8").trim();
 
+const oauthSessions= new Map<string, PendingOAuthSession>(); //map holding the "state":PendingOAuthSession() key value pairs,
 
 //redirect_uri for third party auth, check notion for value
 const redirectURI = process.env.REDIRECT_URI;
@@ -292,7 +291,9 @@ app.post('/auth/refresh-token', async (req, res) => {
 //revoke ALL refresh tokens (logout everywhere, admin delete, rotate tokens on permission change, etc)
 app.patch('/auth/revoke/refresh-token/:userId', async (req, res) => {
     console.log("In revoke all refesh tokens route");
+    console.log(req.body.permissions);
     const targetId = parseInt(req.params.userId);
+    console.log(targetId, req.body.tokenId);
     if ((!req.body.permissions.includes('manageLogout') && !req.body.permissions.includes('logoutSelf')) ||
         (req.body.permissions.includes('logoutSelf') && targetId !== req.body.tokenId))
         return res.status(403).json({error: "Permissions denied for PATCH /auth/revoke/refresh-token/:userId"});
@@ -329,6 +330,8 @@ app.patch("/auth/revoke/refresh-token", async (req, res) =>{
     if (!oldRefreshToken) {
         return res.status(404).json({error: "No refresh token"});
     }
+    if (!req.body.permissions.includes('logoutSelf') && !req.body.permissions.includes('manageLogout'))
+        return res.status(403).json({error: "Permissions denied on PATCH /auth/revoke/refesh-token"});
     let decoded;
     try {
         decoded = jwt.verify(oldRefreshToken, REFRESH_SECRET, {ignoreExpiration: true}) as jwt.JwtPayload;
@@ -337,19 +340,46 @@ app.patch("/auth/revoke/refresh-token", async (req, res) =>{
     }
     try {
         const revoke = await prisma.refresh_tokens.update({
-        where: {
-            jti: decoded.jti,
-        },
-        data: {
-            updated_at: new Date(),
-            revoked_at: new Date(),
-        },
-    });
+            where: {
+                jti: decoded.jti,
+            },
+            data: {
+                updated_at: new Date(),
+                revoked_at: new Date(),
+            },
+        });
     } catch (error) {
         return res.status(404).json({error: "Refresh Token non existent in database"});
     }
     return res.status(200).json({message: "refresh token revoked", userId: decoded.userId});
 })
+
+// app.patch("/auth/revoke/refresh-token/everywhere", async (req, res) =>{
+//     const oldRefreshToken = req.body?.refreshToken;
+//     if (!oldRefreshToken) {
+//         return res.status(404).json({error: "No refresh token"});
+//     }
+//     let decoded;
+//     try {
+//         decoded = jwt.verify(oldRefreshToken, REFRESH_SECRET, {ignoreExpiration: true}) as jwt.JwtPayload;
+//     } catch(error) {
+//         return res.status(401).json({error: "Invalid refresh token"});
+//     }
+//     try {
+//         const revoke = await prisma.refresh_tokens.updateMany({
+//             where: {
+//                 user_id: decoded.user_id,
+//             },
+//             data: {
+//                 updated_at: new Date(),
+//                 revoked_at: new Date(),
+//             },
+//         });
+//     } catch (error) {
+//         return res.status(404).json({error: "Refresh Token non existent in database"});
+//     }
+//     return res.status(200).json({message: "refresh tokens revoked", userId: decoded.userId});
+// })
 
 app.post("/auth/user", async (req, res) => {
     const loginParse = Login.safeParse({email: req.body.email, password: req.body.password}); //email and password validation
