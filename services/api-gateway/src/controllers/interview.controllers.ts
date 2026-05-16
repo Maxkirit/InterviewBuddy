@@ -201,11 +201,11 @@ export const submitInterview = async (req: Request, res: Response) => {
 
 export const deleteInterview = async (req: Request, res: Response) => {
     const { interview_id } = req.params;
+	console.log("in delete Inteview api")
     try {
         const result = await axios.patch(`http://svc-interview-store:3000/interview/${interview_id}/delete`,{
-            user_id: (req as ReqWithUser).userId,
+            userId: (req as ReqWithUser).userId,
             permissions: (req as ReqWithUser).permissions,
-            body: req.body,
         });
         res.status(200).json(result?.data);
     } catch (e) {
