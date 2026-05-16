@@ -26,7 +26,7 @@ const Login = z.object({
     password: passwordSchema,
 });
 
-const REFRESH_SECRET = "changewhenvaultisup";
+const REFRESH_SECRET = readFileSync("/secrets/refresh_secret").toString("utf8").trim();
 
 
 // dotenv.config() // {path: '...'} pour personnailiser ou est la cles

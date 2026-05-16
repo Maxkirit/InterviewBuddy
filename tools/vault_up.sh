@@ -33,13 +33,13 @@ wait_for_log() {
 }
 
 echo "[vault_up] === VAULT STACK (profile=vault) ==="
-docker compose --profile vault up -d vault-certgen vault
+docker compose --profile vault up -d --build vault-certgen vault
 wait_for_log vault "Vault server started" 180
 
-docker compose --profile vault up -d vault-bootstrap
+docker compose --profile vault up -d --build vault-bootstrap
 wait_for_log vault-bootstrap "\[bootstrap\] DONE" 240
 
-docker compose --profile vault up -d vault-seed
+docker compose --profile vault up --force-recreate -d --build vault-seed
 wait_for_log vault-seed "\[seed\] DONE" 180
 
 echo "[vault_up] DONE. Logs written to $LOG_DIR/"
