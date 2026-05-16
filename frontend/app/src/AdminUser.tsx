@@ -27,6 +27,7 @@ export default function AdminUsers(){
 	const editModalUser = useRef<HTMLDialogElement>(null);
 	const deleteModalUser = useRef<HTMLDialogElement>(null);
 	const authContext = useContext(AuthContext);
+	const [filter, setFilter] = useState<'all' | 'candidate' | 'recruiter'>('all');
 
 	useEffect(()=>{
 		async function getUser(){
@@ -90,7 +91,11 @@ export default function AdminUsers(){
 			console.log(e);
 		}
 	}
-
+	let filteredUsers : User[];
+	if (filter === 'all')
+		filteredUsers = users;
+	else
+		filteredUsers = users.filter(user => user.role === filter)
 	return(
         <div className="max-w-[900px] mx-auto px-6 py-10">
 
@@ -99,9 +104,32 @@ export default function AdminUsers(){
                 <h1 className="text-[1.75rem] font-bold text-[#1a1d2e]">Users</h1>
             </div>
 
+			{/* Filter */}
+			<button 
+				className={filter === 'all' 
+    			? "text-sm font-medium px-3.5 py-1.5 rounded-lg bg-[#eef1ff] text-[#4f6ef7]" 
+    			: "text-sm font-medium text-gray-500 px-3.5 py-1.5 rounded-lg hover:bg-[#f0f3ff] hover:text-[#4f6ef7] transition"}
+				onClick={() => setFilter('all')}>
+				All
+			</button>
+			<button
+				className={filter === 'recruiter' 
+    			? "text-sm font-medium px-3.5 py-1.5 rounded-lg bg-[#eef1ff] text-[#4f6ef7]" 
+    			: "text-sm font-medium text-gray-500 px-3.5 py-1.5 rounded-lg hover:bg-[#f0f3ff] hover:text-[#4f6ef7] transition"}
+				onClick={() => setFilter('recruiter')}>
+				Recruiters
+			</button>
+			<button
+				className={filter === 'candidate' 
+    			? "text-sm font-medium px-3.5 py-1.5 rounded-lg bg-[#eef1ff] text-[#4f6ef7]" 
+    			: "text-sm font-medium text-gray-500 px-3.5 py-1.5 rounded-lg hover:bg-[#f0f3ff] hover:text-[#4f6ef7] transition"}
+				onClick={() => setFilter('candidate')}>
+				Candidates
+			</button>
+
             {/* Liste */}
             <div className="flex flex-col gap-3">
-                {users.map(user => (
+                {filteredUsers.map(user => (
                     <div key={user.user_id} className="bg-white border border-[#e4e8f0] rounded-[14px] px-6 py-5 flex items-center gap-6">
 
                         {/* Gauche */}

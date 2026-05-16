@@ -160,9 +160,17 @@ export default function AppLayout() {
                                 Users
                             </NavLink>
                         </li>
+						<li>
+                            <NavLink
+                                to="/admin/connections"
+                                className={navLinkClass}
+                            >
+                                Connections
+                            </NavLink>
+                        </li>
                         <li>
                             <NavLink
-                                to="/admin/Interviews"
+                                to="/admin/interviews"
                                 className={navLinkClass}
                             >
                                 Interviews

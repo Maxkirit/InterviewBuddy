@@ -16,7 +16,8 @@ import RecruiterListCandidates from "./RecruiterListConnections"
 import InviteLink from "./invite";
 import GradingPage from "./GradingPage";
 import ViewProfile from "./ViewProfile";
-
+import AdminInterviews from "./AdminInterviews";
+import AdminConnections from "./AdminConnections";
 
 export default function Router() {
     return (
@@ -48,7 +49,16 @@ export default function Router() {
                                 element={<GradingPage />}/>
                         </Route>
                         <Route path="/admin" element={<AdminView />}>
-                            <Route path="/admin/users" element={<AdminUsers />} />
+                            <Route 
+								path="/admin/users"
+								element={<AdminUsers />} />
+							<Route 
+								path="/admin/interviews"
+								element={<AdminInterviews />} />
+							<Route 
+								path="/admin/Connections"
+								element={<AdminConnections />} />
+
                         </Route>
                         <Route path="/profile" element={<MyProfile />} />
                         <Route path="/profile/:user_id" element={<ViewProfile />} />
