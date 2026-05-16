@@ -239,7 +239,7 @@ export default function RecruiterInterviews() {
                     <div className="avatar relative overflow-hidden">
                         {candidate?.profile_pic_url && (
                             <img
-                                src={`http://localhost:3000/avatars/${candidate.profile_pic_url}`}
+                                src={`/avatars/${candidate.profile_pic_url}`}
                                 className="absolute inset-0 w-full h-full object-cover rounded-full"
                                 onError={(e) => e.currentTarget.remove()}
                             />
