@@ -99,7 +99,7 @@ CREATE TABLE $TABLE_USER (
 	email			VARCHAR(255)	NOT NULL UNIQUE,			--255 = RFC 5321
 	phone_number	VARCHAR(32),
 	is_active		BOOLEAN			NOT NULL DEFAULT TRUE,
-	last_login		TIMESTAMPTZ,
+	last_seen		TIMESTAMPTZ		NOT NULL DEFAULT NOW(),
 	created_at		TIMESTAMPTZ		NOT NULL DEFAULT NOW(),
 	updated_at		TIMESTAMPTZ		NOT NULL DEFAULT NOW(),
 	deleted_at		TIMESTAMPTZ								--definie a null, sinon = utilisateur delete virtuellement interdir l'accès

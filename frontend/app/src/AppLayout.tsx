@@ -11,6 +11,19 @@ export default function AppLayout() {
     const authContext = useContext(AuthContext);
     const [url, setUrl] = useState();
 
+    useEffect(() => {
+        if (!authContext?.accessToken) return;
+        async function getUrl() {
+            try {
+                const res = await authContext?.axiosInstance.get(`/api/v1/user/avatar/${authContext.userId}`);
+                setUrl(res?.data.profile_pic_url);
+            } catch (error) {
+                console.log("in error path");
+            }
+        }
+        getUrl();
+    }, [authContext?.accessToken]);
+
     if (authContext?.isLoading === true) {
         return (
             <div>
@@ -22,21 +35,6 @@ export default function AppLayout() {
     if (authContext?.accessToken === null) {
         return <Navigate to="/login" replace />;
     }
-
-    useEffect(() => {
-        async function getUrl() {
-            try {
-                const res = await authContext?.axiosInstance.get(`/api/v1/user/avatar/${authContext.userId}`);
-                console.log(res?.data);
-                setUrl(res?.data.profile_pic_url);
-            } catch (error) {
-                // error
-                console.log("in error path");
-            }
-        }
-        
-        getUrl();
-    }, []);
 
     function renderNavbar() {
         if (authContext?.role === "candidate") {

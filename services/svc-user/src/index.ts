@@ -280,6 +280,7 @@ app.get("/user/:userId/connections", async (req, res) => {
                         lastname: true,
                         profile_pic_url: true,
                         organization: true,
+                        last_seen: true,
                     },
                 },
                 // When this user is the recruiter, select the candidate's info
@@ -289,6 +290,7 @@ app.get("/user/:userId/connections", async (req, res) => {
                         firstname: true,
                         lastname: true,
                         profile_pic_url: true,
+                        last_seen: true,
                     },
                 },
             },
@@ -542,6 +544,31 @@ app.get('/user/link/generate', async(req, res) =>{
 		return res.status(500).json(e);
 	}
 })
+
+app.patch('/user/:user_id/heartbeat', async (req, res) => {
+    try {
+        await prisma.users.update({
+            where: {
+                user_id: parseInt(req.params.user_id),
+            },
+            data: {
+                last_seen: new Date(),
+            }
+        });
+        res.status(201).json({message: "Heatbeat recorded"});
+    } catch (error) {
+        console.log("in error path\n");
+        if (error instanceof Prisma.PrismaClientInitializationError)
+            return res.status(503).json({ error: "Database unavailable" });
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            if (error.code === 'P2025') {
+                return res.status(404).json({error: "User not found"});
+            }
+            return res.status(502).json({error: error.message});
+        }
+        return res.status(502).json({error: "Bad gateway (svc-user)"});
+    }
+});
 
 app.listen(port, () => {
     console.log(`listening on port ${port}`);

@@ -8,6 +8,7 @@ type ConnectionData = {
 	lastname: string;
 	organization: string;
 	profile_pic_url: string;
+	last_seen: string;
 }
 
 export default function RecruiterListCandidates() {
@@ -28,6 +29,7 @@ export default function RecruiterListCandidates() {
 					lastname: item.lastname,
 					organization: item.organization,
 					profile_pic_url: item.profile_pic_url,
+					last_seen: item.last_seen,
 				}));
 				setConnections(parsed);
 			} catch (error) {
@@ -69,34 +71,39 @@ export default function RecruiterListCandidates() {
                         share invite link
                 </button>
             </div>
-			<div className="candidates-list" style={{ padding: "24px" }}>
+			<div className="flex flex-col gap-2">
 				{connections.length === 0 ? (
 					<p>No connections yet</p>
 				) : (
-					connections.map((conn) => (
-						<Link key={conn.user_id} to={`/profile/${conn.user_id}`} className="no-underline bg-white border border-[#e4e8f0] rounded-[12px] px-5 py-3.5 flex items-center justify-between hover:border-[#4f6ef7] transition">
-							<div className="flex items-center gap-3">
-								<div className="avatar relative overflow-hidden">
-									{conn?.profile_pic_url && (
-										<img
-											src={`https://localhost/avatars/${conn.profile_pic_url}`}
-											className="absolute inset-0 w-full h-full object-cover rounded-full"
-											onError={(e) => e.currentTarget.remove()}
-										/>
-									)}
-									{conn ? `${conn.firstname[0]}${conn.lastname[0]}` : "??"}
+					connections.map((conn) => {
+						const isOnline = Date.now() - new Date(conn.last_seen).getTime() < 60_000;
+						return (
+							<Link key={conn.user_id} to={`/profile/${conn.user_id}`} className="no-underline bg-white border border-[#e4e8f0] rounded-[12px] px-5 py-3.5 flex items-center justify-between hover:border-[#4f6ef7] transition">
+								<div className="flex items-center gap-3">
+									<div className="avatar relative overflow-hidden">
+										{conn?.profile_pic_url && (
+											<img
+												src={`https://localhost/avatars/${conn.profile_pic_url}`}
+												className="absolute inset-0 w-full h-full object-cover rounded-full"
+												onError={(e) => e.currentTarget.remove()}
+											/>
+										)}
+										{conn ? `${conn.firstname[0]}${conn.lastname[0]}` : "??"}
+									</div>
+									<div className="flex flex-col gap-0.5">
+										<span className="text-[0.975rem] font-semibold text-[#1a1d2e]">
+											{conn.firstname} {conn.lastname}
+										</span>
+										<span className="text-[0.8rem] text-gray-500">
+											{conn.organization ?? "—"}
+										</span>
+									</div>
 								</div>
-								<div className="flex flex-col gap-0.5">
-									<span className="text-[0.975rem] font-semibold text-[#1a1d2e]">
-										{conn.firstname} {conn.lastname}
-									</span>
-									<span className="text-[0.8rem] text-gray-500">
-										{conn.organization ?? "—"}
-									</span>
-								</div>
-							</div>
-						</Link>
-					))
+								<div className="w-3 h-3 rounded-full shrink-0"
+									style={{ background: isOnline ? "#22c55e" : "#d1d5db" }} />
+							</Link>
+						)
+					})
 				)}
 			</div>
 			      <dialog ref={modalRef} className="rounded-xl p-0 w-[480px] shadow-xl backdrop:bg-black/50">
