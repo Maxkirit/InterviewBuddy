@@ -80,6 +80,13 @@ export default function Login() {
         }
     }
 
+    async function continueGoogle() {
+        window.location.href = "http://localhost:3000/api/v1/auth/google/init";
+        //new component mounted when final 202 returned
+        //mount in router
+        //check invite.tsx for pop up 
+    }
+
     return (
         <div className="min-h-screen flex items-center justify-center p-6">
             <div className="bg-white border border-[#e4e8f0] rounded-2xl py-10 px-11 w-full max-w-[420px]">
@@ -136,7 +143,8 @@ export default function Login() {
                     <span className="flex-1 h-px bg-[#e4e8f0]" />
                 </div>
 
-                <button className="w-full py-[10px] rounded-[10px] border border-[#e4e8f0] bg-white text-[#374151] text-[0.9rem] font-medium cursor-pointer flex items-center justify-center gap-2.5 hover:bg-gray-50 hover:border-gray-300 transition">
+                <button className="w-full py-[10px] rounded-[10px] border border-[#e4e8f0] bg-white text-[#374151] text-[0.9rem] font-medium cursor-pointer flex items-center justify-center gap-2.5 hover:bg-gray-50 hover:border-gray-300 transition"
+                        onClick={continueGoogle}>
                     <svg
                         className="w-[18px] h-[18px] shrink-0"
                         viewBox="0 0 24 24"
