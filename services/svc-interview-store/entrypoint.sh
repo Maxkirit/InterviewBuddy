@@ -1,10 +1,10 @@
 #!/bin/bash
 set -e
 
-echo "[svc-interview-store] waiting for /secrets/db.env..."
-while [ ! -f /secrets/db.env ]; do
-  sleep 1
-done
+if [ ! -r /secrets/db.env ]; then
+  echo "[svc-auth] ERROR: missing or unreadable /secrets/db.env"
+  exit 1
+fi
 
 set -a
 . /secrets/db.env
