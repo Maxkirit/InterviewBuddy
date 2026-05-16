@@ -19,7 +19,7 @@ type ApiError = {
 const clientId = process.env.CLIENT_ID;
 if (!clientId) throw new Error("CLIENT_ID missing in .env file");
 //will be fetched from vault like PRIVATE_KEY once setup
-const clientSecret = process.env.CLIENT_SECRET;
+const clientSecret = readFileSync("/secrets/google_client_secret").toString("utf8").trim();
 if (!clientSecret) throw new Error("CLIENT_SECRET missing");
 
 const passwordSchema = z.string()

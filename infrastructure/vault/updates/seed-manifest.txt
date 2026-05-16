@@ -60,3 +60,6 @@ grading-db kv/svc/grading-db/db user literal:app_grading
 grading-db kv/svc/grading-db/db superuser_password secret:grading_db_superuser_password
 grading-db kv/svc/grading-db/db admin_password secret:grading_db_admin_password
 grading-db kv/svc/grading-db/db app_password secret:grading_db_app_password
+
+grafana kv/svc/grafana/admin user literal:admin
+grafana kv/svc/grafana/admin password secret:grafana_admin_password

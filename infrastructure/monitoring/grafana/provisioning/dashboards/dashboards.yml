@@ -1,0 +1,11 @@
+apiVersion: 1
+
+providers:
+  - name: InterviewBuddy
+    orgId: 1
+    folder: InterviewBuddy
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /var/lib/grafana/dashboards
