@@ -339,6 +339,44 @@ app.patch("/interview/:interview_id", async (req, res) => {
     }
 });
 
+
+app.patch("/interview/:interview_id/delete", async (req, res) => {
+    const { interview_id } = req.params;
+    const userId = parseInt(req.body.userId);
+    const permissions: string[] = req.body.permissions;
+
+    try {
+        const interview = await prisma.interviews.findUnique({
+            where: { unique_interview_id: parseInt(interview_id) },
+        });
+
+        if (!interview)
+            return res.status(404).json({ error: "interview not found" });
+
+        if (interview.status === "graded")
+            return res.status(403).json({ error: "cannot delete a graded interview" });
+
+        const isRecruiter = permissions.includes("deleteRealInterview") && interview.recruiter_id === userId;
+        const isCandidate = permissions.includes("deleteMockInterview") && interview.candidate_id === userId;
+        const isAdmin = permissions.includes("manageInterview");
+
+        if (!isRecruiter && !isCandidate && !isAdmin)
+            return res.status(403).json({ error: "forbidden" });
+
+        await prisma.interviews.update({
+            where: { unique_interview_id: parseInt(interview_id) },
+            data: { deleted: true },
+        });
+
+        return res.status(200).json({ message: "delete success" });
+
+    } catch (error) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError)
+            return res.status(400).json({ error: "error deleting interview", code: error.code });
+        return res.status(500).json({ error: "internal error" });
+    }
+});
+
 app.listen(port, () => {
     console.log(`listening on port ${port}`);
 });
