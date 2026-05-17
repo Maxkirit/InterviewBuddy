@@ -81,7 +81,7 @@ export default function Login() {
     }
 
     async function continueGoogle() {
-        window.location.href = "http://localhost:3000/api/v1/auth/google/init";
+        window.location.href = "http://localhost/api/v1/auth/google/init";
         //new component mounted when final 202 returned
         //mount in router
         //check invite.tsx for pop up 

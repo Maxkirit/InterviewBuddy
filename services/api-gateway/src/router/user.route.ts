@@ -10,6 +10,7 @@ import {
 	getLink,
     heartbeat,
 	deleteConnection,
+	deleteUser,
 } from "../controllers/user.controllers.js";
 
 const router = Router();
@@ -28,5 +29,6 @@ router.get("/avatar/:userId", getAvatarURL);
 router.post("/:user_id/connections/:link_id", addConnection);
 router.patch("/heartbeat", heartbeat);
 router.patch("/connections/:user_id/:connectionId", deleteConnection);
+router.patch("/:user_id/delete", deleteUser);
 
 export default router;

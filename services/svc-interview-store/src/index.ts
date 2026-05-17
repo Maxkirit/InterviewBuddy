@@ -310,6 +310,29 @@ app.patch("/interview/:interview_id/submit", async (req, res) => {
     }
 });
 
+
+//Delete all interview when connection delete
+app.patch("/interview/connection-delete", async (req, res) => {
+    const { recruiter_id, candidate_id } = req.body;
+
+    if (!recruiter_id || !candidate_id)
+        return res.status(400).json({ error: "recruiter_id and candidate_id required" });
+
+    try {
+        const result = await prisma.interviews.updateMany({
+            where: {
+                recruiter_id: parseInt(recruiter_id),
+                candidate_id: parseInt(candidate_id),
+                deleted: false,
+            },
+            data: { deleted: true }
+        });
+        return res.status(200).json({ message: `${result.count} interviews soft deleted` });
+    } catch (error) {
+        return res.status(500).json({ error: "internal error" });
+    }
+});
+
 app.patch("/interview/:interview_id", async (req, res) => {
     try {
         const { interview_id } = req.params;
@@ -367,9 +390,6 @@ app.patch("/interview/:interview_id/delete", async (req, res) => {
         if (!interview)
             return res.status(404).json({ error: "interview not found" });
 
-        if (interview.status === "graded")
-            return res.status(403).json({ error: "cannot delete a graded interview" });
-
         const isRecruiter = permissions.includes("deleteRealInterview") && interview.recruiter_id === userId;
         const isCandidate = permissions.includes("deleteMockInterview") && interview.candidate_id === userId;
         const isAdmin = permissions.includes("manageInterview");
@@ -390,6 +410,7 @@ app.patch("/interview/:interview_id/delete", async (req, res) => {
         return res.status(500).json({ error: "internal error" });
     }
 });
+ 
 
 app.listen(port, () => {
     console.log(`listening on port ${port}`);
