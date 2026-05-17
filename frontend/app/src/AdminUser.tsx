@@ -2,7 +2,7 @@ import { useState, useRef, useContext, useEffect} from 'react';
 import { AuthContext } from "./AuthProvider";
 import { ProfileSchema } from './Profile';
 
-type User = {
+export type User = {
     user_id: number;
     auth_id: number;
     firstname: string;

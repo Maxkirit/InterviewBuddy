@@ -2,7 +2,7 @@ import { useEffect, useState, useContext, useRef } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "./AuthProvider";
 
-type ConnectionData = {
+export type ConnectionData = {
 	recruiter_id: number;
 	candidate_id: number;
 	status: string;
@@ -22,7 +22,7 @@ type ConnectionData = {
     };
 }
 
-type ConfirmState = {
+export type ConfirmState = {
 	open: boolean;
 	recruiterId: number | null;
 	candidateId: number | null;
