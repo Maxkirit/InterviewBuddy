@@ -75,7 +75,9 @@ export default function Login() {
                     if (issue.path[0]) errs[issue.path[0] as string] = issue.message;
                 });
                 setFieldErrors(errs);
-            } else if (axios.isAxiosError(error) && error.response?.status == 401) {
+            } else if (axios.isAxiosError(error) && error.response?.status == 401 && error.response.data.error == "3rd party sign necessary") {
+                setFieldErrors({ form: "Try signing in with Google" });
+            }else if (axios.isAxiosError(error) && error.response?.status == 401) {
                 setFieldErrors({ form: "Invalid email or password" });
             } else {
                 setFieldErrors({ form: "Something went wrong. Please try again" });
@@ -83,8 +85,8 @@ export default function Login() {
         }
     }
 
-    async function continueGoogle() {
-        window.location.href = "http://localhost:3000/api/v1/auth/google/init";
+    function continueGoogle() {
+        window.location.href = "/api/v1/auth/google/init";
         //new component mounted when final 202 returned
         //mount in router
         //check invite.tsx for pop up 

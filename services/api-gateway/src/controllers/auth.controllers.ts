@@ -25,7 +25,7 @@ export const login = async (req: Request, res: Response) => {
       httpOnly: true,
       secure: false,
       sameSite: 'strict',
-      maxAge: response.data.maxAge,
+      maxAge: response.data.maxAge * 1000,
     });
     return res.status(200).json({ accessToken: response.data.accessToken, message: 'Login successful' });
   } catch (error) {
@@ -48,7 +48,7 @@ export const refresh = async (req: Request, res: Response) =>{
 		const result = await axios.post("http://svc-auth:3000/auth/refresh-token", {
 			refreshToken: oldRefreshToken,
 		});
-    res.cookie("refreshToken", result.data.refreshToken, {httpOnly: true, secure:  false, sameSite: "strict", maxAge: result.data.refreshMaxAge});
+    res.cookie("refreshToken", result.data.refreshToken, {httpOnly: true, secure: false, sameSite: "strict", maxAge: result.data.refreshMaxAge * 1000});
 		return res.json({accessToken: result.data.accessToken, message: 'Refresh successful'});
 	} catch (error){
 		if (axios.isAxiosError<ApiError>(error) && error.response?.status){
@@ -126,7 +126,7 @@ export const registrationFlow = async (req: Request, res: Response) => {
           httpOnly: true,
           secure: false,
           sameSite: 'strict',
-          maxAge: response.data.maxAge,
+          maxAge: response.data.maxAge * 1000,
         });
         return res.status(203).json({accessToken: response.data.accessToken, message: "User created"});
     } catch (error) {
@@ -180,7 +180,7 @@ export const validateExternalAuth = async (req: Request, res: Response) => {
                                                     httpOnly: true,
                                                     secure: false,
                                                     sameSite: 'strict',
-                                                    maxAge: response.data.maxAge,
+                                                    maxAge: response.data.maxAge * 1000,
                                                 })
                         .location(`http://localhost:5173/auth/callback?${urlParams.toString()}`)
                         .end();
@@ -219,7 +219,7 @@ export const chooseUserRole = async (req: Request, res: Response) => {
                                                                 httpOnly: true,
                                                                 secure: false,
                                                                 sameSite: 'strict',
-                                                                maxAge: authUpdate.data.maxAge,
+                                                                maxAge: authUpdate.data.maxAge * 1000,
                                                             })
                             .json({message: "Role updated succesfully",
                                     accessToken: authUpdate.data.accessToken
