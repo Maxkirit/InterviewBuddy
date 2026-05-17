@@ -194,6 +194,8 @@ app.post("/auth/user", async (req, res) => {
     if (!loginParse.success) {
         return res.status(400).json({error: loginParse.error});
     }
+	if (req.body.email.endsWith("@deleted.local"))
+    	return res.status(400).json({ error: "invalid email" });
     let user = await prisma.auths.findUnique({
         where: { email: req.body.email },
     });
@@ -261,6 +263,25 @@ app.post("/auth/user", async (req, res) => {
         } else {
             return res.status(502).json({error: "Bad gateway"});
         }
+    }
+})
+
+app.patch ("/auth/revokeToken/delete/:user_id", async(req, res) => {
+	const user_id = req.params.user_id
+	if (req.body.role !== "admin")
+		return res.status(403).json({error: "forbidden"});
+	try {
+        const revoke = await prisma.refresh_tokens.updateMany({
+            where: {
+                user_id: user_id,
+            },
+            data: {
+                updated_at: new Date(),
+                revoked_at: new Date(),
+            },
+        });
+    } catch (error) {
+        return res.status(404).json({error: "Refresh Token non existent in database"});
     }
 })
 
