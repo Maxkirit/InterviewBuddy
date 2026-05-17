@@ -1,0 +1,29 @@
+groups:
+  - name: interviewbuddy-alerts
+    rules:
+      - alert: ServiceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Prometheus target is down"
+          description: "{{ $labels.job }} / {{ $labels.instance }} has been down for more than 1 minute."
+
+      - alert: HighHttp5xxRate
+        expr: sum(rate(http_requests_total{status_code=~"5.."}[5m])) > 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "HTTP 5xx errors detected"
+          description: "One or more services are returning 5xx responses."
+
+      - alert: HighHttpLatencyP95
+        expr: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, service)) > 1
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High HTTP p95 latency"
+          description: "p95 latency is above 1 second for service {{ $labels.service }}."

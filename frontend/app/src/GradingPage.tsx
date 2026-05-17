@@ -2,6 +2,7 @@ import { useEffect, useState, useContext, type SubmitEvent } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { AuthContext } from "./AuthProvider";
 import z from "zod";
+import ErrorBanner from "./ErrorBanner";
 
 type Question = {
     question_id: number,
@@ -107,6 +108,7 @@ export default function GradingPage() {
     const [scaleScore, setScaleScore] = useState<number>(0);
     const [resScore, setResScore] = useState<number>(0);
     const [note, setNote] = useState<string>("");
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         async function getData() {
@@ -119,8 +121,8 @@ export default function GradingPage() {
                 const candidateData = await authContext?.axiosInstance.get(`api/v1/user/${interview?.candidate_id}/public`);
                 setCandidate(candidateData?.data);
             } catch (error) {
-                // error banner
                 console.log(`in error path: ${error}`);
+                setError("Failed to load the interview. Please try again.");
             }
         }
 
@@ -138,8 +140,7 @@ export default function GradingPage() {
             });
             navigate("/recruiter/interviews");
         } catch (error) {
-            // error banner
-            console.log(`in error path: ${error}`);
+            setError("Failed to submit the grade. Please try again.");
         }
     }
 
@@ -147,122 +148,131 @@ export default function GradingPage() {
     const totalPct = Math.round((totalScore / 20) * 100);
 
     return (
-        <div className="max-w-[820px] mx-auto px-6 py-10 flex flex-col gap-6">
+        <>
+            {error && <ErrorBanner message={error} onDismiss={() => setError(null)} />}
+            <div className="max-w-[820px] mx-auto px-6 py-10 flex flex-col gap-6">
 
-            {/* Page header */}
-            <div>
-                <h1 className="text-[1.75rem] font-bold text-[#1a1d2e] mb-1">Grade Interview</h1>
-                <p className="text-[0.875rem] text-[#6b7280]">
-                    {candidate?.firstname} {candidate?.lastname} &nbsp;·&nbsp; {interview?.job_title}
-                </p>
-            </div>
-
-            {/* 1 — Question */}
-            <div className="bg-white border border-[#e4e8f0] rounded-[14px] px-7 py-6">
-                <div className="flex items-center gap-3 mb-5">
-                    <div className="w-7 h-7 rounded-full bg-[#eef1ff] text-[#4f6ef7] text-[0.8rem] font-bold flex items-center justify-center shrink-0">1</div>
-                    <h2 className="text-[1.05rem] font-bold text-[#1a1d2e]">Interview Question</h2>
+                {/* Page header */}
+                <div>
+                    <h1 className="text-[1.75rem] font-bold text-[#1a1d2e] mb-1">Grade Interview</h1>
+                    <p className="text-[0.875rem] text-[#6b7280]">
+                        {candidate?.firstname} {candidate?.lastname} &nbsp;·&nbsp; {interview?.job_title}
+                    </p>
                 </div>
 
-                <p className="text-[1rem] font-semibold text-[#1a1d2e] mb-4">
-                    {interview?.questions.name}
-                </p>
-
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-[#f8f9ff] rounded-[10px] p-4">
-                        <p className="text-[0.775rem] font-bold text-[#4f6ef7] uppercase tracking-[0.06em] mb-2.5">
-                            Functional Requirements
-                        </p>
-                        <ul className="flex flex-col gap-1.5">
-                            {interview?.questions.functional_req.split('\n\n').map((req, i) => (
-                                <li key={i} className="flex items-baseline gap-2 text-[0.875rem] text-[#4b5563]">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-[#4f6ef7] shrink-0 mt-[5px]" />
-                                    {req}
-                                </li>
-                            ))}
-                        </ul>
+                {/* 1 — Question */}
+                <div className="bg-white border border-[#e4e8f0] rounded-[14px] px-7 py-6">
+                    <div className="flex items-center gap-3 mb-5">
+                        <div className="w-7 h-7 rounded-full bg-[#eef1ff] text-[#4f6ef7] text-[0.8rem] font-bold flex items-center justify-center shrink-0">1</div>
+                        <h2 className="text-[1.05rem] font-bold text-[#1a1d2e]">Interview Question</h2>
                     </div>
-                    <div className="bg-[#fffbf0] rounded-[10px] p-4">
-                        <p className="text-[0.775rem] font-bold text-[#b45309] uppercase tracking-[0.06em] mb-2.5">
-                            Non-Functional Requirements
-                        </p>
-                        <ul className="flex flex-col gap-1.5">
-                            {interview?.questions.non_functional_req.split('\n\n').map((req, i) => (
-                                <li key={i} className="flex items-baseline gap-2 text-[0.875rem] text-[#4b5563]">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-[#f59e0b] shrink-0 mt-[5px]" />
-                                    {req}
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                </div>
-            </div>
 
-            {/* 2 — Candidate Answer */}
-            <div className="bg-white border border-[#e4e8f0] rounded-[14px] px-7 py-6">
-                <div className="flex items-center gap-3 mb-5">
-                    <div className="w-7 h-7 rounded-full bg-[#eef1ff] text-[#4f6ef7] text-[0.8rem] font-bold flex items-center justify-center shrink-0">2</div>
-                    <h2 className="text-[1.05rem] font-bold text-[#1a1d2e]">Candidate's Answer</h2>
-                </div>
-                <div className="bg-[#f4f6fb] rounded-[10px] px-5 py-5 text-[0.9rem] text-[#374151] leading-relaxed whitespace-pre-line">
-                    {interview?.unfinished_text}
-                </div>
-            </div>
+                    <p className="text-[1rem] font-semibold text-[#1a1d2e] mb-4">
+                        {interview?.questions.name}
+                    </p>
 
-            {/* 3 — Guiding Questions */}
-            <div className="bg-white border border-[#e4e8f0] rounded-[14px] px-7 py-6">
-                <div className="flex items-center gap-3 mb-5">
-                    <div className="w-7 h-7 rounded-full bg-[#eef1ff] text-[#4f6ef7] text-[0.8rem] font-bold flex items-center justify-center shrink-0">3</div>
-                    <h2 className="text-[1.05rem] font-bold text-[#1a1d2e]">Evaluation Guide</h2>
-                </div>
-
-                <div className="flex flex-col gap-3.5">
-                    {interview?.questions.grading_guide.split('\n\n').map((quest, i) => (
-                        <div key={i} className="flex items-start gap-3 text-[0.9rem] text-[#374151]">
-                            <div className="w-5 h-5 rounded-full bg-[#e4e8f0] text-[#6b7280] text-[0.7rem] font-bold flex items-center justify-center shrink-0 mt-0.5">
-                                {i + 1}
-                            </div>
-                            {quest}
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="bg-[#f8f9ff] rounded-[10px] p-4">
+                            <p className="text-[0.775rem] font-bold text-[#4f6ef7] uppercase tracking-[0.06em] mb-2.5">
+                                Functional Requirements
+                            </p>
+                            <ul className="flex flex-col gap-1.5">
+                                {interview?.questions.functional_req.split('\n\n').map((req, i) => (
+                                    <li key={i} className="flex items-baseline gap-2 text-[0.875rem] text-[#4b5563]">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-[#4f6ef7] shrink-0 mt-[5px]" />
+                                        {req}
+                                    </li>
+                                ))}
+                            </ul>
                         </div>
-                    ))}
-                </div>
-            </div>
-
-            {/* 4 — Scoring */}
-            <div className="bg-white border border-[#e4e8f0] rounded-[14px] px-7 py-6">
-                <div className="flex items-center gap-3 mb-6">
-                    <div className="w-7 h-7 rounded-full bg-[#eef1ff] text-[#4f6ef7] text-[0.8rem] font-bold flex items-center justify-center shrink-0">4</div>
-                    <h2 className="text-[1.05rem] font-bold text-[#1a1d2e]">Score</h2>
-                    <div className="ml-auto flex items-baseline gap-2">
-                        <span className="text-[2rem] font-extrabold text-[#1a1d2e] leading-none">{totalPct}%</span>
-                        <span className="text-[0.8rem] text-[#b0b7c3]">{totalScore} / 20</span>
+                        <div className="bg-[#fffbf0] rounded-[10px] p-4">
+                            <p className="text-[0.775rem] font-bold text-[#b45309] uppercase tracking-[0.06em] mb-2.5">
+                                Non-Functional Requirements
+                            </p>
+                            <ul className="flex flex-col gap-1.5">
+                                {interview?.questions.non_functional_req.split('\n\n').map((req, i) => (
+                                    <li key={i} className="flex items-baseline gap-2 text-[0.875rem] text-[#4b5563]">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-[#f59e0b] shrink-0 mt-[5px]" />
+                                        {req}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
                     </div>
                 </div>
 
-                <form onSubmit={handleSubmit}>
-                    <div className="flex flex-col gap-5">
-                        <ScoreSlider label="Requirements Coverage" value={reqScore}  onChange={setReqScore} />
-                        <ScoreSlider label="System Architecture"   value={archiScore} onChange={setArchiScore} />
-                        <ScoreSlider label="Scalability"           value={scaleScore} onChange={setScaleScore} />
-                        <ScoreSlider label="Tradeoffs & Reasoning" value={resScore}   onChange={setResScore} />
+                {/* 2 — Candidate Answer */}
+                <div className="bg-white border border-[#e4e8f0] rounded-[14px] px-7 py-6">
+                    <div className="flex items-center gap-3 mb-5">
+                        <div className="w-7 h-7 rounded-full bg-[#eef1ff] text-[#4f6ef7] text-[0.8rem] font-bold flex items-center justify-center shrink-0">2</div>
+                        <h2 className="text-[1.05rem] font-bold text-[#1a1d2e]">Candidate's Answer</h2>
+                    </div>
+                    <div className="bg-[#f4f6fb] rounded-[10px] px-5 py-5 text-[0.9rem] text-[#374151] leading-relaxed whitespace-pre-line">
+                        {interview?.unfinished_text}
+                    </div>
+                </div>
+
+                {/* 3 — Guiding Questions */}
+                <div className="bg-white border border-[#e4e8f0] rounded-[14px] px-7 py-6">
+                    <div className="flex items-center gap-3 mb-5">
+                        <div className="w-7 h-7 rounded-full bg-[#eef1ff] text-[#4f6ef7] text-[0.8rem] font-bold flex items-center justify-center shrink-0">3</div>
+                        <h2 className="text-[1.05rem] font-bold text-[#1a1d2e]">Evaluation Guide</h2>
                     </div>
 
-                    <div className="flex flex-col gap-1.5 mt-7">
-                        <label className="form-label" htmlFor="notes">Personal Notes</label>
-                        <textarea
-                            id="notes"
-                            className="form-input min-h-[110px] resize-y"
-                            placeholder="Add your personal observations, strengths, areas for improvement…"
-                            value={note}
-                            onChange={(e) => setNote(e.target.value)}
-                        />
+                    <div className="flex flex-col gap-3.5">
+                        {interview?.questions.grading_guide.split('\n\n').map((quest, i) => (
+                            <div key={i} className="flex items-start gap-3 text-[0.9rem] text-[#374151]">
+                                <div className="w-5 h-5 rounded-full bg-[#e4e8f0] text-[#6b7280] text-[0.7rem] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                                    {i + 1}
+                                </div>
+                                {quest}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* 4 — Scoring */}
+                <div className="bg-white border border-[#e4e8f0] rounded-[14px] px-7 py-6">
+                    <div className="flex items-center gap-3 mb-6">
+                        <div className="w-7 h-7 rounded-full bg-[#eef1ff] text-[#4f6ef7] text-[0.8rem] font-bold flex items-center justify-center shrink-0">4</div>
+                        <h2 className="text-[1.05rem] font-bold text-[#1a1d2e]">Score</h2>
+                        <div className="ml-auto flex items-baseline gap-2">
+                            <span className="text-[2rem] font-extrabold text-[#1a1d2e] leading-none">{totalPct}%</span>
+                            <span className="text-[0.8rem] text-[#b0b7c3]">{totalScore} / 20</span>
+                        </div>
                     </div>
 
-                    <div className="flex justify-end gap-2.5 pt-4">
-                        <button type="submit" className="btn-primary px-6 py-[9px]">Submit grade</button>
-                    </div>
-                </form>
+                    <form onSubmit={handleSubmit}>
+                        <div className="flex flex-col gap-5">
+                            <ScoreSlider label="Requirements Coverage" value={reqScore}  onChange={setReqScore} />
+                            <ScoreSlider label="System Architecture"   value={archiScore} onChange={setArchiScore} />
+                            <ScoreSlider label="Scalability"           value={scaleScore} onChange={setScaleScore} />
+                            <ScoreSlider label="Tradeoffs & Reasoning" value={resScore}   onChange={setResScore} />
+                        </div>
+
+                        <div className="flex flex-col gap-1.5 mt-7">
+                            <label className="form-label" htmlFor="notes">Personal Notes</label>
+                            <textarea
+                                id="notes"
+                                className="form-input min-h-[110px] resize-y"
+                                placeholder="Add your personal observations, strengths, areas for improvement…"
+                                value={note}
+                                onChange={(e) => setNote(e.target.value)}
+                            />
+                        </div>
+
+                        <div className="flex justify-end gap-2.5 pt-4">
+                            <button
+                                type="submit"
+                                className="btn-primary px-6 py-[9px] disabled:opacity-50 disabled:cursor-not-allowed"
+                                disabled={totalScore === 0}
+                            >
+                                Submit grade
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
-        </div>
+        </>
     );
 }

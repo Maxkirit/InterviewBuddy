@@ -1,0 +1,28 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - /etc/prometheus/alerts.yml
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets:
+          - prometheus:9090
+
+  - job_name: cadvisor
+    static_configs:
+      - targets:
+          - cadvisor:8080
+
+  # These targets will become UP once /metrics is implemented in each service.
+  - job_name: interviewbuddy-services
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - api-gateway:3000
+          - svc-auth:3000
+          - svc-user:3000
+          - svc-interview-store:3000
+          - svc-grading:3000

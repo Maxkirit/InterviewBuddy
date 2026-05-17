@@ -9,7 +9,7 @@ required_files="
 "
 
 for file in $required_files; do
-  if [ ! -r "$file"]; then
+  if [ ! -r "$file" ]; then
     echo "[svc-auth] ERROR: missing or unreadable secret file: $file"
     exit 1
   fi

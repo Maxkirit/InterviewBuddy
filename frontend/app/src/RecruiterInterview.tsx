@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "./AuthProvider";
 import SetupInterviewModal from "./SetupInterviewModal";
 import { type InterviewData } from "./CandidateOfficialInterview";
+import ErrorBanner from "./ErrorBanner";
 
 export type Grade = {
     req: number;
@@ -37,9 +38,10 @@ type CandidateData = {
 type DisplayStatus = "pending" | "overdue" | "completed" | "graded";
 
 function getDisplayStatus(interview: Interview): DisplayStatus {
-    if (interview.status === "graded")    return "graded";
-    if (interview.status === "completed") return "completed";
-    if (interview.dueDate < new Date())   return "overdue";
+    if (interview.status === "graded")                          return "graded";
+    if (interview.status === "completed")                       return "completed";
+    if (interview.status === "past_due_date")                   return "overdue";
+    if (interview.dueDate < new Date())                         return "overdue";
     return "pending";
 }
 
@@ -56,9 +58,11 @@ export default function RecruiterInterviews() {
     const [interviews, setInterviews] = useState<Interview[]>([]);
     const [candidateMap, setCandidateMap] = useState<Record<string, CandidateData>>({});
     const [gradeMap, setGradeMap] = useState<Record<number, Grade>>({});
-    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+    const [confirmInterviewId, setConfirmInterviewId] = useState<number | null>(null);
     const [isSetupOpen, setIsSetupOpen] = useState(false);
     const [refreshKey, setRefreshKey] = useState(0);
+    const [gradeErrorSet, setGradeErrorSet] = useState<Set<number>>(new Set());
+    const [error, setError] = useState<string | null>(null);
     const confirmRef = useRef<HTMLDialogElement>(null);
 
     useEffect(() => {
@@ -78,8 +82,7 @@ export default function RecruiterInterviews() {
                 }));
                 setInterviews(parsed);
             } catch (error) {
-                console.log("in error path");
-                // error banner
+                setError("Failed to load interviews. Please try again.");
             }
         }
         getInterviews();
@@ -102,7 +105,7 @@ export default function RecruiterInterviews() {
     useEffect(() => {
         const gradedInterviews = [...new Set(interviews.filter((i) => i.status === "graded").map((i) => i.id))];
         gradedInterviews.forEach(async (interviewId) => {
-            if (gradeMap[interviewId] || !interviewId) return;
+            if (gradeMap[interviewId] || gradeErrorSet.has(interviewId) || !interviewId) return;
             try {
                 const res = await authContext?.axiosInstance.get(`/api/v1/grading/grading-report`, {
                     params: {
@@ -119,19 +122,31 @@ export default function RecruiterInterviews() {
                 };
                 setGradeMap((prev) => ({ ...prev, [interviewId]: grade }));
             } catch (error) {
-                // handle error
-                console.log(`in error path: ${error}`);
+                setGradeErrorSet((prev) => new Set(prev).add(interviewId));
             }
         });
     }, [interviews]);
 
     useEffect(() => {
-        if (isConfirmOpen) confirmRef.current?.showModal();
+        if (confirmInterviewId !== null) confirmRef.current?.showModal();
         else confirmRef.current?.close();
-    }, [isConfirmOpen]);
+    }, [confirmInterviewId]);
 
     function handleBackdropClick(e: React.MouseEvent<HTMLDialogElement>) {
-        if (e.target === confirmRef.current) setIsConfirmOpen(false);
+        if (e.target === confirmRef.current) setConfirmInterviewId(null);
+    }
+
+    async function handleDeleteInterview() {
+        if (confirmInterviewId === null) return;
+        try {
+            await authContext?.axiosInstance.patch(
+                `/api/v1/interview/${confirmInterviewId}/delete`
+            );
+            setInterviews((prev) => prev.filter((i) => i.id !== confirmInterviewId));
+        } catch (e) {
+            console.log("error deleting interview");
+        }
+        setConfirmInterviewId(null);
     }
 
     function renderRightSide(displayStatus: DisplayStatus, interview: Interview) {
@@ -143,6 +158,12 @@ export default function RecruiterInterviews() {
                             Due {interview.dueDate.toDateString()}
                         </span>
                         <span className="status-badge status-pending">Pending</span>
+                        <button
+                            className="px-4 py-[7px] rounded-lg bg-white text-[0.85rem] font-medium cursor-pointer whitespace-nowrap transition border border-[#ef4444] text-[#ef4444] hover:bg-[#ef4444] hover:text-white"
+                            onClick={() => setConfirmInterviewId(interview.id)}
+                        >
+                            Delete
+                        </button>
                     </div>
                 );
 
@@ -155,7 +176,7 @@ export default function RecruiterInterviews() {
                         <span className="status-badge status-overdue">Past due date</span>
                         <button
                             className="px-4 py-[7px] rounded-lg bg-white text-[0.85rem] font-medium cursor-pointer whitespace-nowrap transition border border-[#ef4444] text-[#ef4444] hover:bg-[#ef4444] hover:text-white"
-                            onClick={() => setIsConfirmOpen(true)}
+                            onClick={() => setConfirmInterviewId(interview.id)}
                         >
                             Delete
                         </button>
@@ -172,6 +193,12 @@ export default function RecruiterInterviews() {
                         >
                             Grade
                         </button>
+                        <button
+                            className="px-4 py-[7px] rounded-lg bg-white text-[0.85rem] font-medium cursor-pointer whitespace-nowrap transition border border-[#ef4444] text-[#ef4444] hover:bg-[#ef4444] hover:text-white"
+                            onClick={() => setConfirmInterviewId(interview.id)}
+                        >
+                            Delete
+                        </button>
                     </div>
                 );
 
@@ -185,11 +212,14 @@ export default function RecruiterInterviews() {
                             <span className="status-badge status-graded">Graded</span>
                             <button
                                 className="px-4 py-[7px] rounded-lg bg-white text-[0.85rem] font-medium cursor-pointer whitespace-nowrap transition border border-[#ef4444] text-[#ef4444] hover:bg-[#ef4444] hover:text-white"
-                                onClick={() => setIsConfirmOpen(true)}
+                                onClick={() => setConfirmInterviewId(interview.id)}
                             >
                                 Delete
                             </button>
                         </div>
+                        {!grade && gradeErrorSet.has(interview.id) && (
+                            <span className="text-xs text-[#ef4444]">Failed to load score</span>
+                        )}
                         {grade && (
                             <div className="flex items-center gap-[18px]">
                                 <div className="text-[1.15rem] font-bold text-[#4f6ef7] min-w-[44px] text-center">
@@ -258,6 +288,7 @@ export default function RecruiterInterviews() {
 
     return (
         <>
+            {error && <ErrorBanner message={error} onDismiss={() => setError(null)} />}
             <div className="max-w-[900px] mx-auto py-10 px-6">
                 <div className="flex items-baseline gap-3 mb-7">
                     <h1 className="text-[1.75rem] font-bold text-[#1a1d2e]">Interviews</h1>
@@ -269,7 +300,9 @@ export default function RecruiterInterviews() {
                     </button>
                 </div>
                 <div className="flex flex-col gap-3">
-                    {interviews.map(renderInterviews)}
+                    {interviews.length === 0 ? (
+                        <p>No interviews yet</p>
+                    ) : interviews.map(renderInterviews)}
                 </div>
             </div>
 
@@ -281,7 +314,7 @@ export default function RecruiterInterviews() {
                         <h2 className="text-[1.1rem] font-bold text-[#1a1d2e]">Cancel interview?</h2>
                         <button
                             className="w-[30px] h-[30px] rounded-lg border border-[#e4e8f0] bg-white text-gray-400 text-xs cursor-pointer flex items-center justify-center transition hover:border-[#ef4444] hover:text-[#ef4444]"
-                            onClick={() => setIsConfirmOpen(false)}
+                            onClick={() => setConfirmInterviewId(null)}
                         >
                             &#10005;
                         </button>
@@ -290,10 +323,10 @@ export default function RecruiterInterviews() {
                         <p>This interview will be permanently cancelled and cannot be undone.</p>
                     </div>
                     <div className="flex justify-end gap-2.5 mt-6">
-                        <button type="button" className="btn-cancel" onClick={() => setIsConfirmOpen(false)}>
+                        <button type="button" className="btn-cancel" onClick={() => setConfirmInterviewId(null)}>
                             Keep
                         </button>
-                        <button className="btn-danger">Cancel interview</button>
+                        <button className="btn-danger" onClick={handleDeleteInterview}>Cancel interview</button>
                     </div>
                 </div>
             </dialog>

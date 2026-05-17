@@ -118,7 +118,12 @@ app.get("/interview/real-interviews", async (req, res) => {
         }
         try {
             console.log("admin perm okay...");
-            const interviews = await prisma.interviews.findMany();
+            const interviews = await prisma.interviews.findMany({
+				where:{
+					deleted : false,
+					status : {not: "mock"},
+				},
+			});
             return res.status(200).json(interviews);
         } catch (e) {
             return res.status(500).json({ error: "Internal error" });
@@ -137,7 +142,10 @@ app.get("/interview/real-interviews", async (req, res) => {
     console.log("permissions:", permission);
     try {
         const interview = await prisma.interviews.findMany({
-            where: { recruiter_id: parseInt(recruiter_id as string, 10) },
+            where: { 
+				recruiter_id: parseInt(recruiter_id as string, 10),
+				deleted: false,
+			 },
         });
         console.log("ici on passe");
         res.status(200).json(interview);
@@ -167,7 +175,9 @@ app.get("/interview/candidat-interviews", async (req, res) => {
     console.log("permissions:", permission);
     try {
         const interview = await prisma.interviews.findMany({
-            where: { candidate_id: parseInt(candidate_id as string, 10) },
+            where: { candidate_id: parseInt(candidate_id as string, 10),
+				deleted: false,
+			 },
         });
         console.log("ici on passe");
         res.status(200).json(interview);
@@ -212,6 +222,7 @@ app.get("/interview/:interview_id", async (req, res) => {
         const interview = await prisma.interviews.findUniqueOrThrow({
             where: {
                 unique_interview_id: parseInt(interview_id),
+				deleted: false,
             },
             include: { questions: true },
         })
@@ -243,6 +254,7 @@ app.get("/interview/:interview_id/start", async (req, res) => {
         const interview = await prisma.interviews.findUniqueOrThrow({
             where: {
                 unique_interview_id: parseInt(interview_id),
+				deleted: false,
             },
             include: { questions: true },
         })
@@ -272,6 +284,7 @@ app.patch("/interview/:interview_id/submit", async (req, res) => {
         const interview = await prisma.interviews.findUniqueOrThrow({
             where: {
                 unique_interview_id: parseInt(interview_id),
+				deleted: false,
             },
         });
         if (interview.candidate_id !== userId || interview.status !== "scheduled") {
@@ -308,6 +321,7 @@ app.patch("/interview/:interview_id", async (req, res) => {
         const interview = await prisma.interviews.findUniqueOrThrow({
             where: {
                 unique_interview_id: parseInt(interview_id),
+				deleted: false,
             },
         });
         if (interview.recruiter_id !== userId) {
@@ -335,6 +349,44 @@ app.patch("/interview/:interview_id", async (req, res) => {
                 .status(400)
                 .json({ error: "Error submitting interview", code: error.code });
         }
+        return res.status(500).json({ error: "internal error" });
+    }
+});
+
+
+app.patch("/interview/:interview_id/delete", async (req, res) => {
+    const { interview_id } = req.params;
+    const userId = parseInt(req.body.userId);
+    const permissions: string[] = req.body.permissions;
+
+    try {
+        const interview = await prisma.interviews.findUnique({
+            where: { unique_interview_id: parseInt(interview_id) },
+        });
+
+        if (!interview)
+            return res.status(404).json({ error: "interview not found" });
+
+        if (interview.status === "graded")
+            return res.status(403).json({ error: "cannot delete a graded interview" });
+
+        const isRecruiter = permissions.includes("deleteRealInterview") && interview.recruiter_id === userId;
+        const isCandidate = permissions.includes("deleteMockInterview") && interview.candidate_id === userId;
+        const isAdmin = permissions.includes("manageInterview");
+
+        if (!isRecruiter && !isCandidate && !isAdmin)
+            return res.status(403).json({ error: "forbidden" });
+
+        await prisma.interviews.update({
+            where: { unique_interview_id: parseInt(interview_id) },
+            data: { deleted: true },
+        });
+
+        return res.status(200).json({ message: "delete success" });
+
+    } catch (error) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError)
+            return res.status(400).json({ error: "error deleting interview", code: error.code });
         return res.status(500).json({ error: "internal error" });
     }
 });

@@ -29,6 +29,7 @@ const LoginSchema = z.object({
 export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
     const authContext = useContext(AuthContext);
     const navigate = useNavigate();
 	const location= useLocation();
@@ -49,11 +50,9 @@ export default function Login() {
 
     async function handleSubmit(event: SubmitEvent) {
         event.preventDefault();
+        setFieldErrors({});
         try {
-            const input = {
-                email: email,
-                password: password,
-            };
+            const input = { email, password };
             LoginSchema.parse(input);
             const result = await axios.post(
                 "/api/v1/auth/login",
@@ -70,14 +69,25 @@ export default function Login() {
             );
             navigate(from || "/", {replace: true});
         } catch (error) {
-            console.log(`in error path: ${error}`);
             if (error instanceof ZodError) {
-                // error banner
-                console.log(`zod error`);
+                const errs: Record<string, string> = {};
+                error.issues.forEach((issue) => {
+                    if (issue.path[0]) errs[issue.path[0] as string] = issue.message;
+                });
+                setFieldErrors(errs);
+            } else if (axios.isAxiosError(error) && error.response?.status == 401) {
+                setFieldErrors({ form: "Invalid email or password" });
             } else {
-                // add try again banner to form
+                setFieldErrors({ form: "Something went wrong. Please try again" });
             }
         }
+    }
+
+    async function continueGoogle() {
+        window.location.href = "http://localhost:3000/api/v1/auth/google/init";
+        //new component mounted when final 202 returned
+        //mount in router
+        //check invite.tsx for pop up 
     }
 
     return (
@@ -99,13 +109,14 @@ export default function Login() {
                             Email
                         </label>
                         <input
-                            className="form-input"
+                            className={`form-input ${fieldErrors.email ? "border-[#ef4444] focus:border-[#ef4444]" : ""}`}
                             type="email"
                             id="email"
                             placeholder="you@example.com"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                         />
+                        {fieldErrors.email && <span className="text-xs text-[#ef4444] mt-0.5">{fieldErrors.email}</span>}
                     </div>
 
                     <div className="form-field">
@@ -113,15 +124,17 @@ export default function Login() {
                             Password
                         </label>
                         <input
-                            className="form-input"
+                            className={`form-input ${fieldErrors.password ? "border-[#ef4444] focus:border-[#ef4444]" : ""}`}
                             type="password"
                             id="password"
                             placeholder="••••••••"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                         />
+                        {fieldErrors.password && <span className="text-xs text-[#ef4444] mt-0.5">{fieldErrors.password}</span>}
                     </div>
 
+                    {fieldErrors.form && <p className="text-xs text-[#ef4444] mb-2">{fieldErrors.form}</p>}
                     <button
                         className="btn-primary w-full py-[11px] mt-2"
                         type="submit"
@@ -136,7 +149,8 @@ export default function Login() {
                     <span className="flex-1 h-px bg-[#e4e8f0]" />
                 </div>
 
-                <button className="w-full py-[10px] rounded-[10px] border border-[#e4e8f0] bg-white text-[#374151] text-[0.9rem] font-medium cursor-pointer flex items-center justify-center gap-2.5 hover:bg-gray-50 hover:border-gray-300 transition">
+                <button className="w-full py-[10px] rounded-[10px] border border-[#e4e8f0] bg-white text-[#374151] text-[0.9rem] font-medium cursor-pointer flex items-center justify-center gap-2.5 hover:bg-gray-50 hover:border-gray-300 transition"
+                        onClick={continueGoogle}>
                     <svg
                         className="w-[18px] h-[18px] shrink-0"
                         viewBox="0 0 24 24"
