@@ -48,3 +48,10 @@ template {
   perms       = "0600"
   error_on_missing_key = true
 }
+
+template {
+  source      = "/vault/agent/templates/auth_db_admin_password.ctmpl"
+  destination = "/secrets/auth_db_admin_password"
+  perms       = "0600"
+  error_on_missing_key = true
+}

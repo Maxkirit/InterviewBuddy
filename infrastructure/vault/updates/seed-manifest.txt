@@ -10,6 +10,7 @@ auth kv/svc/auth/db password secret:auth_db_app_password
 auth kv/svc/auth/jwt private_pem secret:svc_auth_jwt_private_key
 auth kv/svc/auth/refresh_secret refresh_secret secret:svc_auth_refresh_secret
 auth kv/svc/auth/google client_secret env:GOOGLE_CLIENT_SECRET
+auth kv/svc/auth/db admin_password secret:auth_db_admin_password
 
 user kv/svc/user/db host literal:user-db
 user kv/svc/user/db port literal:5432
