@@ -540,6 +540,31 @@ app.patch('/user/:user_id/heartbeat', async (req, res) => {
     }
 });
 
+app.patch("/user/:user_id/delete"), async(req, res) =>{
+	const {userId, permissions, role} = req.body;
+	const user_id = Number (req.params?.user_id);
+
+	console.log("in delete user endpoint");
+
+	if (user_id !== userId || !permissions?.includes("deleteUserInfo"))
+		return res.status(403).json({error: "forbiden"})
+	try{
+		await prisma.users.update({
+			where: {user_id: userId},
+			data: {
+				is_active: false,
+				deleted_at: new Date(),
+				updated_at: new Date(),
+				email: `deleted_${user_id}@deleted.local`
+			}
+		})
+		console.log("prisma update ok");
+		return (res.status(200).json({message: "user delete sucess"}))
+	}
+	catch(e){
+		return res.status(500).json({error : "internal server error"});
+	}
+}
 
 app.listen(port, () => {
     console.log(`listening on port ${port}`);

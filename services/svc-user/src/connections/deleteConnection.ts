@@ -26,7 +26,7 @@ export const DeleteConnection= async (req: Request, res: Response) =>{
 
 	if (!permissions?.includes("deleteConnection") || (!isParticipant && !permissions?.includes("manageConnection"))){
 		console.log(`no permission for delete connection: user : ${isParticipant} `);
-		return res.status(403).json({error :"forbiden"});
+		return res.status(403).json({error :"forbidden"});
 	}
 	try{
 		await prisma.connections.update({
