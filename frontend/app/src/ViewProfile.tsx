@@ -34,7 +34,7 @@ export default function ViewProfile() {
     useEffect(() => {
         async function getUser() {
             try {
-                const res = await authContext?.axiosInstance.get(`api/v1/user/${user_id}/public`);
+                const res = await authContext?.axiosInstance.get(`/api/v1/user/${user_id}/public`);
                 setUser(res?.data);
             } catch (error) {
                 console.log(`in error path: ${error}`);

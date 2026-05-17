@@ -10,7 +10,7 @@ export const DeleteConnection= async (req: Request, res: Response) =>{
 	let recruiter_id : number;
 	let candidate_id : number;
 	if (role === "admin"){
-		recruiter_id = userId;
+		recruiter_id = user_id;
 		candidate_id = connectionId;
 	}
 	else if (role === "recruiter"){
