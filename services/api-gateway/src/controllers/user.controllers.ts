@@ -288,10 +288,13 @@ export const deleteConnection = async(req: Request, res: Response) =>{
 };
 
 
-deleteUser{
-1. révoquer tokens        → svc-auth (déconnexion immédiate)
-2. auth = false           → svc-auth (blocage connexion)
-3. soft delete interviews → svc-interview-store
-4. delete connections     → svc-user
-5. delete user            → svc-user
+export const deleteUser = async(req: Request, res: Response){
+	const {userId, permissions, role} = (req as ReqWithUser)
+	
 }
+
+// 1. révoquer tokens        → svc-auth (déconnexion immédiate)
+// 2. auth = false           → svc-auth (blocage connexion)
+// 3. soft delete interviews → svc-interview-store
+// 4. delete connections     → svc-user
+// 5. delete user            → svc-user

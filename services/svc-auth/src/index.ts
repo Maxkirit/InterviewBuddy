@@ -458,7 +458,7 @@ app.post("/auth/user", async (req, res) => {
     }
 })
 
-app.patch ("/auth/revokeToken/delete/:user_id", async(req, res) => {
+app.patch ("/auth/Token/delete/:user_id", async(req, res) => {
 	const user_id = req.params.user_id
 	if (req.body.role !== "admin")
 		return res.status(403).json({error: "forbidden"});
