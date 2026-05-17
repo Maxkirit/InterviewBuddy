@@ -24,7 +24,7 @@ const NewUser = z.object({
     email: z.email({ error: "Wrong email format", abort: true }),
     name: nameSurnameSchema,
     surname: nameSurnameSchema,
-    role_type: z.enum(["candidate", "recruiter", "admin"]),
+    role_type: z.enum(["candidate", "recruiter", "admin", "pending"]),
 });
 
 const GenderTypeSchema = z.union([
@@ -206,7 +206,7 @@ app.post("/user/profile/:auth_id", async (req, res) => {
         }
         console.log(`authId valid, checking role: ${req.body.role_type}\n`);
         const role: role_type = req.body.role_type;
-        if (role !== "recruiter" && role !== "candidate" && role !== "admin")
+        if (role !== "recruiter" && role !== "candidate" && role !== "admin" && role !== "pending")
             return res.status(400).json({ error: "Invalid role type" });
         console.log("role_type validated\n");
         const newUser = await prisma.users.create({
@@ -519,6 +519,40 @@ app.get('/user/:userId/avatar', async(req, res) => {
     }
 })
 
+//only own user with role as pending and thus "modifyUserRole" permission can use this route
+app.patch('/user/:userId/role', async(req, res) => {
+    console.log("in update user role svc-user");
+    console.log("permission: ", req.body.permissions);
+    const targetId = parseInt(req.params.userId);
+    if (!targetId)
+        return res.status(400).json({error: "Invalid userId in params"});
+    console.log(targetId !== req.body.tokenId);
+    console.log(!req.body.permissions.includes('modifyUserRole'));
+    if (!req.body.permissions.includes('modifyUserRole') || targetId !== req.body.tokenId)
+        return res.status(403).json({error: "Invalid permissions for PATCH /user/:userId/role"});
+    try {
+        console.log("permission validated");
+        const response = await prisma.users.update({
+            where: { user_id: targetId},
+            data: {
+                role: req.body.newRole,
+                updated_at: new Date(),
+            }
+        });
+        return res.status(200).json({message: "Role updated"});
+    } catch (error) {
+        console.log("in error path\n", error);
+        if (error instanceof Prisma.PrismaClientInitializationError)
+            return res.status(503).json({ error: "Database unavailable" });
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            if (error.code === 'P2025') {
+                return res.status(404).json({error: "User not found"});
+            }
+            return res.status(502).json({error: error.message});
+        }
+        return res.status(502).json({error: "Bad gateway (svc-user)"});
+    }
+})
 app.get('/user/link/generate', async(req, res) =>{
 	const tmp = req.query.permissions ?? {};
     const permission = Object.values(tmp) as string[];

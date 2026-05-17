@@ -6,3 +6,4 @@ auth-db
 user-db
 interview-store-db
 grading-db
+grafana
