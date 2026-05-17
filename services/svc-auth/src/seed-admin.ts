@@ -6,8 +6,8 @@ import axios from 'axios';
 type ApiError = { error: string };
 
 //to change with Vault agents
-const admin_email: string = readFileSync("/run/secrets/admin_email", "utf8").trim();
-const admin_password: string = readFileSync("/run/secrets/admin_password", "utf8").trim();
+const admin_email: string = readFileSync("/secrets/admin_email", "utf8").trim();
+const admin_password: string = readFileSync("/secrets/admin_password", "utf8").trim();
 
 let user = await prisma.auths.findUnique({
 	where: { email: admin_email },

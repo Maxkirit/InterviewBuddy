@@ -50,8 +50,15 @@ template {
 }
 
 template {
-  source      = "/vault/agent/templates/auth_db_admin_password.ctmpl"
-  destination = "/secrets/auth_db_admin_password"
+  source      = "/vault/agent/templates/admin_password.ctmpl"
+  destination = "/secrets/admin_password"
+  perms       = "0600"
+  error_on_missing_key = true
+}
+
+template {
+  source      = "/vault/agent/templates/admin_email.ctmpl"
+  destination = "/secrets/admin_email"
   perms       = "0600"
   error_on_missing_key = true
 }
