@@ -78,17 +78,68 @@ services:
     #         - backend-network
     #     restart: unless-stopped
 
-    # svc-monitoring:
-    #     container_name: svc-monitoring
-    #     build: services/svc-monitoring
-    #     networks:
-    #         - backend-network
-    #     restart: unless-stopped
-
     # dev-front:
     #     container_name: dev-front
     #     ports:
     #         - "5173:5173"
+
+
+    prometheus:
+        profiles: ["app"]
+        container_name: prometheus
+        image: prom/prometheus:latest
+        command:
+            - "--config.file=/etc/prometheus/prometheus.yml"
+            - "--storage.tsdb.path=/prometheus"
+        ports:
+            - "127.0.0.1:9090:9090"
+        volumes:
+            - ./infrastructure/monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+            - ./infrastructure/monitoring/prometheus/alerts.yml:/etc/prometheus/alerts.yml:ro
+            - prometheus_data:/prometheus
+        networks:
+            - backend-network
+        restart: unless-stopped
+
+    cadvisor:
+        profiles: ["app"]
+        container_name: cadvisor
+        image: gcr.io/cadvisor/cadvisor:latest
+        expose:
+            - "8080"
+        volumes:
+            - /:/rootfs:ro
+            - /var/run:/var/run:rw
+            - /sys:/sys:ro
+            - /var/lib/docker/:/var/lib/docker:ro
+        networks:
+            - backend-network
+        restart: unless-stopped
+
+    grafana:
+        profiles: ["app"]
+        container_name: grafana
+        image: grafana/grafana-oss:latest
+        ports:
+            - "127.0.0.1:3001:3000"
+        environment:
+            GF_SECURITY_ADMIN_USER: admin
+            GF_SECURITY_ADMIN_PASSWORD_FILE: /run/secrets/grafana_admin_password
+            GF_USERS_ALLOW_SIGN_UP: "false"
+            GF_AUTH_ANONYMOUS_ENABLED: "false"
+        volumes:
+            - grafana_data:/var/lib/grafana
+            - grafana_secrets:/run/secrets:ro
+            - ./infrastructure/monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+            - ./infrastructure/monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+        networks:
+            - backend-network
+        depends_on:
+            vault-agent-grafana:
+                condition: service_completed_successfully
+            prometheus:
+                condition: service_started
+        restart: unless-stopped
 
     frontend-certgen:
         profiles: ["app"]
@@ -285,6 +336,7 @@ services:
             - user_db_vault_creds:/vault/bootstrap/creds-out/user-db
             - interview_store_db_vault_creds:/vault/bootstrap/creds-out/interview-store-db
             - grading_db_vault_creds:/vault/bootstrap/creds-out/grading-db
+            - grafana_vault_creds:/vault/bootstrap/creds-out/grafana
 
             - ./infrastructure/vault/tools/scripts/bootstrap.sh:/vault/bootstrap/scripts/bootstrap.sh
             - ./infrastructure/vault/updates/services.txt:/vault/bootstrap/services_updates/services.txt
@@ -506,6 +558,28 @@ services:
         networks:
             - backend-network
         restart: "no"
+    
+    vault-agent-grafana:
+        profiles: ["app"]
+        container_name: vault-agent-grafana
+        image: hashicorp/vault:2.0.0
+        user: "0:0"
+        entrypoint: ["/bin/vault"]
+        command: ["agent", "-config=/vault/agent/agent.hcl"]
+        environment:
+            VAULT_ADDR: "https://vault:8200"
+            VAULT_CACERT: "/vault/tls/ca.crt"
+        tmpfs:
+            - /vault/file
+            - /vault/logs
+        volumes:
+            - vault_tls:/vault/tls:ro
+            - grafana_vault_creds:/vault/creds:ro
+            - grafana_secrets:/run/secrets
+            - ./infrastructure/vault/agents/grafana:/vault/agent:ro
+        networks:
+            - backend-network
+        restart: "no"
 
 networks:
     frontend-network:
@@ -529,6 +603,10 @@ volumes:
         name: ingress_volume
     profile_pictures:
         name: profile_pictures_shared_volume
+    prometheus_data:
+        name: prometheus_data_volume
+    grafana_data:
+        name: grafana_data_volume
     
     # SECRETS VOLUMES FOR VAULT AGENTS AND SERVICES/DB
     svc_auth_secrets:
@@ -547,6 +625,8 @@ volumes:
         name: interview_store_db_secrets_volume
     grading_db_secrets:
         name: grading_db_secrets_volume
+    grafana_secrets:
+        name: grafana_secrets_volume
 
     # VAULT CREDS VOLUMES
     svc_auth_vault_creds:
@@ -565,6 +645,8 @@ volumes:
         name: svc_interview_store_db_creds_volume
     grading_db_vault_creds:
         name: grading_db_vault_creds_volume
+    grafana_vault_creds:
+        name: grafana_vault_creds_volume
 
     # VAULT VOLUMES
     vault_data:
