@@ -458,24 +458,37 @@ app.post("/auth/user", async (req, res) => {
     }
 })
 
-app.patch ("/auth/Token/delete/:user_id", async(req, res) => {
-	const user_id = req.params.user_id
-	if (req.body.role !== "admin")
-		return res.status(403).json({error: "forbidden"});
+app.patch("/auth/disable/:targetId", async(req, res) => {
+	const { userId, permissions, auth_id } = req.body;
+	const targetId = Number(req.params?.targetId);
+
+	const isAdmin = permissions?.includes("manageUserInfo") && targetId !== userId;
+	const isSelf  = permissions?.includes("deleteUserInfo") && targetId === userId;
+
+	if (!isAdmin && !isSelf)
+		return res.status(403).json({ error: "forbidden" });
+
+	if (!auth_id)
+		return res.status(400).json({ error: "auth_id is required" });
+
 	try {
-        const revoke = await prisma.refresh_tokens.updateMany({
-            where: {
-                user_id: user_id,
-            },
-            data: {
-                updated_at: new Date(),
-                revoked_at: new Date(),
-            },
-        });
-    } catch (error) {
-        return res.status(404).json({error: "Refresh Token non existent in database"});
-    }
+		await prisma.auths.update({
+			where: { auth_id: Number(auth_id) },
+			data: {
+				email: `deleted_${targetId}@deleted.local`,
+				updated_at: new Date(),
+			}
+		});
+		console.log(`auth ${auth_id} disabled and email anonymized for user ${targetId}`);
+		return res.status(200).json({ message: "auth disabled" });
+	} catch (error) {
+		if (error instanceof Prisma.PrismaClientKnownRequestError)
+			return res.status(400).json({ error: "auth not found", code: error.code });
+		return res.status(500).json({ error: "internal server error" });
+	}
 })
+
+
 
 app.listen(port, () =>{
 	console.log(`listening on port ${port}`)

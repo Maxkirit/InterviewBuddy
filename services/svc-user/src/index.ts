@@ -612,9 +612,9 @@ app.patch("/user/:user_id/delete"), async(req, res) =>{
 	const user_id = Number (req.params?.user_id);
 
 	console.log("in delete user endpoint");
-	
+
 	if (user_id !== userId || !permissions?.includes("deleteUserInfo"))
-		return res.status(403).json({error: "forbidden"})
+		return res.status(403).json({error: "forbiden"})
 	try{
 		await prisma.users.update({
 			where: {user_id: userId},
