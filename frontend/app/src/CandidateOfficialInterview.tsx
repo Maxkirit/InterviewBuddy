@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "./AuthProvider";
 import { type Grade } from "./RecruiterInterview";
+import ErrorBanner from "./ErrorBanner";
 
 export type InterviewData = {
     unique_interview_id: number,
@@ -58,6 +59,8 @@ export default function CandidateOfficialInterview() {
     const [recruiterMap, setRecruiterMap] = useState<Record<string, RecruiterData>>({});
     const [gradeMap, setGradeMap] = useState<Record<number, Grade>>({});
     const [selectedInterview, setSelectedInterview] = useState<Interview | null>(null);
+    const [gradeErrorSet, setGradeErrorSet] = useState<Set<number>>(new Set());
+    const [error, setError] = useState<string | null>(null);
     const ref = useRef<HTMLDialogElement>(null);
 
     useEffect(() => {
@@ -78,7 +81,7 @@ export default function CandidateOfficialInterview() {
                 setInterviews(parsed);
             } catch (error) {
                 console.log("in error path");
-                // error banner
+                setError("Failed to load interviews. Please try again.");
             }
         }
         getInterviews();
@@ -101,7 +104,7 @@ export default function CandidateOfficialInterview() {
     useEffect(() => {
         const gradedInterviews = [...new Set(interviews.filter((i) => i.status === "graded").map((i) => i.id))];
         gradedInterviews.forEach(async (interviewId) => {
-            if (gradeMap[interviewId] || !interviewId) return;
+            if (gradeMap[interviewId] || gradeErrorSet.has(interviewId) || !interviewId) return;
             try {
                 const res = await authContext?.axiosInstance.get(`api/v1/grading/grading-report`, {
                     params: {
@@ -118,8 +121,7 @@ export default function CandidateOfficialInterview() {
                 };
                 setGradeMap((prev) => ({ ...prev, [interviewId]: grade }));
             } catch (error) {
-                // handle error
-                console.log(`in error path: ${error}`);
+                setGradeErrorSet((prev) => new Set(prev).add(interviewId));
             }
         });
     }, [interviews]);
@@ -182,6 +184,9 @@ export default function CandidateOfficialInterview() {
                 return (
                     <div className="flex-1 flex flex-col items-end gap-3">
                         <span className="status-badge status-graded">Graded</span>
+                        {!grade && gradeErrorSet.has(interview.id) && (
+                            <span className="text-xs text-[#ef4444]">Failed to load score</span>
+                        )}
                         {grade && (
                             <div className="flex items-center gap-[18px]">
                                 <div className="text-[1.15rem] font-bold text-[#4f6ef7] min-w-[44px] text-center">
@@ -246,12 +251,15 @@ export default function CandidateOfficialInterview() {
 
     return (
         <>
+            {error && <ErrorBanner message={error} onDismiss={() => setError(null)} />}
             <div className="max-w-[900px] mx-auto py-10 px-6">
                 <div className="flex items-baseline gap-3 mb-7">
                     <h1 className="text-[1.75rem] font-bold text-[#1a1d2e]">Interviews</h1>
                 </div>
                 <div className="flex flex-col gap-3">
-                    {interviews.filter((item) => item.status !== "mock").map(renderInterviews)}
+                    {interviews.length === 0 ? (
+                        <p>No interviews yet</p>
+                    ) : interviews.filter((item) => item.status !== "mock").map(renderInterviews)}
                 </div>
             </div>
 
