@@ -23,7 +23,7 @@ export type ConnectionData = {
     };
 }
 
-export type ConfirmState = {
+type ConfirmState = {
 	open: boolean;
 	recruiterId: number | null;
 	candidateId: number | null;

@@ -1,18 +1,21 @@
-import { useEffect, useState, useContext,  } from "react"; //useRef
+import { useEffect, useState, useContext, useRef } from "react"; 
 import { Link } from "react-router-dom";
 import { AuthContext } from "./AuthProvider";
 import { type InterviewData } from "./CandidateOfficialInterview";
 import { type User } from "./AdminUser";
-// import { type ConfirmState } from "./AdminConnections";
 import ErrorBanner from './ErrorBanner';
+
+type ConfirmState = {
+	open: boolean;
+	interviewId: number | null;
+}
 
 export default function AdminInterviews(){
 	const authContext = useContext(AuthContext);
 	const [interviews, setInterviews] = useState<InterviewData[]>([]);
-	// const confirmRef = useRef<HTMLDialogElement>(null);
-	// const [confirm, setConfirm] = useState<ConfirmState>({ open: false, recruiterId: null, candidateId: null });
+	const confirmRef = useRef<HTMLDialogElement>(null);
+	const [confirm, setConfirm] = useState<ConfirmState>({ open: false, interviewId: null });
 	const [users, setUsers] = useState<User[]>([]);
-	// const [selectUser, setSelectUser] = useState<User | null>(null);
 	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
@@ -43,28 +46,26 @@ export default function AdminInterviews(){
 		getData();
 	}, []);
 
-	// async function handleDeleteInterview(recruiterId: number, candidateId: number) {
-	// 	try {
-	// 		await authContext?.axiosInstance.patch(
-	// 			`/api/v1/user/connections/${recruiterId}/${candidateId}`//CHANGE
-	// 		);
-	// 		setInterviews((prev) => prev.filter(c => !(c.recruiter_id === recruiterId && c.candidate_id === candidateId)));
-	// 	} catch (e) {
-	// 		console.log("error deleting interview");
-	// 	} finally {
-	// 		setConfirm({ open: false, recruiterId: null, candidateId: null });
-	//		setError("Failed to delete Interview. Please try again.");
-	// 		confirmRef.current?.close();
-	// 	}
-	// }
+	async function handleDeleteInterview(interviewId: number) {
+		try {
+			await authContext?.axiosInstance.patch(
+				`/api/v1/interview/${interviewId}/delete`
+			);
+			setInterviews((prev) => prev.filter(i => i.unique_interview_id !== interviewId));
+		} catch (e) {
+			console.log("error deleting interview");
+			setError("Failed to delete Interview. Please try again.");
+		} finally {
+			setConfirm({ open: false,  interviewId: null });
+			confirmRef.current?.close();
+		}
+	}
 
-	// function openConfirm(recruiterId: number, candidateId: number) {
-	// 	setConfirm({ open: true, recruiterId, candidateId, });
-	// 	confirmRef.current?.showModal();
-	// }
+	function openConfirm(interviewId: number) {
+		setConfirm({ open: true, interviewId });
+		confirmRef.current?.showModal();
+	}
 
-// {rec?.firstname ?? "Unknown"} {rec?.lastname ?? ""}
-// {can?.firstname ?? "Unknown"} {can?.lastname ?? ""}
 	return (
 		<>
 			{error && <ErrorBanner message={error} onDismiss={() => setError(null)} />}
@@ -105,7 +106,7 @@ export default function AdminInterviews(){
 
 									{/* CENTER: Delete button */}
 									<button className="px-4 py-[7px] rounded-lg border border-[#ef4444] text-[#ef4444] text-[0.85rem] font-medium cursor-pointer hover:bg-[#ef4444] hover:text-white transition"
-										// onClick={() => openConfirm(inter.recruiter_id, inter.candidate_id)}
+										onClick={() => openConfirm(inter.unique_interview_id)}
 										>
 									Delete Interview
 									</button>
@@ -135,7 +136,7 @@ export default function AdminInterviews(){
 					)}
 				</div>
 
-				{/* <dialog ref={confirmRef} className="rounded-xl p-0 w-[420px] shadow-xl backdrop:bg-black/50">
+				<dialog ref={confirmRef} className="rounded-xl p-0 w-[420px] shadow-xl backdrop:bg-black/50">
 					<div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-gray-100">
 						<h2 className="text-[1.1rem] font-bold text-[#1a1d2e]">Delete interview</h2>
 						<button
@@ -154,13 +155,12 @@ export default function AdminInterviews(){
 						</button>
 						<button
 							className="px-4 py-[7px] rounded-lg bg-white text-[0.85rem] font-medium cursor-pointer whitespace-nowrap transition border border-[#ef4444] text-[#ef4444] hover:bg-[#ef4444] hover:text-white"
-							onClick={() => confirm.recruiterId !== null && confirm.candidateId !== null 
-								&& handleDeleteInterview(confirm.recruiterId, confirm.candidateId)}
+							onClick={() => confirm.interviewId !== null && handleDeleteInterview(confirm.interviewId)}
 						>
 							Delete
 						</button>
 					</div>
-				</dialog> */}
+				</dialog>
 			</div>
 		</>
 	);
