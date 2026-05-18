@@ -29,6 +29,7 @@ export const login = async (req: Request, res: Response) => {
     });
     return res.status(200).json({ accessToken: response.data.accessToken, message: 'Login successful' });
   } catch (error) {
+	console.log("fdp t mauvais\n");
     if (axios.isAxiosError<ApiError>(error) && error.response?.status) {
       return res.status(error.response.status).json({error: error.response.data?.error ?? error.message});
     }

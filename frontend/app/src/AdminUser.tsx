@@ -109,6 +109,19 @@ export default function AdminUsers(){
             }
         }
 	}
+	
+	async function handleDeleteUser(user_id : number | undefined){
+		try {
+			await authContext?.axiosInstance.patch(
+				`user/${user_id}/delete`
+			);
+			setUsers((prev) => prev.filter(c => c.user_id !== user_id));
+		} catch (e) {
+			console.log("error deleting user");
+			setError("Failed to delete user. Please try again.");
+		}
+	}
+
 	let filteredUsers : User[];
 	if (filter === 'all')
 		filteredUsers = users;
@@ -278,7 +291,12 @@ export default function AdminUsers(){
                     </div>
                     <div className="flex justify-end gap-2.5 px-9 py-6">
                         <button className="btn-cancel" onClick={() => deleteModalUser.current?.close()}>Cancel</button>
-                        <button className="btn-danger">Delete</button>
+                        <button 
+							className="btn-danger"
+							onClick={() => handleDeleteUser(selectUser?.user_id)}
+						>
+							Delete
+						</button>
                     </div>
                 </dialog>
 
