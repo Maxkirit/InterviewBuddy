@@ -1,6 +1,7 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext} from "react";
 import { AuthContext } from "./AuthProvider";
 import { Navigate, Outlet, Link, NavLink, useNavigate } from "react-router-dom";
+import Footer from "./Footer";
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
     isActive
@@ -9,21 +10,7 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
 
 export default function AppLayout() {
     const authContext = useContext(AuthContext);
-    const [url, setUrl] = useState();
     const navigate = useNavigate();
-
-    useEffect(() => {
-        if (!authContext?.accessToken) return;
-        async function getUrl() {
-            try {
-                const res = await authContext?.axiosInstance.get(`/api/v1/user/avatar/${authContext.userId}`);
-                setUrl(res?.data.profile_pic_url);
-            } catch (error) {
-                console.log("in error path");
-            }
-        }
-        getUrl();
-    }, [authContext?.accessToken]);
 
     if (authContext?.isLoading === true) {
         return (
@@ -77,9 +64,9 @@ export default function AppLayout() {
                     </ul>
                     <div className="flex items-center gap-3">
                         <Link to="/profile" className="avatar no-underline relative overflow-hidden">
-                            {url && (
+                            {authContext?.profilePicUrl && (
                                 <img
-                                    src={`/avatars/${url}`}
+                                    src={`/avatars/${authContext?.profilePicUrl}`}
                                     className="absolute inset-0 w-full h-full object-cover rounded-full"
                                     onError={(e) => e.currentTarget.remove()}
                                 />
@@ -124,9 +111,9 @@ export default function AppLayout() {
                     </ul>
                     <div className="flex items-center gap-3">
                         <Link to="/profile" className="avatar no-underline relative overflow-hidden">
-                            {url && (
+                            {authContext?.profilePicUrl && (
                                 <img
-                                    src={`/avatars/${url}`}
+                                    src={`/avatars/${authContext?.profilePicUrl}`}
                                     className="absolute inset-0 w-full h-full object-cover rounded-full"
                                     onError={(e) => e.currentTarget.remove()}
                                 />
@@ -179,9 +166,9 @@ export default function AppLayout() {
                     </ul>
                     <div className="flex items-center gap-3">
                         <Link to="/profile" className="avatar no-underline relative overflow-hidden">
-                            {url && (
+                            {authContext?.profilePicUrl && (
                                 <img
-                                    src={`/avatars/${url}`}
+                                    src={`/avatars/${authContext?.profilePicUrl}`}
                                     className="absolute inset-0 w-full h-full object-cover rounded-full"
                                     onError={(e) => e.currentTarget.remove()}
                                 />
@@ -208,10 +195,7 @@ export default function AppLayout() {
         <>
             {renderNavbar()}
             <Outlet />
-            <footer className="flex justify-center gap-5 px-6 py-6 text-[0.8rem]">
-                <Link to="" className="text-[#b0b7c3] no-underline hover:text-gray-500 transition">Privacy Policy</Link>
-                <Link to="" className="text-[#b0b7c3] no-underline hover:text-gray-500 transition">Terms of Service</Link>
-            </footer>
+            <Footer />
         </>
     );
 }

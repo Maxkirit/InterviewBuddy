@@ -17,13 +17,16 @@ export const ProfileSchema = z.object({
                 message: "Not a LinkedIn link",
             }),
         z.string().max(0),
-    ]),
-    phone_number: z.string().nullable(),
+    ], {error: "Invalid LinkedIn URL (e.g. https://linkedin/in/username)"}),
+    phone_number: z.union([
+        z.e164({ error: "Invalid phone number" }),
+        z.string().max(0),
+    ], {error: "Invalid phone number (e.g. +41781234567"}),
     job_title: z.string().nullable(),
     gender: z
         .literal(["male", "female", "non_binary", "prefer_not_to_say", ""])
         .nullable(),
-    date_of_birth: z.string().nullable(),
+    date_of_birth: z.union([z.string().length(10), z.string().max(0)], {error: "Invalid date format use dd/mm/yyyy"}),
 });
 
 const selectArrowStyle = {
@@ -90,6 +93,16 @@ export default function MyProfile() {
         }
     }
 
+	async function handleDeleteProfile() {
+        try {
+            await authContext?.axiosInstance.patch(`/api/v1/user/${authContext.userId}/delete`);
+			authContext?.logout();
+
+        } catch (error) {
+            setError("Failed to delete");
+        }
+    }
+
     async function handleSubmit(event: SubmitEvent) {
         event.preventDefault();
         setFieldErrors({});
@@ -104,7 +117,7 @@ export default function MyProfile() {
                 phone_number: phone ?? "",
                 job_title: jobTitle ?? "",
                 gender: gender ?? "",
-                date_of_birth: dob ? new Date(dob) : "",
+                date_of_birth: dob ?? "",
             };
             ProfileSchema.parse(input);
             await authContext?.axiosInstance.patch(
@@ -159,38 +172,14 @@ export default function MyProfile() {
                 { headers: { "Content-Type": selectedFile.type } },
             );
             const res = await authContext?.axiosInstance.get(`/api/v1/user/avatar/${authContext?.userId}`);
-            setProfilePic(res?.data.profile_pic_url ?? "");
+            const newUrl = res?.data.profile_pic_url ?? "";
+            setProfilePic(newUrl);
+            authContext?.setProfilePicUrl(newUrl || null);
             closeDialog();
         } catch (error) {
             setPicError("Failed to upload photo. Please try again.");
         }
     }
-
-    
-    // async function handlePicSubmit(e: SubmitEvent) {
-    //     e.preventDefault();
-    //     if (!selectedFile) return;
-
-    //     try {
-    //         const formData = new FormData();
-    //         formData.append("avatar", selectedFile);
-
-    //         await authContext?.axiosInstance.post(
-    //             `/api/v1/user/avatar/${authContext?.userId}`,
-    //             formData,
-    //         );
-
-    //         const res = await authContext?.axiosInstance.get(
-    //             `/api/v1/user/avatar/${authContext?.userId}`,
-    //         );
-
-    //         setProfilePic(res?.data.profile_pic_url ?? "");
-    //         closeDialog();
-    //     } catch (error) {
-    //         console.log(`in error path ${error}`);
-    //         // error banner
-    //     }
-    // }
 
     return (
         <>
@@ -246,7 +235,7 @@ export default function MyProfile() {
                                         id="gender"
                                         value={gender}
                                         onChange={(e) => setGender(e.target.value)}
-                                        className="form-input appearance-none bg-white cursor-pointer pr-9"
+                                        className="form-input appearance-none cursor-pointer pr-9"
                                         style={selectArrowStyle}
                                     >
                                         <option value="">Select…</option>
@@ -271,6 +260,7 @@ export default function MyProfile() {
                                         value={dob}
                                         onChange={(e) => setDob(e.target.value)}
                                     />
+                                    {fieldErrors.date_of_birth && <span className="text-xs text-[#ef4444] mt-0.5">{fieldErrors.date_of_birth}</span>}
                                 </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
@@ -294,10 +284,11 @@ export default function MyProfile() {
                                         className="form-input"
                                         type="tel"
                                         id="phone"
-                                        placeholder="+1 555 000 0000"
+                                        placeholder="+15550000000"
                                         value={phone}
                                         onChange={(e) => setPhone(e.target.value)}
                                     />
+                                    {fieldErrors.phone_number && <span className="text-xs text-[#ef4444] mt-0.5">{fieldErrors.phone_number}</span>}
                                 </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
@@ -342,7 +333,7 @@ export default function MyProfile() {
                                 <textarea
                                     id="bio"
                                     className="form-input resize-y min-h-[90px]"
-                                    placeholder="Tell recruiters a bit about yourself…"
+                                    placeholder="Tell us a bit about yourself…"
                                     value={bio}
                                     onChange={(e) => setBio(e.target.value)}
                                 />
@@ -368,6 +359,13 @@ export default function MyProfile() {
                                     className="px-4 py-[10px] rounded-lg border border-[#ef4444] text-[#ef4444] text-sm font-medium cursor-pointer hover:bg-[#ef4444] hover:text-white transition"
                                 >
                                     Logout everywhere
+                                </button>
+								<button
+                                    type="button"
+                                    onClick={handleDeleteProfile}
+                                    className="px-4 py-[10px] rounded-lg border border-[#ef4444] text-[#ef4444] text-sm font-medium cursor-pointer hover:bg-[#ef4444] hover:text-white transition"
+                                >
+                                    Delete Profile
                                 </button>
                                 <button
                                     className="btn-primary px-7 py-[10px]"

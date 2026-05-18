@@ -13,7 +13,7 @@ export default function InviteLink() {
   async function createConnection() {
     try {
       await authContext?.axiosInstance.post(
-        `api/v1/user/${authContext.userId}/connections/${token}`
+        `/api/v1/user/${authContext.userId}/connections/${token}`
       );
       navigate("/profile", { replace: true });
     } catch (e) {

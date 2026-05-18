@@ -3,7 +3,7 @@ import axios, {
     type AxiosError,
     type InternalAxiosRequestConfig,
 } from "axios";
-import { createContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useEffect, useRef, useState, type ReactNode } from "react";
 
 interface RetryConfig extends InternalAxiosRequestConfig {
     _retry?: boolean;
@@ -22,6 +22,8 @@ type AuthContextType = {
     logout: () => void;
     isLoading: boolean;
     axiosInstance: AxiosInstance;
+    profilePicUrl: string | null;
+    setProfilePicUrl: (url: string | null) => void;
 };
 
 type JwtPayload = {
@@ -30,6 +32,9 @@ type JwtPayload = {
     role: string;
 };
 
+//for dev container
+axios.defaults.baseURL="http://localhost:3000";
+
 export const AuthContext = createContext<AuthContextType | null>(null);
 
 export function decodeJwt(token: string): JwtPayload {
@@ -37,113 +42,120 @@ export function decodeJwt(token: string): JwtPayload {
     return JSON.parse(atob(payload));
 }
 
+// axios.defaults.baseURL = "http://localhost:3000";
+
 export default function AuthProvider({ children }: { children: ReactNode }) {
     const [token, setToken] = useState<string | null>(null);
     const [userId, setUserId] = useState<number | null>(null);
     const [role, setRole] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [profilePicUrl, setProfilePicUrl] = useState<string | null>(null);
+    const axiosInstance = useRef(axios.create({ withCredentials: true })).current;
+    const tokenRef = useRef<string | null>(null);
+    const isRefreshingRef = useRef(false);
+    const failedQueueRef = useRef<QueueItem[]>([]);
 
-    function login(token: string, userId: number, role: string) {
-        setToken(token);
-        setUserId(userId);
-        setRole(role);
+    tokenRef.current = token;
+
+    function login(newToken: string, newUserId: number, newRole: string) {
+        setToken(newToken);
+        setUserId(newUserId);
+        setRole(newRole);
     }
 
     function logout() {
         setToken(null);
         setUserId(null);
+        setProfilePicUrl(null);
     }
 
-    const axiosInstance = axios.create({
-        withCredentials: true,
-    });
+    // Register interceptors once on mount; eject on unmount
+    useEffect(() => {
+        function processQueue(error: unknown | null, token: string | null = null) {
+            failedQueueRef.current.forEach((item) => {
+                if (error) item.reject(error);
+                else item.resolve(token!);
+            });
+            failedQueueRef.current = [];
+        }
 
-    axiosInstance.interceptors.request.use(
-        function (config: InternalAxiosRequestConfig) {
-            if (token) {
-                config.headers.set("Authorization", `Bearer ${token}`);
-            }
-            return config;
-        },
-        function (error) {
-            return Promise.reject(error);
-        },
-    );
+        const reqId = axiosInstance.interceptors.request.use(
+            (config: InternalAxiosRequestConfig) => {
+                if (tokenRef.current) {
+                    config.headers.set("Authorization", `Bearer ${tokenRef.current}`);
+                }
+                return config;
+            },
+            (error) => Promise.reject(error),
+        );
 
-    let isRefreshing = false;
-    let failedQueue: QueueItem[] = [];
+        const resId = axiosInstance.interceptors.response.use(
+            (response) => response,
+            async (error: AxiosError) => {
+                const originalRequest = error.config as RetryConfig | undefined;
 
-    const processQueue = (
-        error: unknown | null,
-        token: string | null = null,
-    ): void => {
-        failedQueue.forEach((item) => {
-            if (error) {
-                item.reject(error);
-            } else {
-                item.resolve(token!);
-            }
-        });
-        failedQueue = [];
-    };
-
-    axiosInstance.interceptors.response.use(
-        (response) => response,
-        async (error: AxiosError) => {
-            const originalRequest = error.config as RetryConfig | undefined;
-
-            if (
-                error.response?.status === 401 &&
-                originalRequest &&
-                !originalRequest._retry
-            ) {
-                if (isRefreshing) {
-                    // Queue the request until the refresh completes
-                    return new Promise<string>((resolve, reject) => {
-                        failedQueue.push({ resolve, reject });
-                    })
-                        .then((token) => {
-                            originalRequest.headers["Authorization"] =
-                                `Bearer ${token}`;
-                            return axiosInstance(originalRequest);
+                if (
+                    error.response?.status === 401 &&
+                    originalRequest &&
+                    !originalRequest._retry
+                ) {
+                    if (isRefreshingRef.current) {
+                        return new Promise<string>((resolve, reject) => {
+                            failedQueueRef.current.push({ resolve, reject });
                         })
-                        .catch((err) => Promise.reject(err));
+                            .then((token) => {
+                                originalRequest.headers["Authorization"] = `Bearer ${token}`;
+                                return axiosInstance(originalRequest);
+                            })
+                            .catch((err) => Promise.reject(err));
+                    }
+
+                    originalRequest._retry = true;
+                    isRefreshingRef.current = true;
+
+                    try {
+                        const { data } = await axios.post(
+                            "/api/v1/auth/refresh",
+                            null,
+                            { withCredentials: true },
+                        );
+                        const newToken = data.accessToken;
+                        tokenRef.current = newToken;
+                        setToken(newToken);
+                        axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
+                        processQueue(null, newToken);
+                        return axiosInstance(originalRequest);
+                    } catch (refreshError) {
+                        processQueue(refreshError, null);
+                        logout();
+                        return Promise.reject(refreshError);
+                    } finally {
+                        isRefreshingRef.current = false;
+                    }
                 }
 
-                originalRequest._retry = true;
-                isRefreshing = true;
+                return Promise.reject(error);
+            },
+        );
 
-                try {
-                    const { data } = await axios.post(
-                        "/api/v1/auth/refresh",
-                        null,
-                        { withCredentials: true },
-                    );
-                    const newToken = data.accessToken;
-                    setToken(newToken);
-                    axiosInstance.defaults.headers.common["Authorization"] =
-                        `Bearer ${newToken}`;
-
-                    processQueue(null, newToken);
-                    return axiosInstance(originalRequest);
-                } catch (refreshError) {
-                    processQueue(refreshError, null);
-                    // Redirect to login or emit an event
-                    setToken(null);
-                    return Promise.reject(refreshError);
-                } finally {
-                    isRefreshing = false;
-                }
-            }
-
-            return Promise.reject(error);
-        },
-    );
+        return () => {
+            axiosInstance.interceptors.request.eject(reqId);
+            axiosInstance.interceptors.response.eject(resId);
+        };
+    }, []);
 
     useEffect(() => {
-        // hit /refresh to get new access token (with refresh token in cookie)
-        // if success setToken and pass it in context
-        // if not fail (no or expired refresh token) redirect to login
+        if (!userId) return;
+        async function fetchAvatar() {
+            try {
+                const res = await axiosInstance.get(`/api/v1/user/avatar/${userId}`);
+                setProfilePicUrl(res.data.profile_pic_url ?? null);
+            } catch (_) {}
+        }
+        fetchAvatar();
+    }, [userId]);
+
+    useEffect(() => {
         const controller = new AbortController();
         axios.defaults.withCredentials = true;
         async function restoreSession() {
@@ -159,7 +171,6 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
                 setRole(decoded.role);
             } catch (error) {
                 if (axios.isCancel(error)) return;
-                // genuinely not logged in
             } finally {
                 if (!controller.signal.aborted) {
                     setIsLoading(false);
@@ -171,12 +182,6 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
         return () => controller.abort();
     }, []);
 
-    // if (isLoading === true) {
-    //     return (
-    //         <div><p>Loading...</p></div>
-    //     );
-    // }
-
     return (
         <AuthContext.Provider
             value={{
@@ -187,6 +192,8 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
                 logout: logout,
                 isLoading: isLoading,
                 axiosInstance: axiosInstance,
+                profilePicUrl: profilePicUrl,
+                setProfilePicUrl: setProfilePicUrl,
             }}
         >
             {children}

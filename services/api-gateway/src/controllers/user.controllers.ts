@@ -264,6 +264,7 @@ export const addConnection = async (req: Request, res: Response) => {
 };
 
 export const getLink = async(req:Request, res: Response) =>{
+	console.log("try to get invite link");
 	try{
 		const response = await axios.get(
             `http://svc-user:3000/user/link/generate`,
