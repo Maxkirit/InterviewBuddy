@@ -118,7 +118,7 @@ export default function GradingPage() {
                     navigate("/recruiter/interviews");
                 }
                 setInterview(interviewData?.data);
-                const candidateData = await authContext?.axiosInstance.get(`api/v1/user/${interview?.candidate_id}/public`);
+                const candidateData = await authContext?.axiosInstance.get(`api/v1/user/${interviewData?.data?.candidate_id}/public`);
                 setCandidate(candidateData?.data);
             } catch (error) {
                 console.log(`in error path: ${error}`);
@@ -177,7 +177,7 @@ export default function GradingPage() {
                                 Functional Requirements
                             </p>
                             <ul className="flex flex-col gap-1.5">
-                                {interview?.questions.functional_req.split('\n\n').map((req, i) => (
+                                {interview && interview.questions.functional_req.split('\n\n').map((req, i) => (
                                     <li key={i} className="flex items-baseline gap-2 text-[0.875rem] text-[#4b5563]">
                                         <span className="w-1.5 h-1.5 rounded-full bg-[#4f6ef7] shrink-0 mt-[5px]" />
                                         {req}
@@ -190,7 +190,7 @@ export default function GradingPage() {
                                 Non-Functional Requirements
                             </p>
                             <ul className="flex flex-col gap-1.5">
-                                {interview?.questions.non_functional_req.split('\n\n').map((req, i) => (
+                                {interview && interview.questions.non_functional_req.split('\n\n').map((req, i) => (
                                     <li key={i} className="flex items-baseline gap-2 text-[0.875rem] text-[#4b5563]">
                                         <span className="w-1.5 h-1.5 rounded-full bg-[#f59e0b] shrink-0 mt-[5px]" />
                                         {req}
@@ -220,7 +220,7 @@ export default function GradingPage() {
                     </div>
 
                     <div className="flex flex-col gap-3.5">
-                        {interview?.questions.grading_guide.split('\n\n').map((quest, i) => (
+                        {interview && interview.questions.grading_guide.split('\n\n').map((quest, i) => (
                             <div key={i} className="flex items-start gap-3 text-[0.9rem] text-[#374151]">
                                 <div className="w-5 h-5 rounded-full bg-[#e4e8f0] text-[#6b7280] text-[0.7rem] font-bold flex items-center justify-center shrink-0 mt-0.5">
                                     {i + 1}

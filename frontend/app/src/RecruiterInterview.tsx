@@ -112,15 +112,17 @@ export default function RecruiterInterviews() {
                         interview_id: interviewId,
                     }
                 });
-                const splitted = res?.data.report.split('\n\n');
-                const grade: Grade = {
-                    req: parseInt(splitted[0]),
-                    archi: parseInt(splitted[1]),
-                    scale: parseInt(splitted[2]),
-                    res: parseInt(splitted[3]),
-                    note: splitted[4],
-                };
-                setGradeMap((prev) => ({ ...prev, [interviewId]: grade }));
+                if (res?.data.report) {
+                    const splitted = res?.data.report.split('\n\n');
+                    const grade: Grade = {
+                        req: parseInt(splitted[0]),
+                        archi: parseInt(splitted[1]),
+                        scale: parseInt(splitted[2]),
+                        res: parseInt(splitted[3]),
+                        note: splitted[4],
+                    };
+                    setGradeMap((prev) => ({ ...prev, [interviewId]: grade }));
+                }
             } catch (error) {
                 setGradeErrorSet((prev) => new Set(prev).add(interviewId));
             }

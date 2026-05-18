@@ -16,6 +16,8 @@ app.use(express.json());
 
 app.post('/grading/grading-report', async (req: Request, res: Response) => {
     try {
+        if (!req.body.permissions.includes("createGradingReport"))
+            return res.status(403).json({error: "User does not have the required permissions"});
         const parsed = GradingReportSchema.parse(req.body.body);
         const interview = await axios.get(`http://svc-interview-store:3000/interview/${parsed.unique_interview_id}`, {
             params: {
@@ -23,9 +25,8 @@ app.post('/grading/grading-report', async (req: Request, res: Response) => {
                 permissions: req.body.permissions,
             }
         });
-        if (interview.data.recruiter_id != req.body.userId || !req.body.permissions.includes("createGradingReport")) {
+        if (interview.data.recruiter_id != req.body.userId)
             return res.status(403).json({error: "User does not have the required permissions"});
-        }
         await prisma.grading_reports.create({
             data: {unique_interview_id: parsed.unique_interview_id as number, report: parsed.report}
         });

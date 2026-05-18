@@ -88,7 +88,7 @@ export default function Interview() {
                         <div>
                             <h3 className="text-[0.825rem] font-bold text-[#374151] mb-2.5">Functional</h3>
                             <ul className="flex flex-col gap-[7px] list-none">
-                                {interview?.questions.functional_req.split('\n\n').map((req, i) => (
+                                {interview && interview.questions.functional_req.split('\n\n').map((req, i) => (
                                     <li key={i} className="flex items-baseline gap-2 text-[0.875rem] text-[#4b5563]">
                                         <span className="w-1.5 h-1.5 rounded-full bg-[#4f6ef7] shrink-0 mt-[3px]" />
                                         {req}

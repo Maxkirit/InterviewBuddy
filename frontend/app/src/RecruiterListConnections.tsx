@@ -192,7 +192,7 @@ export default function RecruiterListCandidates() {
 				id="invite-link"
 				type="text"
 				readOnly
-				defaultValue={link}
+				value={link}
 				className="flex-1 border border-[#e4e8f0] rounded-lg px-3 py-2 text-sm text-gray-500 bg-gray-50 outline-none"
 				/>
 			</div>
