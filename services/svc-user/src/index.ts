@@ -607,7 +607,7 @@ app.patch('/user/:user_id/heartbeat', async (req, res) => {
     }
 });
 
-app.patch("/user/:user_id/delete"), async(req, res) =>{
+app.patch("/user/:user_id/delete"), async(req: Request, res: Response) =>{
 	const {userId, permissions, role} = req.body;
 	const user_id = Number (req.params?.user_id);
 
