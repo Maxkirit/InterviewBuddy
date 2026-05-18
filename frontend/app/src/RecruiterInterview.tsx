@@ -93,7 +93,7 @@ export default function RecruiterInterviews() {
         uniqueCandidateIds.forEach(async (candidateId) => {
             if (candidateMap[candidateId] || !candidateId) return;
             try {
-                const res = await authContext?.axiosInstance.get(`api/v1/user/${candidateId}/public`);
+                const res = await authContext?.axiosInstance.get(`/api/v1/user/${candidateId}/public`);
                 setCandidateMap((prev) => ({ ...prev, [candidateId]: res?.data }));
             } catch (error) {
                 // handle error
@@ -107,7 +107,7 @@ export default function RecruiterInterviews() {
         gradedInterviews.forEach(async (interviewId) => {
             if (gradeMap[interviewId] || gradeErrorSet.has(interviewId) || !interviewId) return;
             try {
-                const res = await authContext?.axiosInstance.get(`api/v1/grading/grading-report`, {
+                const res = await authContext?.axiosInstance.get(`/api/v1/grading/grading-report`, {
                     params: {
                         interview_id: interviewId,
                     }

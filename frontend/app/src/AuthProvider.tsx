@@ -33,7 +33,7 @@ type JwtPayload = {
 };
 
 //for dev container
-axios.defaults.baseURL="http://localhost:3000";
+// axios.defaults.baseURL="http://localhost:3000";
 
 export const AuthContext = createContext<AuthContextType | null>(null);
 
