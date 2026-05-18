@@ -12,6 +12,7 @@ import { read } from "node:fs";
 import { create } from "node:domain";
 import dotenv from 'dotenv'
 import { DeleteConnection } from "./connections/deleteConnection.js";
+import { DeleteUser } from "./delete/dispatchDelete.js";
 
 dotenv.config();
 
@@ -607,6 +608,7 @@ app.patch('/user/:user_id/heartbeat', async (req, res) => {
     }
 });
 
+app.patch("/user/:user_id/delete", DeleteUser);
 
 app.listen(port, () => {
     console.log(`listening on port ${port}`);

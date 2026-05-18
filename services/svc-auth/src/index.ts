@@ -294,8 +294,9 @@ app.patch('/auth/revoke/refresh-token/:userId', async (req, res) => {
     console.log(req.body.permissions);
     const targetId = parseInt(req.params.userId);
     console.log(targetId, req.body.tokenId);
-    if ((!req.body.permissions.includes('manageLogout') && !req.body.permissions.includes('logoutSelf')) ||
-        (req.body.permissions.includes('logoutSelf') && targetId !== req.body.tokenId))
+    const canManage = req.body.permissions.includes('manageLogout') || req.body.permissions.includes('manageUserInfo');
+    const canSelf = req.body.permissions.includes('logoutSelf') && targetId === req.body.tokenId;
+    if (!canManage && !canSelf)
         return res.status(403).json({error: "Permissions denied for PATCH /auth/revoke/refresh-token/:userId"});
     try {
         console.log("updating tokens")
@@ -386,6 +387,8 @@ app.post("/auth/user", async (req, res) => {
     if (!loginParse.success) {
         return res.status(400).json({error: loginParse.error});
     }
+	if (req.body.email.endsWith("@deleted.local"))
+    	return res.status(400).json({ error: "invalid email" });
     let user = await prisma.auths.findUnique({
         where: { email: req.body.email },
     });
@@ -455,6 +458,38 @@ app.post("/auth/user", async (req, res) => {
         }
     }
 })
+
+app.patch("/auth/disable/:targetId", async(req, res) => {
+	const { userId, permissions, auth_id } = req.body;
+	const targetId = Number(req.params?.targetId);
+
+	const isAdmin = permissions?.includes("manageUserInfo") && targetId !== userId;
+	const isSelf  = permissions?.includes("deleteUserInfo") && targetId === userId;
+
+	if (!isAdmin && !isSelf)
+		return res.status(403).json({ error: "forbidden" });
+
+	if (!auth_id)
+		return res.status(400).json({ error: "auth_id is required" });
+
+	try {
+		await prisma.auths.update({
+			where: { auth_id: Number(auth_id) },
+			data: {
+				email: `deleted_${targetId}@deleted.local`,
+				updated_at: new Date(),
+			}
+		});
+		console.log(`auth ${auth_id} disabled and email anonymized for user ${targetId}`);
+		return res.status(200).json({ message: "auth disabled" });
+	} catch (error) {
+		if (error instanceof Prisma.PrismaClientKnownRequestError)
+			return res.status(400).json({ error: "auth not found", code: error.code });
+		return res.status(500).json({ error: "internal server error" });
+	}
+})
+
+
 
 app.listen(port, () =>{
 	console.log(`listening on port ${port}`)
