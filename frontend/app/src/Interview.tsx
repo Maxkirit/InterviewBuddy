@@ -34,7 +34,7 @@ export default function Interview() {
     const [interview, setInterview] = useState<Interview>()
     const [reasoning, setReasoning] = useState("");
     const [error, setError] = useState<string | null>(null);
-    const [submitError, setSubmitError] = useState<string | null>(null);
+    const [submitError] = useState<string | null>(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -46,8 +46,11 @@ export default function Interview() {
                 console.log(`in error path: ${error}`);
                 if (axios.isAxiosError(error) && error.response?.status == 410) {
                     navigate("/candidate/official-interviews", { replace: true, state: { flash: "This interview has been canceled by the recruiter." } });
-                } else
-                    setError("Failed to load the interview. Please try again.")
+                } else if (axios.isAxiosError(error) && error.response?.status == 403) {
+                    navigate("/candidate/official-interviews", { replace: true, state: { flash: "Acess forbiden" } });
+                }
+				else
+					navigate("/candidate/official-interviews", { replace: true, state: { flash: "Failed to load interview, please retry later" } });
             }
         }
 
@@ -63,10 +66,13 @@ export default function Interview() {
             });
             navigate('/candidate/official-interviews', {replace: true});
         } catch (error) {
-            if (axios.isAxiosError(error) && error.response?.status == 410) {
-                navigate("/candidate/official-interviews", { replace: true, state: { flash: "This interview has been canceled by the recruiter." } });
-            } else
-                setSubmitError("Failed to submit your answer. Please try again.");
+                if (axios.isAxiosError(error) && error.response?.status == 410) {
+                    navigate("/candidate/official-interviews", { replace: true, state: { flash: "This interview has been canceled by the recruiter." } });
+                } else if (axios.isAxiosError(error) && error.response?.status == 403) {
+                    navigate("/candidate/official-interviews", { replace: true, state: { flash: "Acess forbiden" } });
+                }
+				else
+					navigate("/candidate/official-interviews", { replace: true, state: { flash: "Failed to load interview, please retry later" } });
         }
     }
 
