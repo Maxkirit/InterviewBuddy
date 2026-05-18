@@ -1,4 +1,4 @@
-import { useContext} from "react";
+import { useContext } from "react";
 import { AuthContext } from "./AuthProvider";
 import { Navigate, Outlet, Link, NavLink, useNavigate } from "react-router-dom";
 import Footer from "./Footer";

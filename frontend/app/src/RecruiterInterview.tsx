@@ -264,8 +264,8 @@ export default function RecruiterInterviews() {
         const name = candidate ? `${candidate.firstname} ${candidate.lastname}` : "-";
 
         return (
-            <div key={interview.id} className="bg-white border border-[#e4e8f0] rounded-[14px] px-6 py-5 flex items-center gap-6">
-                <div className="flex items-center gap-3.5 flex-[0_0_240px]">
+            <div key={interview.id} className="bg-white border border-[#e4e8f0] rounded-[14px] px-6 py-5 flex items-center gap-6 flex-wrap">
+                <div className="flex items-center gap-3.5 flex-[1_1_200px] min-w-0">
                     <div className="avatar relative overflow-hidden">
                         {candidate?.profile_pic_url && (
                             <img

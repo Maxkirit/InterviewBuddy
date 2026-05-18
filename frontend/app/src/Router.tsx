@@ -32,7 +32,6 @@ export default function Router() {
                 <Route element={<ProtectedLayout />}>
                 <Route path="/pick-role" element={<PickRole />}/>
                     <Route element={<AppLayout />}>
-						<Route path="/invite" element={<InviteLink />} />
                         <Route path = "/legal" element={<LegalPage />} />
                         <Route path="/candidate" element={<CandidateView />}>
                             <Route
@@ -40,7 +39,9 @@ export default function Router() {
                                 element={<CandidateOfficialInterview />}/>
     						<Route
                             	path="/candidate/recruiters"
-                            	element={<CandidateListRecruiters />}/>
+                            	element={<CandidateListRecruiters />}>
+                                <Route path="/candidate/recruiters/invite" element={<InviteLink />} />
+                            </Route>
                         </Route>
                         <Route path="/recruiter" element={<RecruiterView />}>
                             <Route 

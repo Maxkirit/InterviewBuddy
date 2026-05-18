@@ -254,11 +254,12 @@ app.get("/interview/:interview_id/start", async (req, res) => {
         const interview = await prisma.interviews.findUniqueOrThrow({
             where: {
                 unique_interview_id: parseInt(interview_id),
-				deleted: false,
             },
             include: { questions: true },
         })
         console.log(interview);
+        if (interview.deleted == true)
+            return res.status(410).json({error: "Interview deleted"});
         if (interview.candidate_id !== userId || interview.status !== "scheduled") {
             return res.status(403).json({ error: "forbidden" });
         }
@@ -284,9 +285,11 @@ app.patch("/interview/:interview_id/submit", async (req, res) => {
         const interview = await prisma.interviews.findUniqueOrThrow({
             where: {
                 unique_interview_id: parseInt(interview_id),
-				deleted: false,
             },
         });
+        if (interview.deleted == true) {
+            return res.status(410).json({error: "Interview deleted"});
+        }
         if (interview.candidate_id !== userId || interview.status !== "scheduled") {
             return res.status(403).json({ error: "forbidden" });
         }
