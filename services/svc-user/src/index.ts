@@ -170,7 +170,10 @@ app.get("/user/:user_id", async (req, res) => {
         }
         try {
             console.log("admin perm okay...");
-            const user = await prisma.users.findMany({ orderBy: { user_id: 'asc' } });
+            const user = await prisma.users.findMany({
+				orderBy: { user_id: 'asc' },
+				where :{ is_active : true,}
+			});
             return res.status(200).json(user);
         } catch (e) {
             return res.status(500).json({ error: "Internal error" });
@@ -184,7 +187,7 @@ app.get("/user/:user_id", async (req, res) => {
     console.log("permissions:", permission);
     try {
         const user = await prisma.users.findUnique({
-            where: { user_id: parseInt(user_id as string, 10) },
+            where: { user_id: parseInt(user_id as string, 10), is_active : true },
         });
         if (!user) return res.status(404).json({ error: "not find" });
         res.json(user);

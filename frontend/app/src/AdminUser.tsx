@@ -109,16 +109,18 @@ export default function AdminUsers(){
             }
         }
 	}
-	
+
 	async function handleDeleteUser(user_id : number | undefined){
 		try {
 			await authContext?.axiosInstance.patch(
-				`user/${user_id}/delete`
+				`/api/v1/user/${user_id}/delete`
 			);
 			setUsers((prev) => prev.filter(c => c.user_id !== user_id));
 		} catch (e) {
 			console.log("error deleting user");
 			setError("Failed to delete user. Please try again.");
+		} finally {
+			deleteModalUser.current?.close();
 		}
 	}
 

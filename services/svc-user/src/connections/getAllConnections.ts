@@ -13,11 +13,14 @@ export const getAllConnections =  async (req: Request, res: Response) =>  {
 	try {
 		console.log("Admin perm okay...");
 		const connections = await prisma.connections.findMany({
+			where :{
+				is_active : true,
+			},
 			select: {
 				recruiter_id: true,
 				candidate_id: true,
 				status: true,
-				is_active: true,
+				// is_active: true,
 				users_connections_recruiter_idTousers: {
 					select: {
 						user_id: true,
