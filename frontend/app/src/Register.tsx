@@ -1,6 +1,6 @@
 import { useState, useContext, type SubmitEvent } from "react";
 import { AuthContext, decodeJwt } from "./AuthProvider";
-import { Navigate, Link, useNavigate } from "react-router-dom";
+import { Navigate, Link, useNavigate, useLocation } from "react-router-dom";
 import { z, ZodError } from "zod";
 import axios from "axios";
 import { passwordSchema } from './Login';
@@ -22,6 +22,8 @@ export default function Register() {
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
     const authContext = useContext(AuthContext);
     const navigate = useNavigate();
+    const location= useLocation();
+    const from: string = location.state?.from?.pathname + location.state?.from?.search;
 
     if (authContext?.isLoading === true) {
         return (
@@ -63,7 +65,7 @@ export default function Register() {
                 parseInt(decoded.userId),
                 decoded.role,
             );
-            navigate("/");
+            from.startsWith("/invite") ? navigate(from) : navigate("/profile");
         } catch (error) {
             console.log(`in error path: ${error}`);
             if (error instanceof ZodError) {
