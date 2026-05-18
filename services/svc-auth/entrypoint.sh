@@ -6,6 +6,7 @@ required_files="
 /secrets/jwt_private.pem
 /secrets/refresh_secret
 /secrets/google_client_secret
+/secrets/admin_email
 "
 
 for file in $required_files; do
@@ -31,4 +32,5 @@ echo "[svc-auth] Found all secrets. Starting init..."
 npx prisma db pull --force
 npx prisma generate
 npm run build
+node dist/seed-admin.js
 npm run start
