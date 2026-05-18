@@ -2,6 +2,7 @@ import { useState, useContext, useEffect, type SubmitEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AuthContext } from "./AuthProvider";
 import z from "zod";
+import axios from "axios";
 import ErrorBanner from "./ErrorBanner";
 
 type Question = {
@@ -33,6 +34,7 @@ export default function Interview() {
     const [interview, setInterview] = useState<Interview>()
     const [reasoning, setReasoning] = useState("");
     const [error, setError] = useState<string | null>(null);
+    const [submitError, setSubmitError] = useState<string | null>(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -42,7 +44,10 @@ export default function Interview() {
                 setInterview(res?.data);
             } catch (error) {
                 console.log(`in error path: ${error}`);
-                setError("Failed to load the interview. Please try again.")
+                if (axios.isAxiosError(error) && error.response?.status == 410) {
+                    navigate("/candidate/official-interviews", { replace: true, state: { flash: "This interview has been canceled by the recruiter." } });
+                } else
+                    setError("Failed to load the interview. Please try again.")
             }
         }
 
@@ -58,7 +63,10 @@ export default function Interview() {
             });
             navigate('/candidate/official-interviews', {replace: true});
         } catch (error) {
-            setError("Failed to submit your answer. Please try again.");
+            if (axios.isAxiosError(error) && error.response?.status == 410) {
+                navigate("/candidate/official-interviews", { replace: true, state: { flash: "This interview has been canceled by the recruiter." } });
+            } else
+                setSubmitError("Failed to submit your answer. Please try again.");
         }
     }
 
@@ -113,8 +121,9 @@ export default function Interview() {
                             onChange={(e) => setReasoning(e.target.value)}
                         />
                     </div>
-                    <div className="flex justify-end mt-4">
+                    <div className="flex flex-col items-end mt-4 gap-2">
                         <button className="btn-primary px-7 py-[10px] disabled:opacity-50 disabled:cursor-not-allowed" type="submit" disabled={!reasoning.trim()}>Submit</button>
+                        {submitError && <p className="text-xs text-[#ef4444]">{submitError}</p>}
                     </div>
                 </form>
             </div>

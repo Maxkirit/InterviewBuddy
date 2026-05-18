@@ -42,8 +42,6 @@ export function decodeJwt(token: string): JwtPayload {
     return JSON.parse(atob(payload));
 }
 
-// axios.defaults.baseURL = "http://localhost:3000";
-
 export default function AuthProvider({ children }: { children: ReactNode }) {
     const [token, setToken] = useState<string | null>(null);
     const [userId, setUserId] = useState<number | null>(null);

@@ -314,7 +314,6 @@ export const deleteConnection = async(req: Request, res: Response) =>{
 
 };
 
-
 export const deleteUser = async (req: Request, res: Response) => {
 	const { user_id } = req.params;
 	const tokenReq = req as ReqWithUser;

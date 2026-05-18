@@ -182,6 +182,7 @@ export default function Login() {
                     Don't have an account?{" "}
                     <Link
                         to="/register"
+                        state={{ from: location.state?.from }}
                         className="text-[#4f6ef7] no-underline font-medium hover:underline"
                     >
                         Sign up
