@@ -18,6 +18,7 @@ import RecruiterListCandidates from "./RecruiterListConnections"
 import InviteLink from "./invite";
 import GradingPage from "./GradingPage";
 import ViewProfile from "./ViewProfile";
+import LegalPage from "./Legal";
 
 
 export default function Router() {
@@ -32,6 +33,7 @@ export default function Router() {
                 <Route path="/pick-role" element={<PickRole />}/>
                     <Route element={<AppLayout />}>
 						<Route path="/invite" element={<InviteLink />} />
+                        <Route path = "/legal" element={<LegalPage />} />
                         <Route path="/candidate" element={<CandidateView />}>
                             <Route
                                 path="/candidate/official-interviews"

@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "./AuthProvider";
 import { Navigate, Outlet, Link, NavLink, useNavigate } from "react-router-dom";
+import Footer from "./Footer";
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
     isActive
@@ -186,10 +187,7 @@ export default function AppLayout() {
         <>
             {renderNavbar()}
             <Outlet />
-            <footer className="flex justify-center gap-5 px-6 py-6 text-[0.8rem]">
-                <Link to="" className="text-[#b0b7c3] no-underline hover:text-gray-500 transition">Privacy Policy</Link>
-                <Link to="" className="text-[#b0b7c3] no-underline hover:text-gray-500 transition">Terms of Service</Link>
-            </footer>
+            <Footer />
         </>
     );
 }
