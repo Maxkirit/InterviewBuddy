@@ -288,6 +288,7 @@ export const deleteConnection = async(req: Request, res: Response) =>{
 };
 
 
+<<<<<<< HEAD
 export const deleteUser = async (req: Request, res: Response) => {
 	const { user_id } = req.params;
 	const tokenReq = req as ReqWithUser;
@@ -307,3 +308,15 @@ export const deleteUser = async (req: Request, res: Response) => {
 		return res.status(502).json({ error: "Bad gateway" });
 	}
 };
+=======
+// export const deleteUser = async(req: Request, res: Response) => {
+// 	const {userId, permissions, role} = (req as ReqWithUser)
+	
+// }
+
+// // 1. révoquer tokens        → svc-auth (déconnexion immédiate)
+// // 2. auth = false           → svc-auth (blocage connexion)
+// // 3. soft delete interviews → svc-interview-store
+// // 4. delete connections     → svc-user
+// // 5. delete user            → svc-user
+>>>>>>> 514f068553badd9f8fc5408a04d82edd8e05f442
