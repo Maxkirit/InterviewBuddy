@@ -30,6 +30,9 @@ type JwtPayload = {
     role: string;
 };
 
+//for dev container
+axios.defaults.baseURL="http://localhost:3000";
+
 export const AuthContext = createContext<AuthContextType | null>(null);
 
 export function decodeJwt(token: string): JwtPayload {
