@@ -2,7 +2,8 @@ import axios from "axios";
 import { randomBytes, createHash } from "node:crypto";
 import { jwtVerify } from "jose";
 import { prisma, Prisma } from "./prisma.js";
-import { createAccessToken, createRefreshToken } from "./jwt.js";  
+import { createAccessToken, createRefreshToken } from "./jwt.js";
+import { oauthProviderDuration } from "../metrics.js";
 
 export const SESSION_TTL_MS = 2 * 60 * 1000; //TTL for state map entries in 3rd party auth
 // required for third party auth, check notion for value
@@ -40,6 +41,7 @@ export function validateState(state: string, sessionMap: Map<string, PendingOAut
     const oauth = sessionMap.get(state)
     if (!oauth)
         return {error: "state not found"};
+    oauthProviderDuration.observe({provider: 'google'}, (Date.now() - oauth.createdAt) / 1000);
     if (Date.now() -  oauth.createdAt > SESSION_TTL_MS)
         return {error: "state expired"};
     return {message: "state valid", codeVerifier: oauth.codeVerifier};
