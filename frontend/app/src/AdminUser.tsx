@@ -4,7 +4,7 @@ import { ProfileSchema } from './Profile';
 import { ZodError } from 'zod';
 import ErrorBanner from './ErrorBanner';
 
-type User = {
+export type User = {
     user_id: number;
     auth_id: number;
     firstname: string;
@@ -32,6 +32,7 @@ export default function AdminUsers(){
 	const editModalUser = useRef<HTMLDialogElement>(null);
 	const deleteModalUser = useRef<HTMLDialogElement>(null);
 	const authContext = useContext(AuthContext);
+	const [filter, setFilter] = useState<'all' | 'candidate' | 'recruiter'>('all');
 
 	useEffect(()=>{
 		async function getUser(){
@@ -109,6 +110,25 @@ export default function AdminUsers(){
         }
 	}
 
+	async function handleDeleteUser(user_id : number | undefined){
+		try {
+			await authContext?.axiosInstance.patch(
+				`/api/v1/user/${user_id}/delete`
+			);
+			setUsers((prev) => prev.filter(c => c.user_id !== user_id));
+		} catch (e) {
+			console.log("error deleting user");
+			setError("Failed to delete user. Please try again.");
+		} finally {
+			deleteModalUser.current?.close();
+		}
+	}
+
+	let filteredUsers : User[];
+	if (filter === 'all')
+		filteredUsers = users;
+	else
+		filteredUsers = users.filter(user => user.role === filter)
 	return(
         <>
             {error && <ErrorBanner message={error} onDismiss={() => setError(null)} />}
@@ -119,10 +139,33 @@ export default function AdminUsers(){
                     <h1 className="text-[1.75rem] font-bold text-[#1a1d2e]">Users</h1>
                 </div>
 
-                {/* Liste */}
-                <div className="flex flex-col gap-3">
-                    {users.map(user => (
-                        <div key={user.user_id} className="bg-white border border-[#e4e8f0] rounded-[14px] px-6 py-5 flex items-center gap-6">
+			{/* Filter */}
+			<button 
+				className={filter === 'all' 
+    			? "text-sm font-medium px-3.5 py-1.5 rounded-lg bg-[#eef1ff] text-[#4f6ef7]" 
+    			: "text-sm font-medium text-gray-500 px-3.5 py-1.5 rounded-lg hover:bg-[#f0f3ff] hover:text-[#4f6ef7] transition"}
+				onClick={() => setFilter('all')}>
+				All
+			</button>
+			<button
+				className={filter === 'recruiter' 
+    			? "text-sm font-medium px-3.5 py-1.5 rounded-lg bg-[#eef1ff] text-[#4f6ef7]" 
+    			: "text-sm font-medium text-gray-500 px-3.5 py-1.5 rounded-lg hover:bg-[#f0f3ff] hover:text-[#4f6ef7] transition"}
+				onClick={() => setFilter('recruiter')}>
+				Recruiters
+			</button>
+			<button
+				className={filter === 'candidate' 
+    			? "text-sm font-medium px-3.5 py-1.5 rounded-lg bg-[#eef1ff] text-[#4f6ef7]" 
+    			: "text-sm font-medium text-gray-500 px-3.5 py-1.5 rounded-lg hover:bg-[#f0f3ff] hover:text-[#4f6ef7] transition"}
+				onClick={() => setFilter('candidate')}>
+				Candidates
+			</button>
+
+            {/* Liste */}
+            <div className="flex flex-col gap-3">
+                {filteredUsers.map(user => (
+                    <div key={user.user_id} className="bg-white border border-[#e4e8f0] rounded-[14px] px-6 py-5 flex items-center gap-6">
 
                             {/* Gauche */}
                             <div className="flex items-center gap-3.5 flex-[0_0_240px]">
@@ -250,7 +293,12 @@ export default function AdminUsers(){
                     </div>
                     <div className="flex justify-end gap-2.5 px-9 py-6">
                         <button className="btn-cancel" onClick={() => deleteModalUser.current?.close()}>Cancel</button>
-                        <button className="btn-danger">Delete</button>
+                        <button 
+							className="btn-danger"
+							onClick={() => handleDeleteUser(selectUser?.user_id)}
+						>
+							Delete
+						</button>
                     </div>
                 </dialog>
 
