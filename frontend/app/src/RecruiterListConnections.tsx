@@ -50,8 +50,9 @@ export default function RecruiterListCandidates() {
 	}, []);
 
 	async function handleSharelink(){
+		console.log("test debeug");
 		try{
-			const result = await authContext?.axiosInstance.get(`api/v1/user/link/generate`)
+			const result = await authContext?.axiosInstance.get(`/api/v1/user/link/generate`)
 			setlink(result?.data.url);
 			console.log(result?.data);
 			modalRef.current?.showModal();
