@@ -294,8 +294,9 @@ app.patch('/auth/revoke/refresh-token/:userId', async (req, res) => {
     console.log(req.body.permissions);
     const targetId = parseInt(req.params.userId);
     console.log(targetId, req.body.tokenId);
-    if ((!req.body.permissions.includes('manageLogout') && !req.body.permissions.includes('logoutSelf')) ||
-        (req.body.permissions.includes('logoutSelf') && targetId !== req.body.tokenId))
+    const canManage = req.body.permissions.includes('manageLogout') || req.body.permissions.includes('manageUserInfo');
+    const canSelf = req.body.permissions.includes('logoutSelf') && targetId === req.body.tokenId;
+    if (!canManage && !canSelf)
         return res.status(403).json({error: "Permissions denied for PATCH /auth/revoke/refresh-token/:userId"});
     try {
         console.log("updating tokens")

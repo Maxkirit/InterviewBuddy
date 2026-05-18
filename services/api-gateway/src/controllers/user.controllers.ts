@@ -314,13 +314,22 @@ export const deleteConnection = async(req: Request, res: Response) =>{
 };
 
 
-export const deleteUser = async(req: Request, res: Response){
-	const {userId, permissions, role} = (req as ReqWithUser)
-	
-}
-
-// 1. révoquer tokens        → svc-auth (déconnexion immédiate)
-// 2. auth = false           → svc-auth (blocage connexion)
-// 3. soft delete interviews → svc-interview-store
-// 4. delete connections     → svc-user
-// 5. delete user            → svc-user
+export const deleteUser = async (req: Request, res: Response) => {
+	const { user_id } = req.params;
+	const tokenReq = req as ReqWithUser;
+	try {
+		const response = await axios.patch(
+			`http://svc-user:3000/user/${user_id}/delete`,
+			{
+				userId: tokenReq.userId,
+				permissions: tokenReq.permissions,
+				role: tokenReq.role,
+			}
+		);
+		return res.status(200).json(response.data);
+	} catch (error) {
+		if (axios.isAxiosError<ApiError>(error) && error.response?.status)
+			return res.status(error.response.status).json({ error: error.response.data?.error ?? error.message });
+		return res.status(502).json({ error: "Bad gateway" });
+	}
+};
