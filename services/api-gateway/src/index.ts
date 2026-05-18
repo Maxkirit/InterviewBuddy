@@ -28,7 +28,7 @@ app.use(cookieParser());
 
 //monitoring 
 app.use(monitoringMiddleware);
-app.use('/api/v1/use', monitor);
+app.use('/metrics', monitor);
 
 app.use('/api/v1/auth',authRoute);
 // // signup before validateAcccessToken

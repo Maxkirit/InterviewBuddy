@@ -29,6 +29,7 @@ export const monitoringMiddleware = (req: Request, res: Response, next: NextFunc
 }
 
 export async function monitor(req: Request, res: Response) {
+    console.log("in monitoring");
     res.setHeader('Content-Type', register.contentType);
     res.send(await register.metrics());
 }
