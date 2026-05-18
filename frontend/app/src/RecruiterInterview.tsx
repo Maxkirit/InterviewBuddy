@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "./AuthProvider";
 import SetupInterviewModal from "./SetupInterviewModal";
 import { type InterviewData } from "./CandidateOfficialInterview";
+import ErrorBanner from "./ErrorBanner";
 
 export type Grade = {
     req: number;
@@ -60,6 +61,8 @@ export default function RecruiterInterviews() {
     const [confirmInterviewId, setConfirmInterviewId] = useState<number | null>(null);
     const [isSetupOpen, setIsSetupOpen] = useState(false);
     const [refreshKey, setRefreshKey] = useState(0);
+    const [gradeErrorSet, setGradeErrorSet] = useState<Set<number>>(new Set());
+    const [error, setError] = useState<string | null>(null);
     const confirmRef = useRef<HTMLDialogElement>(null);
 
     useEffect(() => {
@@ -79,8 +82,7 @@ export default function RecruiterInterviews() {
                 }));
                 setInterviews(parsed);
             } catch (error) {
-                console.log("in error path");
-                // error banner
+                setError("Failed to load interviews. Please try again.");
             }
         }
         getInterviews();
@@ -103,7 +105,7 @@ export default function RecruiterInterviews() {
     useEffect(() => {
         const gradedInterviews = [...new Set(interviews.filter((i) => i.status === "graded").map((i) => i.id))];
         gradedInterviews.forEach(async (interviewId) => {
-            if (gradeMap[interviewId] || !interviewId) return;
+            if (gradeMap[interviewId] || gradeErrorSet.has(interviewId) || !interviewId) return;
             try {
                 const res = await authContext?.axiosInstance.get(`api/v1/grading/grading-report`, {
                     params: {
@@ -120,8 +122,7 @@ export default function RecruiterInterviews() {
                 };
                 setGradeMap((prev) => ({ ...prev, [interviewId]: grade }));
             } catch (error) {
-                // handle error
-                console.log(`in error path: ${error}`);
+                setGradeErrorSet((prev) => new Set(prev).add(interviewId));
             }
         });
     }, [interviews]);
@@ -216,6 +217,9 @@ export default function RecruiterInterviews() {
                                 Delete
                             </button>
                         </div>
+                        {!grade && gradeErrorSet.has(interview.id) && (
+                            <span className="text-xs text-[#ef4444]">Failed to load score</span>
+                        )}
                         {grade && (
                             <div className="flex items-center gap-[18px]">
                                 <div className="text-[1.15rem] font-bold text-[#4f6ef7] min-w-[44px] text-center">
@@ -284,6 +288,7 @@ export default function RecruiterInterviews() {
 
     return (
         <>
+            {error && <ErrorBanner message={error} onDismiss={() => setError(null)} />}
             <div className="max-w-[900px] mx-auto py-10 px-6">
                 <div className="flex items-baseline gap-3 mb-7">
                     <h1 className="text-[1.75rem] font-bold text-[#1a1d2e]">Interviews</h1>
@@ -295,7 +300,9 @@ export default function RecruiterInterviews() {
                     </button>
                 </div>
                 <div className="flex flex-col gap-3">
-                    {interviews.map(renderInterviews)}
+                    {interviews.length === 0 ? (
+                        <p>No interviews yet</p>
+                    ) : interviews.map(renderInterviews)}
                 </div>
             </div>
 

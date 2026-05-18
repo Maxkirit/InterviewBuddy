@@ -3,13 +3,13 @@ import { AuthContext, decodeJwt } from "./AuthProvider";
 import { Navigate, Link, useNavigate } from "react-router-dom";
 import { z, ZodError } from "zod";
 import axios from "axios";
-// import { passwordSchema } from './Login';
+import { passwordSchema } from './Login';
 
 const RegisterSchema = z.object({
-    first_name: z.string().min(1),
-    last_name: z.string().min(1),
+    first_name: z.string().min(1, { error: "Enter your firstname"}),
+    last_name: z.string().min(1, { error: "Enter your lastname"}),
     email: z.email(),
-    // password: passwordSchema,
+    password: passwordSchema,
     role_type: z.literal(["candidate", "recruiter"]),
 });
 
@@ -19,6 +19,7 @@ export default function Register() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [selectedRole, setSelectedRole] = useState("candidate");
+    const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
     const authContext = useContext(AuthContext);
     const navigate = useNavigate();
 
@@ -36,6 +37,7 @@ export default function Register() {
 
     async function handleSubmit(event: SubmitEvent) {
         event.preventDefault();
+        setFieldErrors({});
         try {
             const input = {
                 first_name: firstname,
@@ -65,10 +67,15 @@ export default function Register() {
         } catch (error) {
             console.log(`in error path: ${error}`);
             if (error instanceof ZodError) {
-                // error banner
-                console.log(`zod error`);
+                const errs: Record<string, string> = {};
+                error.issues.forEach((issue) => {
+                    if (issue.path[0]) errs[issue.path[0] as string] = issue.message;
+                });
+                setFieldErrors(errs);
+            } else if (axios.isAxiosError(error) && error.response?.status == 409) {
+                setFieldErrors({ form: "Try to log in instead" });
             } else {
-                // add try again banner to form
+                setFieldErrors({ form: "Something went wrong. Please try again" });
             }
         }
     }
@@ -136,26 +143,28 @@ export default function Register() {
                                 First name
                             </label>
                             <input
-                                className="form-input"
+                                className={`form-input ${fieldErrors.first_name ? "border-[#ef4444] focus:border-[#ef4444]" : ""}`}
                                 type="text"
                                 id="firstname"
                                 placeholder="Jane"
                                 value={firstname}
                                 onChange={(e) => setFirstname(e.target.value)}
                             />
+                            {fieldErrors.first_name && <span className="text-xs text-[#ef4444] mt-0.5">{fieldErrors.first_name}</span>}
                         </div>
                         <div className="form-field">
                             <label htmlFor="lastname" className="form-label">
                                 Last name
                             </label>
                             <input
-                                className="form-input"
+                                className={`form-input ${fieldErrors.last_name ? "border-[#ef4444] focus:border-[#ef4444]" : ""}`}
                                 type="text"
                                 id="lastname"
                                 placeholder="Smith"
                                 value={lastname}
                                 onChange={(e) => setLastname(e.target.value)}
                             />
+                            {fieldErrors.last_name && <span className="text-xs text-[#ef4444] mt-0.5">{fieldErrors.last_name}</span>}
                         </div>
                     </div>
 
@@ -164,13 +173,14 @@ export default function Register() {
                             Email
                         </label>
                         <input
-                            className="form-input"
+                            className={`form-input ${fieldErrors.email ? "border-[#ef4444] focus:border-[#ef4444]" : ""}`}
                             type="email"
                             id="email"
                             placeholder="you@example.com"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                         />
+                        {fieldErrors.email && <span className="text-xs text-[#ef4444] mt-0.5">{fieldErrors.email}</span>}
                     </div>
 
                     <div className="form-field">
@@ -178,15 +188,16 @@ export default function Register() {
                             Password
                         </label>
                         <input
-                            className="form-input"
+                            className={`form-input ${fieldErrors.password ? "border-[#ef4444] focus:border-[#ef4444]" : ""}`}
                             type="password"
                             id="password"
                             placeholder="••••••••"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                         />
+                        {fieldErrors.password && <span className="text-xs text-[#ef4444] mt-0.5">{fieldErrors.password}</span>}
                     </div>
-
+                    {fieldErrors.form && <p className="text-xs text-[#ef4444] mb-2">{fieldErrors.form}</p>}
                     <button
                         className="btn-primary w-full py-[11px] mt-2"
                         type="submit"
