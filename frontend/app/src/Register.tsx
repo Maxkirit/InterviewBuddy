@@ -65,7 +65,7 @@ export default function Register() {
                 parseInt(decoded.userId),
                 decoded.role,
             );
-            from.startsWith("/invite") ? navigate(from) : navigate("/profile");
+            from.startsWith("candidate/recruiters/invite") ? navigate(from) : navigate("/profile");
         } catch (error) {
             console.log(`in error path: ${error}`);
             if (error instanceof ZodError) {
@@ -212,6 +212,7 @@ export default function Register() {
                     Already have an account?{" "}
                     <Link
                         to="/login"
+                        state={{ from: location.state?.from }}
                         className="text-[#4f6ef7] no-underline font-medium hover:underline"
                     >
                         Log in

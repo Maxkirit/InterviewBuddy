@@ -143,9 +143,12 @@ app.get("/user/:user_id/public", async (req, res) => {
                 organization: true,
                 bio: true,
                 linkedin_link: true,
+                is_active: true,
             },
         });
         if (!user) return res.status(404).json({ error: "not find" });
+        if (user.is_active == false)
+            return res.status(410).json({ error: "User deleted" });
         res.json(user);
     } catch (e) {
         return res.status(500).json({ error: "internal error" });
@@ -168,7 +171,10 @@ app.get("/user/:user_id", async (req, res) => {
         }
         try {
             console.log("admin perm okay...");
-            const user = await prisma.users.findMany({ orderBy: { user_id: 'asc' } });
+            const user = await prisma.users.findMany({
+                where: { is_active: true},
+                orderBy: { user_id: 'asc' },
+            });
             return res.status(200).json(user);
         } catch (e) {
             return res.status(500).json({ error: "Internal error" });
@@ -185,6 +191,8 @@ app.get("/user/:user_id", async (req, res) => {
             where: { user_id: parseInt(user_id as string, 10) },
         });
         if (!user) return res.status(404).json({ error: "not find" });
+        if (user.is_active == false)
+            return res.status(410).json({ error: "User deleted" });
         res.json(user);
     } catch (e) {
         return res.status(500).json({ error: "internal error" });
@@ -573,7 +581,7 @@ app.get('/user/link/generate', async(req, res) =>{
 			},
 	})
 		const link= process.env.LINK_URL;
-		const url = `${link}/invite?token=${token}`
+		const url = `${link}/candidate/recruiters/invite?token=${token}`
 		console.log("lien generer et renvoyer")
 		return res.status(200).json({url : url})
 	}

@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 import { AuthContext } from "./AuthProvider";
 import ErrorBanner from "./ErrorBanner";
 
@@ -148,6 +148,7 @@ export default function CandidateListRecruiters() {
 					</div>
 				</dialog>
 			</div>
+			<Outlet />
 		</>
 		
 	);
