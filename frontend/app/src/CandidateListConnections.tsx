@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext, useRef } from "react";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
 import { AuthContext } from "./AuthProvider";
 import ErrorBanner from "./ErrorBanner";
 
@@ -23,6 +23,7 @@ export default function CandidateListRecruiters() {
 	const confirmRef = useRef<HTMLDialogElement>(null);
 	const [confirm, setConfirm] = useState<ConfirmState>({ open: false, recruiterId: null });
 	const [error, setError] = useState<string | null>(null);
+	const location = useLocation();
 
 	useEffect(() => {
 		async function getConnections() {
@@ -45,7 +46,7 @@ export default function CandidateListRecruiters() {
 			}
 		}
 		getConnections();
-	}, []);
+	}, [location.state?.refreshConnections]);
 
 	async function handleDeleteConnection(recruiterId: number) {
 		try {

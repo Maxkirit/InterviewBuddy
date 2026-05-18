@@ -15,7 +15,7 @@ export default function InviteLink() {
       await authContext?.axiosInstance.post(
         `api/v1/user/${authContext.userId}/connections/${token}`
       );
-      navigate("/candidate/recruiters", { replace: true });
+      navigate("/candidate/recruiters", { replace: true, state: { refreshConnections: Date.now() } });
     } catch (e) {
       setError(true);
     }
