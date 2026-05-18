@@ -34,7 +34,7 @@ export default function Interview() {
     const [interview, setInterview] = useState<Interview>()
     const [reasoning, setReasoning] = useState("");
     const [error, setError] = useState<string | null>(null);
-    const [submitError, setSubmitError] = useState<string | null>(null);
+    const [submitError] = useState<string | null>(null);
     const navigate = useNavigate();
 
     useEffect(() => {
