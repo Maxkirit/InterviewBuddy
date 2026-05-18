@@ -93,6 +93,16 @@ export default function MyProfile() {
         }
     }
 
+	async function handleDeleteProfile() {
+        try {
+            await authContext?.axiosInstance.patch(`/api/v1/user/${authContext.userId}/delete`);
+			authContext?.logout();
+
+        } catch (error) {
+            setError("Failed to delete");
+        }
+    }
+
     async function handleSubmit(event: SubmitEvent) {
         event.preventDefault();
         setFieldErrors({});
@@ -170,32 +180,6 @@ export default function MyProfile() {
             setPicError("Failed to upload photo. Please try again.");
         }
     }
-
-    
-    // async function handlePicSubmit(e: SubmitEvent) {
-    //     e.preventDefault();
-    //     if (!selectedFile) return;
-
-    //     try {
-    //         const formData = new FormData();
-    //         formData.append("avatar", selectedFile);
-
-    //         await authContext?.axiosInstance.post(
-    //             `/api/v1/user/avatar/${authContext?.userId}`,
-    //             formData,
-    //         );
-
-    //         const res = await authContext?.axiosInstance.get(
-    //             `/api/v1/user/avatar/${authContext?.userId}`,
-    //         );
-
-    //         setProfilePic(res?.data.profile_pic_url ?? "");
-    //         closeDialog();
-    //     } catch (error) {
-    //         console.log(`in error path ${error}`);
-    //         // error banner
-    //     }
-    // }
 
     return (
         <>
@@ -375,6 +359,13 @@ export default function MyProfile() {
                                     className="px-4 py-[10px] rounded-lg border border-[#ef4444] text-[#ef4444] text-sm font-medium cursor-pointer hover:bg-[#ef4444] hover:text-white transition"
                                 >
                                     Logout everywhere
+                                </button>
+								<button
+                                    type="button"
+                                    onClick={handleDeleteProfile}
+                                    className="px-4 py-[10px] rounded-lg border border-[#ef4444] text-[#ef4444] text-sm font-medium cursor-pointer hover:bg-[#ef4444] hover:text-white transition"
+                                >
+                                    Delete Profile
                                 </button>
                                 <button
                                     className="btn-primary px-7 py-[10px]"
