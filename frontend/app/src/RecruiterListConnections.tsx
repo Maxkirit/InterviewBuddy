@@ -157,7 +157,7 @@ export default function RecruiterListCandidates() {
 					</button>
 				</div>
 				<div className="px-6 py-5">
-					<p className="text-sm text-gray-600">Are you sure you want to remove this candidate from your connections?</p>
+					<p className="text-sm text-gray-600">Are you sure you want to remove this candidate from your connections? This will also cancel all the interviews you have with them.</p>
 				</div>
 				<div className="flex justify-end gap-2.5 px-6 py-4 border-t border-gray-100">
 					<button className="btn-cancel" onClick={() => confirmRef.current?.close()}>
