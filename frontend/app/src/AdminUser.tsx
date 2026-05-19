@@ -69,6 +69,14 @@ export default function AdminUsers(){
         editModalUser.current?.close();
     }
 
+    function handleBackdropClickEdit(e: React.MouseEvent<HTMLDialogElement>) {
+        if (e.target === editModalUser.current) closeEditModal();
+    }
+
+    function handleBackdropClickDelete(e: React.MouseEvent<HTMLDialogElement>) {
+        if (e.target === deleteModalUser.current) deleteModalUser.current?.close();
+    }
+
 	async function handleSave(){
         setModalError(null);
         setFieldErrors({});
@@ -210,7 +218,8 @@ export default function AdminUsers(){
                 </div>
 
                 {/* Modal Edit / Add */}
-                <dialog ref={editModalUser}>
+                <dialog ref={editModalUser} onClick={handleBackdropClickEdit}>
+                    <div onClick={(e) => e.stopPropagation()}>
                     <div className="flex items-center justify-between px-9 pt-8 mb-6">
                         <div>
                             <h2 className="text-[1.1rem] font-bold text-[#1a1d2e]">
@@ -275,10 +284,12 @@ export default function AdminUsers(){
                         <button className="btn-cancel" onClick={closeEditModal}>Cancel</button>
                         <button className="btn-primary px-6 py-[9px]" onClick={handleSave}>Save</button>
                     </div>
+                    </div>
                 </dialog>
 
                 {/* Modal Delete */}
-                <dialog ref={deleteModalUser}>
+                <dialog ref={deleteModalUser} onClick={handleBackdropClickDelete}>
+                    <div onClick={(e) => e.stopPropagation()}>
                     <div className="flex items-center justify-between px-9 pt-8 mb-6">
                         <h2 className="text-[1.1rem] font-bold text-[#1a1d2e]">Delete user?</h2>
                         <button
@@ -293,12 +304,13 @@ export default function AdminUsers(){
                     </div>
                     <div className="flex justify-end gap-2.5 px-9 py-6">
                         <button className="btn-cancel" onClick={() => deleteModalUser.current?.close()}>Cancel</button>
-                        <button 
+                        <button
 							className="btn-danger"
 							onClick={() => handleDeleteUser(selectUser?.user_id)}
 						>
 							Delete
 						</button>
+                    </div>
                     </div>
                 </dialog>
 

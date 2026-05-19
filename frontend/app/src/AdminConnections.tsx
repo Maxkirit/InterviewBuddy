@@ -72,6 +72,10 @@ export default function AdminConnections(){
 		confirmRef.current?.showModal();
 	}
 
+	function handleBackdropClickConfirm(e: React.MouseEvent<HTMLDialogElement>) {
+		if (e.target === confirmRef.current) confirmRef.current?.close();
+	}
+
 	return (
 		<>
         	{error && <ErrorBanner message={error} onDismiss={() => setError(null)} />}
@@ -140,7 +144,8 @@ export default function AdminConnections(){
 					)}
 				</div>
 
-				<dialog ref={confirmRef} className="rounded-xl p-0 w-[420px] shadow-xl backdrop:bg-black/50">
+				<dialog ref={confirmRef} className="rounded-xl p-0 w-[420px] shadow-xl backdrop:bg-black/50" onClick={handleBackdropClickConfirm}>
+				<div onClick={(e) => e.stopPropagation()}>
 					<div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-gray-100">
 						<h2 className="text-[1.1rem] font-bold text-[#1a1d2e]">Delete connection</h2>
 						<button
@@ -164,6 +169,7 @@ export default function AdminConnections(){
 						>
 							Delete
 						</button>
+					</div>
 					</div>
 				</dialog>
 			</div>

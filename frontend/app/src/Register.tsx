@@ -65,7 +65,7 @@ export default function Register() {
                 parseInt(decoded.userId),
                 decoded.role,
             );
-            from.startsWith("candidate/recruiters/invite") ? navigate(from) : navigate("/profile");
+            from.startsWith("/candidate/recruiters/invite") ? navigate(from) : navigate("/profile");
         } catch (error) {
             console.log(`in error path: ${error}`);
             if (error instanceof ZodError) {
