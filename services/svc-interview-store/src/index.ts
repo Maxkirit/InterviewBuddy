@@ -118,12 +118,20 @@ app.get("/interview/real-interviews", async (req, res) => {
         }
         try {
             console.log("admin perm okay...");
+            await prisma.interviews.updateMany({
+                where: {
+                    status: "scheduled",
+                    due_date: { lt: new Date() },
+                    deleted: false,
+                },
+                data: { status: "past_due_date" }
+            });
             const interviews = await prisma.interviews.findMany({
-				where:{
-					deleted : false,
-					status : {not: "mock"},
-				},
-			});
+                where:{
+                    deleted: false,
+                    status: { not: "mock" },
+                },
+            });
             return res.status(200).json(interviews);
         } catch (e) {
             return res.status(500).json({ error: "Internal error" });
@@ -141,13 +149,21 @@ app.get("/interview/real-interviews", async (req, res) => {
     console.log("token_id:", token_id);
     console.log("permissions:", permission);
     try {
-        const interview = await prisma.interviews.findMany({
-            where: { 
-				recruiter_id: parseInt(recruiter_id as string, 10),
-				deleted: false,
-			 },
+        await prisma.interviews.updateMany({
+            where: {
+                status: "scheduled",
+                due_date: { lt: new Date() },
+                deleted: false,
+            },
+            data: { status: "past_due_date" }
         });
-        console.log("ici on passe");
+        const interview = await prisma.interviews.findMany({
+            where: {
+                recruiter_id: parseInt(recruiter_id as string, 10),
+                deleted: false,
+            },
+        });
+        console.log("ici on passe, get interview");
         res.status(200).json(interview);
     } catch (e) {
         return res.status(500).json({ error: "internal error" });
@@ -174,12 +190,21 @@ app.get("/interview/candidat-interviews", async (req, res) => {
     console.log("token_id:", token_id);
     console.log("permissions:", permission);
     try {
-        const interview = await prisma.interviews.findMany({
-            where: { candidate_id: parseInt(candidate_id as string, 10),
-				deleted: false,
-			 },
+        await prisma.interviews.updateMany({
+            where: {
+                status: "scheduled",
+                due_date: { lt: new Date() },
+                deleted: false,
+            },
+            data: { status: "past_due_date" }
         });
-        console.log("ici on passe");
+        const interview = await prisma.interviews.findMany({
+            where: {
+                candidate_id: parseInt(candidate_id as string, 10),
+                deleted: false,
+            },
+        });
+        console.log("ici on passe, inter candidat");
         res.status(200).json(interview);
     } catch (e) {
         return res.status(500).json({ error: "internal error" });
@@ -226,6 +251,13 @@ app.get("/interview/:interview_id", async (req, res) => {
             },
             include: { questions: true },
         })
+		if (interview.status === "scheduled" && interview.due_date !== null && interview.due_date < new Date()) {
+    		await prisma.interviews.update({
+    		    where: { unique_interview_id: interview.unique_interview_id },
+    		    data: { status: "past_due_date" }
+    		});
+    		interview.status = "past_due_date";
+		}
         console.log(interview);
         if (interview.candidate_id != userId && interview.recruiter_id != userId) {
             return res.status(403).json({ error: "forbidden" });
@@ -350,7 +382,8 @@ app.patch("/interview/:interview_id", async (req, res) => {
 				deleted: false,
             },
         });
-        if (interview.recruiter_id !== userId) {
+		console.log(interview.status);
+        if (interview.recruiter_id !== userId || interview.status !== "scheduled") {
             return res.status(403).json({ error: "forbidden" });
         }
         const input = {
