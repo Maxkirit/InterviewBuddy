@@ -2,6 +2,8 @@ import express, { Request } from "express";
 import { prisma, Prisma } from "./lib/prisma.js";
 import { int, z } from "zod";
 import axios from "axios";
+import { monitor, monitoringMiddleware } from "./metrics.js";
+import { interviewCompletionTimeMinutes, questionChoiceTotal } from "./metrics.js";
 
 export interface ReqWithUser extends Request {
     userId: number;
@@ -34,6 +36,10 @@ const RealInterviewSchema = z.object({
 
 app.set("query parser", "extended");
 app.use(express.json());
+
+//monitoring
+app.use(monitoringMiddleware);
+app.use('/metrics', monitor);
 
 app.post("/interview/mock-interview", async (req, res) => {
     try {
@@ -262,6 +268,14 @@ app.get("/interview/:interview_id/start", async (req, res) => {
         if (interview.candidate_id !== userId || interview.status !== "scheduled") {
             return res.status(403).json({ error: "forbidden" });
         }
+        const update = await prisma.interviews.update({
+            where: {
+                unique_interview_id: parseInt(interview_id),
+				deleted: false,
+            },
+            data: { started_at: new Date()},
+        })
+        questionChoiceTotal.inc({question_id: interview.question_id, question_name: interview.questions.name});
         res.status(200).json(interview);
     } catch (error) {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -286,6 +300,7 @@ app.patch("/interview/:interview_id/submit", async (req, res) => {
                 unique_interview_id: parseInt(interview_id),
 				deleted: false,
             },
+            include: {questions: true},
         });
         if (interview.candidate_id !== userId || interview.status !== "scheduled") {
             return res.status(403).json({ error: "forbidden" });
@@ -297,8 +312,13 @@ app.patch("/interview/:interview_id/submit", async (req, res) => {
             data: {
                 status: "completed",
                 unfinished_text: req.body.body.reasoning,
+                submitted_at: new Date(),
             }
         });
+        if (interview.started_at && updated.submitted_at) {
+            interviewCompletionTimeMinutes.observe({question: interview.questions.name}, 
+                (updated.submitted_at.getTime() - interview.started_at.getTime()) / (60 * 1000));
+        }
         res.status(200).json(updated);
     } catch (error) {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {

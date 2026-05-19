@@ -2,6 +2,8 @@ import express, { Request, Response } from "express";
 import { prisma, Prisma } from "./lib/prisma.js";
 import z from "zod";
 import axios from "axios";
+import { GradePerEvalCategory } from "./metrics.js";
+import { parse } from "node:path";
 
 const app = express();
 const port = 3000;
@@ -11,12 +13,31 @@ const GradingReportSchema = z.object({
     report: z.string().min(1),
 });
 
+const ReportSchema = z.object({
+    requirements: z.number().min(0).max(5),
+    architecture: z.number().min(0).max(5),
+    scalability: z.number().min(0).max(5),
+    tradeoff: z.number().min(0).max(5),
+    note: z.string().min(0).max(1000),
+})
+
 app.set("query parser", "extended");
 app.use(express.json());
 
 app.post('/grading/grading-report', async (req: Request, res: Response) => {
     try {
         const parsed = GradingReportSchema.parse(req.body.body);
+        //validation that scores <= 5 ??
+        const reportArr = parsed.report.split("\n\n");
+        const scores = {
+            requirements: parseInt(reportArr[0]),
+            architecture: parseInt(reportArr[1]),
+            scalability: parseInt(reportArr[2]),
+            tradeoff: parseInt(reportArr[3]),
+            note: reportArr[4],
+        }
+        const scoreParsed = ReportSchema.parse(scores);
+        const {note, ...scoreWithoutNote} = scores;
         const interview = await axios.get(`http://svc-interview-store:3000/interview/${parsed.unique_interview_id}`, {
             params: {
                 token_id: req.body.userId,
@@ -29,6 +50,10 @@ app.post('/grading/grading-report', async (req: Request, res: Response) => {
         await prisma.grading_reports.create({
             data: {unique_interview_id: parsed.unique_interview_id as number, report: parsed.report}
         });
+        //monitoring
+        for (const [category, score] of Object.entries(scoreWithoutNote)) {
+            GradePerEvalCategory.observe({ category }, score);
+        }
         res.status(201).json({message: "grading report created"});
     } catch (error) {
         console.error("error path:", error);

@@ -34,7 +34,7 @@ function registerService(serviceName: string) {
 
     //add other metric objects here
     //grade per silo average
-    const averageGradePerEvalCategory = new promClient.Histogram({
+    const GradePerEvalCategory = new promClient.Histogram({
         name: "average_grade_per_eval_category",
         help: "Average grade per grading category (requirement met, security, scalability, tradeoff & reasoning",
         labelNames: ['category'], //our grade categories
@@ -46,12 +46,12 @@ function registerService(serviceName: string) {
         httpRequestDurationSeconds,
         httpRequestsTotal,
         httpRequestsInFlight,
-        averageGradePerEvalCategory,
+        GradePerEvalCategory,
     }
 }
 
 
-const { register, httpRequestsTotal, httpRequestDurationSeconds, httpRequestsInFlight } = registerService('api-gateway');
+export const { register, httpRequestsTotal, httpRequestDurationSeconds, httpRequestsInFlight, GradePerEvalCategory } = registerService('api-gateway');
 
 //start timing metrics and populating the fields we want in the middleware
 export const monitoringMiddleware = (req: Request, res: Response, next: NextFunction) => {
@@ -63,7 +63,8 @@ export const monitoringMiddleware = (req: Request, res: Response, next: NextFunc
 
     res.on('finish', () => {
         const route = req.route?.path ?? req.path; //allows use of route path for better cardinality when :userId baked in route
-
+        const routeKey = `${req.method} ${req.route?.path ?? req.path}`;
+        const statusCode = res.statusCode;
         const labels = {
             method: req.method,
             route,

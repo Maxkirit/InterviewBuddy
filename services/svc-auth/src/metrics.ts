@@ -102,12 +102,6 @@ export const { register,
         authFailureTotal
     } = registerService('api-gateway');
 
-type RouteEvent = {
-    successEvent?: (req: Request, res: Response) => void;
-    failureEvent?: (req: Request, res: Response) => void;
-    failureReason?: string,
-}
-
 const ROUTE_EVENT_MAP: Record<string, RouteEvent> = {
         'POST /api/v1/auth/login': {
         successEvent: () => tokenIssuedTotal.inc({ token_type: 'access' }),
@@ -121,6 +115,12 @@ const ROUTE_EVENT_MAP: Record<string, RouteEvent> = {
         successEvent: () => tokenRevocationTotal.inc({ reason: 'logout' }),
     },
 };
+
+type RouteEvent = {
+    successEvent?: (req: Request, res: Response) => void;
+    failureEvent?: (req: Request, res: Response) => void;
+    failureReason?: string,
+}
 
 //start timing metrics and populating the fields we want in the middleware
 export const monitoringMiddleware = (req: Request, res: Response, next: NextFunction) => {

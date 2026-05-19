@@ -36,7 +36,7 @@ function registerService(serviceName: string) {
     const interviewCompletionTimeMinutes = new promClient.Histogram({
         name: 'interview_completion_time_minutes',
         help: 'Time from interview start to submission in minutes',
-        labelNames: ['question_category'] as const, // e.g. 'system_design' | 'api_design' | 'database'
+        labelNames: ['question'] as const,
         buckets: [1, 5, 10, 20, 30, 45, 60, 90, 120], // realistic interview durations in minutes
         registers: [register],
     });
@@ -61,7 +61,18 @@ function registerService(serviceName: string) {
 }
 
 
-const { register, httpRequestsTotal, httpRequestDurationSeconds, httpRequestsInFlight } = registerService('api-gateway');
+export const { register,
+        httpRequestDurationSeconds,
+        httpRequestsTotal,
+        httpRequestsInFlight,
+        interviewCompletionTimeMinutes,
+        questionChoiceTotal, } = registerService('api-gateway');
+
+type RouteEvent = {
+    successEvent?: (req: Request, res: Response) => void;
+    failureEvent?: (req: Request, res: Response) => void;
+    failureReason?: string,
+}
 
 //start timing metrics and populating the fields we want in the middleware
 export const monitoringMiddleware = (req: Request, res: Response, next: NextFunction) => {
@@ -71,9 +82,11 @@ export const monitoringMiddleware = (req: Request, res: Response, next: NextFunc
     const end = httpRequestDurationSeconds.startTimer();
     httpRequestsInFlight.inc({method: req.method});
 
-    res.on('finish', () => {
-        const route = req.route?.path ?? req.path; //allows use of route path for better cardinality when :userId baked in route
+    
 
+    res.on('finish', () => {
+        const route = req.route?.path ?? req.path;
+        const statusCode = res.statusCode;
         const labels = {
             method: req.method,
             route,
