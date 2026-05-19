@@ -73,6 +73,16 @@ services:
                 condition: service_completed_successfully
         restart: unless-stopped
 
+    test-seed:
+        profiles: ["seed"]
+        container_name: test-seed
+        build: tools/test-seed
+        networks:
+            - backend-network
+        environment:
+            GATEWAY_URL: "http://api-gateway:3000"
+        restart: "no"
+
     # svc-serialization:
     #     container_name: svc-serialization
     #     build: services/svc-serialization
