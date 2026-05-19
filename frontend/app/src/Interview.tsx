@@ -2,6 +2,7 @@ import { useState, useContext, useEffect, type SubmitEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AuthContext } from "./AuthProvider";
 import z from "zod";
+import axios from "axios";
 import ErrorBanner from "./ErrorBanner";
 
 type Question = {
@@ -33,6 +34,7 @@ export default function Interview() {
     const [interview, setInterview] = useState<Interview>()
     const [reasoning, setReasoning] = useState("");
     const [error, setError] = useState<string | null>(null);
+    const [submitError] = useState<string | null>(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -42,7 +44,13 @@ export default function Interview() {
                 setInterview(res?.data);
             } catch (error) {
                 console.log(`in error path: ${error}`);
-                setError("Failed to load the interview. Please try again.")
+                if (axios.isAxiosError(error) && error.response?.status == 410) {
+                    navigate("/candidate/official-interviews", { replace: true, state: { flash: "This interview has been canceled by the recruiter." } });
+                } else if (axios.isAxiosError(error) && error.response?.status == 403) {
+                    navigate("/candidate/official-interviews", { replace: true, state: { flash: "Acess forbiden" } });
+                }
+				else
+					navigate("/candidate/official-interviews", { replace: true, state: { flash: "Failed to load interview, please retry later" } });
             }
         }
 
@@ -58,7 +66,13 @@ export default function Interview() {
             });
             navigate('/candidate/official-interviews', {replace: true});
         } catch (error) {
-            setError("Failed to submit your answer. Please try again.");
+                if (axios.isAxiosError(error) && error.response?.status == 410) {
+                    navigate("/candidate/official-interviews", { replace: true, state: { flash: "This interview has been canceled by the recruiter." } });
+                } else if (axios.isAxiosError(error) && error.response?.status == 403) {
+                    navigate("/candidate/official-interviews", { replace: true, state: { flash: "Acess forbiden" } });
+                }
+				else
+					navigate("/candidate/official-interviews", { replace: true, state: { flash: "Failed to load interview, please retry later" } });
         }
     }
 
@@ -80,7 +94,7 @@ export default function Interview() {
                         <div>
                             <h3 className="text-[0.825rem] font-bold text-[#374151] mb-2.5">Functional</h3>
                             <ul className="flex flex-col gap-[7px] list-none">
-                                {interview?.questions.functional_req.split('\n\n').map((req, i) => (
+                                {interview && interview.questions.functional_req.split('\n\n').map((req, i) => (
                                     <li key={i} className="flex items-baseline gap-2 text-[0.875rem] text-[#4b5563]">
                                         <span className="w-1.5 h-1.5 rounded-full bg-[#4f6ef7] shrink-0 mt-[3px]" />
                                         {req}
@@ -113,8 +127,9 @@ export default function Interview() {
                             onChange={(e) => setReasoning(e.target.value)}
                         />
                     </div>
-                    <div className="flex justify-end mt-4">
+                    <div className="flex flex-col items-end mt-4 gap-2">
                         <button className="btn-primary px-7 py-[10px] disabled:opacity-50 disabled:cursor-not-allowed" type="submit" disabled={!reasoning.trim()}>Submit</button>
+                        {submitError && <p className="text-xs text-[#ef4444]">{submitError}</p>}
                     </div>
                 </form>
             </div>

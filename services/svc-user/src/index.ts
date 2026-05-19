@@ -9,6 +9,8 @@ import dotenv from 'dotenv'
 import { DeleteConnection } from "./connections/deleteConnection.js";
 import { DeleteUser } from "./delete/dispatchDelete.js";
 import { profileUpdateTotal } from "./metrics.js";
+import { getConnection } from "./connections/getConnection.js";
+import { getAllConnections } from "./connections/getAllConnections.js";
 
 dotenv.config();
 
@@ -139,9 +141,12 @@ app.get("/user/:user_id/public", async (req, res) => {
                 organization: true,
                 bio: true,
                 linkedin_link: true,
+                is_active: true,
             },
         });
         if (!user) return res.status(404).json({ error: "not find" });
+        if (user.is_active == false)
+            return res.status(410).json({ error: "User deleted" });
         res.json(user);
     } catch (e) {
         return res.status(500).json({ error: "internal error" });
@@ -164,7 +169,10 @@ app.get("/user/:user_id", async (req, res) => {
         }
         try {
             console.log("admin perm okay...");
-            const user = await prisma.users.findMany({ orderBy: { user_id: 'asc' } });
+            const user = await prisma.users.findMany({
+                where: { is_active: true},
+                orderBy: { user_id: 'asc' },
+            });
             return res.status(200).json(user);
         } catch (e) {
             return res.status(500).json({ error: "Internal error" });
@@ -178,9 +186,11 @@ app.get("/user/:user_id", async (req, res) => {
     console.log("permissions:", permission);
     try {
         const user = await prisma.users.findUnique({
-            where: { user_id: parseInt(user_id as string, 10) },
+            where: { user_id: parseInt(user_id as string, 10), is_active : true },
         });
         if (!user) return res.status(404).json({ error: "not find" });
+        if (user.is_active == false)
+            return res.status(410).json({ error: "User deleted" });
         res.json(user);
     } catch (e) {
         return res.status(500).json({ error: "internal error" });
@@ -247,87 +257,13 @@ app.post("/user/profile/:auth_id", async (req, res) => {
     }
 });
 
-app.get("/user/:userId/connections", async (req, res) => {
-    const userId = parseInt(req.params.userId);
-    const id = parseInt(req.query.userId as string);
-    const tmp = req.query.permissions ?? {};
-    const permissions = Object.values(tmp) as string[];
-
-    console.log(`userId=${userId} id=${id} permissions=${permissions}`);
-    if (
-        (!permissions?.includes("readConnection") &&
-            !permissions?.includes("manageConnection")) ||
-        (permissions?.includes("readConnection") && id != userId)
-    ) {
-        return res
-            .status(403)
-            .json({ error: "No permissions for this actions" });
-    }
-    try {
-        const connections = await prisma.connections.findMany({
-            where: {
-                OR: [{ candidate_id: userId }, { recruiter_id: userId }],
-                status: "accepted",
-				is_active: true,
-            },
-            select: {
-                // When this user is the candidate, select the recruiter's info
-                users_connections_recruiter_idTousers: {
-                    select: {
-                        user_id: true,
-                        firstname: true,
-                        lastname: true,
-                        profile_pic_url: true,
-                        organization: true,
-                        last_seen: true,
-                    },
-                },
-                // When this user is the recruiter, select the candidate's info
-                users_connections_candidate_idTousers: {
-                    select: {
-                        user_id: true,
-                        firstname: true,
-                        lastname: true,
-                        profile_pic_url: true,
-                        last_seen: true,
-                    },
-                },
-            },
-        });
-        const connectedUsers = connections.map((conn) => {
-            const recruiterSide = conn.users_connections_recruiter_idTousers;
-            const candidateSide = conn.users_connections_candidate_idTousers;
-            return recruiterSide?.user_id !== userId
-                ? recruiterSide
-                : candidateSide;
-        });
-        console.log(connectedUsers);
-        res.status(200).json({
-            connections: connectedUsers,
-            message: "Connections found",
-        });
-    } catch (error) {
-        if (error instanceof Prisma.PrismaClientKnownRequestError) {
-            return res
-                .status(400)
-                .json({ error: "No connections found", code: error.code });
-        }
-        return res
-            .status(500)
-            .json({ error: "Bad gateway in svc-user get/connections" });
-    }
-});
-
 app.patch("/user/profile/:user_id", async (req, res) => {
     console.log("in update user profile route\n");
     try {
 		console.log(req.body.permissions);
         const userId = parseInt(req.params.user_id);
-        if (
-            ( req.body.userId !== userId &&
-                !req.body.permissions?.includes("manageUserInfo")) ||
-            !req.body.permissions.includes("modifyOwnUser")
-        ) {
+        if (!((req.body.userId === userId && req.body.permissions.includes("modifyOwnUser"))
+            || req.body.permissions?.includes("manageUserInfo"))) {
 			console.log(`${req.body.userId} vs ${userId}, perm : mdu ${req.body.permissions?.includes("modifyOwnUser")}, mui ${req.body.permissions?.includes("manageUserInfo")}`)
             return res
                 .status(403)
@@ -419,6 +355,8 @@ app.get(
     },
 );
 
+app.get("/user/all/connections", getAllConnections);
+app.get("/user/:userId/connections", getConnection);
 app.post("/user/:user_id/connections/:link_id", addConnection);
 app.patch("/user/connections/:user_id/:connectionId", DeleteConnection)
 
@@ -532,6 +470,8 @@ app.patch('/user/:userId/role', async(req, res) => {
     console.log(!req.body.permissions.includes('modifyUserRole'));
     if (!req.body.permissions.includes('modifyUserRole') || targetId !== req.body.tokenId)
         return res.status(403).json({error: "Invalid permissions for PATCH /user/:userId/role"});
+    if (req.body.newRole != "candidate" && req.body.newRole != "recruiter")
+        return res.status(400).json({error: "Invalid role type"});
     try {
         console.log("permission validated");
         const response = await prisma.users.update({
@@ -574,7 +514,7 @@ app.get('/user/link/generate', async(req, res) =>{
 			},
 	})
 		const link= process.env.LINK_URL;
-		const url = `${link}/invite?token=${token}`
+		const url = `${link}/candidate/recruiters/invite?token=${token}`
 		console.log("lien generer et renvoyer")
 		return res.status(200).json({url : url})
 	}

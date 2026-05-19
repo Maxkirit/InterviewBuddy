@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "./AuthProvider";
 import { type Grade } from "./RecruiterInterview";
 import ErrorBanner from "./ErrorBanner";
@@ -55,12 +55,13 @@ function miniBarColor(score: number): string {
 export default function CandidateOfficialInterview() {
     const authContext = useContext(AuthContext);
     const navigate = useNavigate();
+    const location = useLocation();
     const [interviews, setInterviews] = useState<Interview[]>([]);
     const [recruiterMap, setRecruiterMap] = useState<Record<string, RecruiterData>>({});
     const [gradeMap, setGradeMap] = useState<Record<number, Grade>>({});
     const [selectedInterview, setSelectedInterview] = useState<Interview | null>(null);
     const [gradeErrorSet, setGradeErrorSet] = useState<Set<number>>(new Set());
-    const [error, setError] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(location.state?.flash ?? null);
     const ref = useRef<HTMLDialogElement>(null);
 
     useEffect(() => {
@@ -92,7 +93,7 @@ export default function CandidateOfficialInterview() {
         uniqueRecruiterIds.forEach(async (recruiterId) => {
             if (recruiterMap[recruiterId] || !recruiterId) return;
             try {
-                const res = await authContext?.axiosInstance.get(`api/v1/user/${recruiterId}/public`);
+                const res = await authContext?.axiosInstance.get(`/api/v1/user/${recruiterId}/public`);
                 setRecruiterMap((prev) => ({ ...prev, [recruiterId]: res?.data }));
             } catch (error) {
                 console.log(`in error path: ${error}`);
@@ -106,20 +107,22 @@ export default function CandidateOfficialInterview() {
         gradedInterviews.forEach(async (interviewId) => {
             if (gradeMap[interviewId] || gradeErrorSet.has(interviewId) || !interviewId) return;
             try {
-                const res = await authContext?.axiosInstance.get(`api/v1/grading/grading-report`, {
+                const res = await authContext?.axiosInstance.get(`/api/v1/grading/grading-report`, {
                     params: {
                         interview_id: interviewId,
                     }
                 });
-                const splitted = res?.data.report.split('\n\n');
-                const grade: Grade = {
-                    req: parseInt(splitted[0]),
-                    archi: parseInt(splitted[1]),
-                    scale: parseInt(splitted[2]),
-                    res: parseInt(splitted[3]),
-                    note: splitted[4],
-                };
-                setGradeMap((prev) => ({ ...prev, [interviewId]: grade }));
+                if (res?.data.report) {
+                    const splitted = res?.data.report.split('\n\n');
+                    const grade: Grade = {
+                        req: parseInt(splitted[0]),
+                        archi: parseInt(splitted[1]),
+                        scale: parseInt(splitted[2]),
+                        res: parseInt(splitted[3]),
+                        note: splitted[4],
+                    };
+                    setGradeMap((prev) => ({ ...prev, [interviewId]: grade }));
+                }
             } catch (error) {
                 setGradeErrorSet((prev) => new Set(prev).add(interviewId));
             }
@@ -225,8 +228,8 @@ export default function CandidateOfficialInterview() {
         const name = recruiter ? `${recruiter.firstname} ${recruiter.lastname}` : "-";
 
         return (
-            <div key={interview.id} className="bg-white border border-[#e4e8f0] rounded-[14px] px-6 py-5 flex items-center gap-6">
-                <div className="flex items-center gap-3.5 flex-[0_0_240px]">
+            <div key={interview.id} className="bg-white border border-[#e4e8f0] rounded-[14px] px-6 py-5 flex items-center gap-6 flex-wrap">
+                <div className="flex items-center gap-3.5 flex-[1_1_200px] min-w-0">
                     <div className="avatar relative overflow-hidden">
                         {recruiter?.profile_pic_url && (
                             <img

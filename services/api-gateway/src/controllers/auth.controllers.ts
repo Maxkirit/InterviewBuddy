@@ -114,6 +114,8 @@ export const registrationFlow = async (req: Request, res: Response) => {
     if (missingFields.length > 0){
         return res.status(400).json({error: 'Missing fields in request', missing: missingFields});
     }
+	if (req.body['role_type'] !== 'candidate' && req.body['role_type'] !== 'recruiter')
+    	return res.status(400).json({error: 'Can only register as candidate or recruiter'});
     try {
         const response = await axios.post("http://svc-auth:3000/auth/user", {
             email: req.body['email'],
@@ -182,7 +184,7 @@ export const validateExternalAuth = async (req: Request, res: Response) => {
                                                     sameSite: 'strict',
                                                     maxAge: response.data.maxAge * 1000,
                                                 })
-                        .location(`http://localhost:5173/auth/callback?${urlParams.toString()}`)
+                        .location(`https://localhost/auth/callback?${urlParams.toString()}`)
                         .end();
     } catch (error) {
         console.log("in validateExternalAuth error path");

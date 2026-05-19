@@ -82,6 +82,32 @@ export const listConnections = async (req: Request, res: Response) => {
     }
 };
 
+export const AllConnections = async (req: Request, res: Response) => {
+    try {
+        const id = req.params.user_id;
+        const result = await axios.get(
+            `http://svc-user:3000/user/all/connections`,
+            {
+                params: {
+                    userId: (req as ReqWithUser).userId,
+                    permissions: (req as ReqWithUser).permissions,
+                },
+            },
+        );
+        res.status(200).json({
+            connections: result.data.connections,
+            message: "Connection list retrieved",
+        });
+    } catch (error) {
+        if (axios.isAxiosError<ApiError>(error) && error.response?.status) {
+            return res
+                .status(error.response.status)
+                .json({ error: error.response.data?.error ?? error.message });
+        }
+        return res.status(502).json({ error: "Bad gateway" });
+    }
+};
+
 //this route is not used for images
 // in this route
 export const updateUserInfo = async (req: Request, res: Response) => {
@@ -294,7 +320,6 @@ export const deleteConnection = async(req: Request, res: Response) =>{
 	}
 
 };
-
 
 export const deleteUser = async (req: Request, res: Response) => {
 	const { user_id } = req.params;

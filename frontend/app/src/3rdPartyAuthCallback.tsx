@@ -28,7 +28,7 @@ export default function AuthCallback() {
             }
         } catch (error) {
             console.error('Auth callback failed:', error);
-            navigate('/error'); 
+            navigate('/login', { replace: true, state: { flash: "3rd party authentication failed"} }); 
         }
     }, [])
 

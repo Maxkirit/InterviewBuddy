@@ -19,7 +19,8 @@ import InviteLink from "./invite";
 import GradingPage from "./GradingPage";
 import ViewProfile from "./ViewProfile";
 import LegalPage from "./Legal";
-
+import AdminInterviews from "./AdminInterviews";
+import AdminConnections from "./AdminConnections";
 
 export default function Router() {
     return (
@@ -32,7 +33,6 @@ export default function Router() {
                 <Route element={<ProtectedLayout />}>
                 <Route path="/pick-role" element={<PickRole />}/>
                     <Route element={<AppLayout />}>
-						<Route path="/invite" element={<InviteLink />} />
                         <Route path = "/legal" element={<LegalPage />} />
                         <Route path="/candidate" element={<CandidateView />}>
                             <Route
@@ -40,7 +40,9 @@ export default function Router() {
                                 element={<CandidateOfficialInterview />}/>
     						<Route
                             	path="/candidate/recruiters"
-                            	element={<CandidateListRecruiters />}/>
+                            	element={<CandidateListRecruiters />}>
+                                <Route path="/candidate/recruiters/invite" element={<InviteLink />} />
+                            </Route>
                         </Route>
                         <Route path="/recruiter" element={<RecruiterView />}>
                             <Route 
@@ -54,7 +56,16 @@ export default function Router() {
                                 element={<GradingPage />}/>
                         </Route>
                         <Route path="/admin" element={<AdminView />}>
-                            <Route path="/admin/users" element={<AdminUsers />} />
+                            <Route 
+								path="/admin/users"
+								element={<AdminUsers />} />
+							<Route 
+								path="/admin/interviews"
+								element={<AdminInterviews />} />
+							<Route 
+								path="/admin/Connections"
+								element={<AdminConnections />} />
+
                         </Route>
                         <Route path="/profile" element={<MyProfile />} />
                         <Route path="/profile/:user_id" element={<ViewProfile />} />

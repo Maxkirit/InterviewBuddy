@@ -157,7 +157,7 @@ export default function RecruiterListCandidates() {
 					</button>
 				</div>
 				<div className="px-6 py-5">
-					<p className="text-sm text-gray-600">Are you sure you want to remove this candidate from your connections?</p>
+					<p className="text-sm text-gray-600">Are you sure you want to remove this candidate from your connections? This will also cancel all the interviews you have with them.</p>
 				</div>
 				<div className="flex justify-end gap-2.5 px-6 py-4 border-t border-gray-100">
 					<button className="btn-cancel" onClick={() => confirmRef.current?.close()}>
@@ -192,7 +192,7 @@ export default function RecruiterListCandidates() {
 				id="invite-link"
 				type="text"
 				readOnly
-				defaultValue={link}
+				value={link}
 				className="flex-1 border border-[#e4e8f0] rounded-lg px-3 py-2 text-sm text-gray-500 bg-gray-50 outline-none"
 				/>
 			</div>

@@ -33,7 +33,7 @@ type JwtPayload = {
 };
 
 //for dev container
-axios.defaults.baseURL="http://localhost:3000";
+// axios.defaults.baseURL="http://localhost:3000";
 
 export const AuthContext = createContext<AuthContextType | null>(null);
 
@@ -41,8 +41,6 @@ export function decodeJwt(token: string): JwtPayload {
     const payload = token.split(".")[1];
     return JSON.parse(atob(payload));
 }
-
-// axios.defaults.baseURL = "http://localhost:3000";
 
 export default function AuthProvider({ children }: { children: ReactNode }) {
     const [token, setToken] = useState<string | null>(null);
@@ -66,6 +64,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     function logout() {
         setToken(null);
         setUserId(null);
+        setRole(null);
         setProfilePicUrl(null);
     }
 

@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "./AuthProvider";
 import { useParams } from "react-router-dom";
+import axios from "axios";
 import ErrorBanner from "./ErrorBanner";
 
 type UserData = {
@@ -36,11 +37,13 @@ export default function ViewProfile() {
     useEffect(() => {
         async function getUser() {
             try {
-                const res = await authContext?.axiosInstance.get(`api/v1/user/${user_id}/public`);
+                const res = await authContext?.axiosInstance.get(`/api/v1/user/${user_id}/public`);
                 setUser(res?.data);
             } catch (error) {
-                console.log(`in error path: ${error}`);
-                setError("Failed to load user profile. Please try again.");
+                if (axios.isAxiosError(error) && error.response?.status == 410) {
+                    setError("This interview has been canceled by the recruiter.");
+                } else 
+                    setError("Failed to load user profile. Please try again.");
             }
         }
         getUser();

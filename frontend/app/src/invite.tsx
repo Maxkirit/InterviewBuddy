@@ -15,7 +15,7 @@ export default function InviteLink() {
       await authContext?.axiosInstance.post(
         `/api/v1/user/${authContext.userId}/connections/${token}`
       );
-      navigate("/profile", { replace: true });
+      navigate("/candidate/recruiters", { replace: true, state: { refreshConnections: Date.now() } });
     } catch (e) {
       setError(true);
     }
@@ -68,7 +68,7 @@ export default function InviteLink() {
           <>
             <button
               className="btn-cancel"
-              onClick={() => navigate("/profile", { replace: true })}
+              onClick={() => navigate("/candidate/recruiters", { replace: true })}
             >
               Decline
             </button>

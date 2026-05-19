@@ -27,13 +27,13 @@ const LoginSchema = z.object({
 });
 
 export default function Login() {
+    const location= useLocation();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+    const [fieldErrors, setFieldErrors] = useState<Record<string, string>>(location.state?.flash ? {form: location.state?.flash} : {});
     const authContext = useContext(AuthContext);
     const navigate = useNavigate();
-	const location= useLocation();
-	const from= location.state?.from?.pathname + location.state?.from?.search;
+	const from = location.state?.from ? location.state.from.pathname + (location.state.from.search ?? "") : null;
 
     if (authContext?.isLoading === true) {
         return (
@@ -182,6 +182,7 @@ export default function Login() {
                     Don't have an account?{" "}
                     <Link
                         to="/register"
+                        state={{ from: location.state?.from }}
                         className="text-[#4f6ef7] no-underline font-medium hover:underline"
                     >
                         Sign up

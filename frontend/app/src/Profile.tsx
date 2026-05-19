@@ -1,6 +1,7 @@
 import { useEffect, useState, useContext, type SubmitEvent, useRef } from "react";
 import { AuthContext } from "./AuthProvider";
 import { ZodError } from "zod";
+import axios from "axios";
 import z from "zod";
 import ErrorBanner from "./ErrorBanner";
 
@@ -77,7 +78,10 @@ export default function MyProfile() {
                 setProfilePic(userInfo?.data.profile_pic_url ?? "");
             } catch (error) {
                 console.log(`in error path: ${error}`);
-                setError("Failed to load profile information. Please try again.");
+                if (axios.isAxiosError(error) && error.response?.status == 410) {
+                    setError("This user has been deleted.");
+                } else
+                    setError("Failed to load profile information. Please try again.");
             }
         }
 

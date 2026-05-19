@@ -93,7 +93,7 @@ export default function RecruiterInterviews() {
         uniqueCandidateIds.forEach(async (candidateId) => {
             if (candidateMap[candidateId] || !candidateId) return;
             try {
-                const res = await authContext?.axiosInstance.get(`api/v1/user/${candidateId}/public`);
+                const res = await authContext?.axiosInstance.get(`/api/v1/user/${candidateId}/public`);
                 setCandidateMap((prev) => ({ ...prev, [candidateId]: res?.data }));
             } catch (error) {
                 // handle error
@@ -107,20 +107,22 @@ export default function RecruiterInterviews() {
         gradedInterviews.forEach(async (interviewId) => {
             if (gradeMap[interviewId] || gradeErrorSet.has(interviewId) || !interviewId) return;
             try {
-                const res = await authContext?.axiosInstance.get(`api/v1/grading/grading-report`, {
+                const res = await authContext?.axiosInstance.get(`/api/v1/grading/grading-report`, {
                     params: {
                         interview_id: interviewId,
                     }
                 });
-                const splitted = res?.data.report.split('\n\n');
-                const grade: Grade = {
-                    req: parseInt(splitted[0]),
-                    archi: parseInt(splitted[1]),
-                    scale: parseInt(splitted[2]),
-                    res: parseInt(splitted[3]),
-                    note: splitted[4],
-                };
-                setGradeMap((prev) => ({ ...prev, [interviewId]: grade }));
+                if (res?.data.report) {
+                    const splitted = res?.data.report.split('\n\n');
+                    const grade: Grade = {
+                        req: parseInt(splitted[0]),
+                        archi: parseInt(splitted[1]),
+                        scale: parseInt(splitted[2]),
+                        res: parseInt(splitted[3]),
+                        note: splitted[4],
+                    };
+                    setGradeMap((prev) => ({ ...prev, [interviewId]: grade }));
+                }
             } catch (error) {
                 setGradeErrorSet((prev) => new Set(prev).add(interviewId));
             }
@@ -264,8 +266,8 @@ export default function RecruiterInterviews() {
         const name = candidate ? `${candidate.firstname} ${candidate.lastname}` : "-";
 
         return (
-            <div key={interview.id} className="bg-white border border-[#e4e8f0] rounded-[14px] px-6 py-5 flex items-center gap-6">
-                <div className="flex items-center gap-3.5 flex-[0_0_240px]">
+            <div key={interview.id} className="bg-white border border-[#e4e8f0] rounded-[14px] px-6 py-5 flex items-center gap-6 flex-wrap">
+                <div className="flex items-center gap-3.5 flex-[1_1_200px] min-w-0">
                     <div className="avatar relative overflow-hidden">
                         {candidate?.profile_pic_url && (
                             <img

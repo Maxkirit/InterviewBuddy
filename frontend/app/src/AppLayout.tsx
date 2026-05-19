@@ -1,4 +1,4 @@
-import { useContext} from "react";
+import { useContext } from "react";
 import { AuthContext } from "./AuthProvider";
 import { Navigate, Outlet, Link, NavLink, useNavigate } from "react-router-dom";
 import Footer from "./Footer";
@@ -147,9 +147,17 @@ export default function AppLayout() {
                                 Users
                             </NavLink>
                         </li>
+						<li>
+                            <NavLink
+                                to="/admin/connections"
+                                className={navLinkClass}
+                            >
+                                Connections
+                            </NavLink>
+                        </li>
                         <li>
                             <NavLink
-                                to="/admin/Interviews"
+                                to="/admin/interviews"
                                 className={navLinkClass}
                             >
                                 Interviews
