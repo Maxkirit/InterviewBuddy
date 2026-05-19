@@ -33,17 +33,32 @@ function registerService(serviceName: string) {
     });
 
     //add other metric objects here
+    const avatarUploadTotal = new promClient.Counter({
+        name: 'user_avatar_upload_total',
+        help: 'Profile picture upload outcomes',
+        labelNames: ['result'], // 'success' | 'too_large' | 'invalid_type'
+        registers: [register],
+    });
+
+    const avatarUploadSizeBytes = new promClient.Histogram({
+        name: 'user_avatar_upload_size_bytes',
+        help: 'Size distribution of uploaded avatars',
+        buckets: [50_000, 100_000, 500_000, 1_000_000, 2_000_000, 5_000_000],
+        registers: [register],
+    });
 
     return { register,
         httpRequestDurationSeconds,
         httpRequestsTotal,
         httpRequestsInFlight,
+        avatarUploadTotal,
+        avatarUploadSizeBytes
         //dont forget to add other objects
     }
 }
 
 
-const { register, httpRequestsTotal, httpRequestDurationSeconds, httpRequestsInFlight } = registerService('api-gateway');
+export const { register, httpRequestsTotal, httpRequestDurationSeconds, httpRequestsInFlight, avatarUploadTotal, avatarUploadSizeBytes } = registerService('api-gateway');
 
 //start timing metrics and populating the fields we want in the middleware
 export const monitoringMiddleware = (req: Request, res: Response, next: NextFunction) => {
@@ -55,7 +70,8 @@ export const monitoringMiddleware = (req: Request, res: Response, next: NextFunc
 
     res.on('finish', () => {
         const route = req.route?.path ?? req.path; //allows use of route path for better cardinality when :userId baked in route
-
+        if (res.statusCode == 413)
+            avatarUploadTotal.inc({result: "too_large"});
         const labels = {
             method: req.method,
             route,

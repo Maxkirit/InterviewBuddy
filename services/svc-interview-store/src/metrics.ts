@@ -68,12 +68,6 @@ export const { register,
         interviewCompletionTimeMinutes,
         questionChoiceTotal, } = registerService('api-gateway');
 
-type RouteEvent = {
-    successEvent?: (req: Request, res: Response) => void;
-    failureEvent?: (req: Request, res: Response) => void;
-    failureReason?: string,
-}
-
 //start timing metrics and populating the fields we want in the middleware
 export const monitoringMiddleware = (req: Request, res: Response, next: NextFunction) => {
     if (req.path === '/api/v1/monitoring')

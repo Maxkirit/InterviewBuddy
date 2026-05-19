@@ -24,7 +24,14 @@ function registerService(serviceName: string) {
         registers: [register],
     });
 
-    
+    //current requests being handled
+    const httpRequestsInFlight = new promClient.Gauge({
+        name: 'http_requests_in_flight',
+        help: 'Number of HTTP requests currently being processed',
+        labelNames: ['method'] as const,
+        registers: [register],
+    });
+
     // Profile operations
     const profileUpdateTotal = new promClient.Counter({
         name: 'user_profile_update_total',
@@ -33,31 +40,9 @@ function registerService(serviceName: string) {
         registers: [register],
     });
 
-    const avatarUploadTotal = new promClient.Counter({
-        name: 'user_avatar_upload_total',
-        help: 'Profile picture upload outcomes',
-        labelNames: ['result'], // 'success' | 'too_large' | 'invalid_type'
-        registers: [register],
-    });
-
-    const avatarUploadSizeBytes = new promClient.Histogram({
-        name: 'user_avatar_upload_size_bytes',
-        help: 'Size distribution of uploaded avatars',
-        buckets: [50_000, 100_000, 500_000, 1_000_000, 2_000_000, 5_000_000],
-        registers: [register],
-    });
-    // Social graph — connections between candidates and recruiters
-    const connectionRequestTotal = new promClient.Counter({
-        name: 'user_connection_request_total',
-        help: 'Connection requests by actor pair and outcome',
-        labelNames: ['initiator_role', 'target_role', 'result'] as const, // roles: 'candidate' | 'recruiter', result: 'sent' | 'accepted' | 'rejected' | 'withdrawn'
-        registers: [register],
-    });
-
     const activeConnectionsGauge = new promClient.Gauge({
         name: 'user_active_connections_total',
         help: 'Total accepted connections in the graph',
-        labelNames: ['pair_type'] as const, // 'candidate_recruiter' | 'candidate_candidate'
         registers: [register],
     });
 
@@ -66,24 +51,32 @@ function registerService(serviceName: string) {
     return { register,
         httpRequestDurationSeconds,
         httpRequestsTotal,
+        httpRequestsInFlight,
         profileUpdateTotal,
-        avatarUploadTotal,
-        avatarUploadSizeBytes,
-        connectionRequestTotal,
         activeConnectionsGauge,
     }
 }
 
 
-const { register,
+export const { register,
         httpRequestDurationSeconds,
         httpRequestsTotal,
+        httpRequestsInFlight,
         profileUpdateTotal,
-        avatarUploadTotal,
-        avatarUploadSizeBytes,
-        connectionRequestTotal,
         activeConnectionsGauge,
     } = registerService('api-gateway');
+
+type RouteEvent = {
+    successEvent?: (req: Request, res: Response) => void;
+    failureEvent?: (req: Request, res: Response) => void;
+    failureReason?: string,
+}
+
+const ROUTE_EVENT_MAP: Record<string, RouteEvent> = {
+    // 'PATCH /user/profile/:user_id': {
+    //     successEvent: profileUpdateTotal.inc()
+    // }
+}
 
 //start timing metrics and populating the fields we want in the middleware
 export const monitoringMiddleware = (req: Request, res: Response, next: NextFunction) => {
@@ -91,18 +84,26 @@ export const monitoringMiddleware = (req: Request, res: Response, next: NextFunc
         return next();
 
     const end = httpRequestDurationSeconds.startTimer();
+    httpRequestsInFlight.inc({method: req.method});
+
+    
 
     res.on('finish', () => {
-        const route = req.route?.path ?? req.path; //allows use of route path for better cardinality when :userId baked in route
-
+        const route = req.route?.path ?? req.path;
+        const statusCode = res.statusCode;
         const labels = {
             method: req.method,
             route,
             status_code: String(res.statusCode),
         };
 
+        if (route === '/user/:user_id/delete')
+            activeConnectionsGauge.dec(1);
+        if (route === '/user/connections/:user_id/:connectionId')
+            activeConnectionsGauge.inc(1);
         httpRequestsTotal.inc(labels);
         end(labels);
+        httpRequestsInFlight.dec({ method: req.method });
     });
 
     next();
