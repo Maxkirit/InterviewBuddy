@@ -1,7 +1,7 @@
 # Where we store log files produced by the Vault orchestration script (tools/vault_up.sh)
 LOG_DIR := ./logs
 
-.PHONY: vault-up vault-reset app-up app-build reset-all
+.PHONY: vault-up vault-reset app-up app-build reset-all seed
 
 all: vault-up app-build
 
@@ -40,3 +40,13 @@ app-up:
 # Start all "app" services and rebuild images (when code/Dockerfiles changed).
 app-build:
 	@docker compose --profile app up -d --build
+
+
+# ---------------------------
+# TEST SEED (profile=seed)
+# ---------------------------
+
+# Build & run the one-shot test-seed container against the running api-gateway.
+# Requires the `app` profile to already be up. Idempotent: re-runs skip existing fixtures.
+seed:
+	@docker compose --profile seed run --rm --build test-seed
