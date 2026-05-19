@@ -39,7 +39,7 @@ type CandidateData = {
 };
 
 const ReportSchema = z.object({
-    report: z.string().min(1),
+    report: z.string().min(1).max(1000),
 });
 
 function sliderColor(v: number): string {
