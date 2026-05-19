@@ -64,6 +64,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     function logout() {
         setToken(null);
         setUserId(null);
+        setRole(null);
         setProfilePicUrl(null);
     }
 

@@ -79,7 +79,7 @@ export default function MyProfile() {
             } catch (error) {
                 console.log(`in error path: ${error}`);
                 if (axios.isAxiosError(error) && error.response?.status == 410) {
-                    setError("This interview has been canceled by the recruiter.");
+                    setError("This user has been deleted.");
                 } else
                     setError("Failed to load profile information. Please try again.");
             }

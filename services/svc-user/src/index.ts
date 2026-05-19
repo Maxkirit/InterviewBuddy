@@ -266,11 +266,8 @@ app.patch("/user/profile/:user_id", async (req, res) => {
     try {
 		console.log(req.body.permissions);
         const userId = parseInt(req.params.user_id);
-        if (
-            ( req.body.userId !== userId &&
-                !req.body.permissions?.includes("manageUserInfo")) ||
-            !req.body.permissions.includes("modifyOwnUser")
-        ) {
+        if (!((req.body.userId === userId && req.body.permissions.includes("modifyOwnUser"))
+            || req.body.permissions?.includes("manageUserInfo"))) {
 			console.log(`${req.body.userId} vs ${userId}, perm : mdu ${req.body.permissions?.includes("modifyOwnUser")}, mui ${req.body.permissions?.includes("manageUserInfo")}`)
             return res
                 .status(403)
@@ -472,6 +469,8 @@ app.patch('/user/:userId/role', async(req, res) => {
     console.log(!req.body.permissions.includes('modifyUserRole'));
     if (!req.body.permissions.includes('modifyUserRole') || targetId !== req.body.tokenId)
         return res.status(403).json({error: "Invalid permissions for PATCH /user/:userId/role"});
+    if (req.body.newRole != "candidate" && req.body.newRole != "recruiter")
+        return res.status(400).json({error: "Invalid role type"});
     try {
         console.log("permission validated");
         const response = await prisma.users.update({

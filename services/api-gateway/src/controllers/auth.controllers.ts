@@ -184,7 +184,7 @@ export const validateExternalAuth = async (req: Request, res: Response) => {
                                                     sameSite: 'strict',
                                                     maxAge: response.data.maxAge * 1000,
                                                 })
-                        .location(`http://localhost:5173/auth/callback?${urlParams.toString()}`)
+                        .location(`https://localhost/auth/callback?${urlParams.toString()}`)
                         .end();
     } catch (error) {
         console.log("in validateExternalAuth error path");
