@@ -150,7 +150,7 @@ export default function Register() {
                                 id="firstname"
                                 placeholder="Jane"
                                 value={firstname}
-                                onChange={(e) => setFirstname(e.target.value)}
+                                onChange={(e) => setFirstname(e.target.value.trim())}
                             />
                             {fieldErrors.first_name && <span className="text-xs text-[#ef4444] mt-0.5">{fieldErrors.first_name}</span>}
                         </div>
@@ -164,7 +164,7 @@ export default function Register() {
                                 id="lastname"
                                 placeholder="Smith"
                                 value={lastname}
-                                onChange={(e) => setLastname(e.target.value)}
+                                onChange={(e) => setLastname(e.target.value.trim())}
                             />
                             {fieldErrors.last_name && <span className="text-xs text-[#ef4444] mt-0.5">{fieldErrors.last_name}</span>}
                         </div>
@@ -180,7 +180,7 @@ export default function Register() {
                             id="email"
                             placeholder="you@example.com"
                             value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            onChange={(e) => setEmail(e.target.value.trim())}
                         />
                         {fieldErrors.email && <span className="text-xs text-[#ef4444] mt-0.5">{fieldErrors.email}</span>}
                     </div>
@@ -195,7 +195,7 @@ export default function Register() {
                             id="password"
                             placeholder="••••••••"
                             value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            onChange={(e) => setPassword(e.target.value.trim())}
                         />
                         {fieldErrors.password && <span className="text-xs text-[#ef4444] mt-0.5">{fieldErrors.password}</span>}
                     </div>

@@ -235,39 +235,39 @@ export default function AdminUsers(){
                                 <label className="form-label">Country</label>
                                 <input className="form-input border-[#d1d5db]" type="text"
                                     value={selectUser?.country ?? ''}
-                                    onChange={(e) => updateField('country', e.target.value)} />
+                                    onChange={(e) => updateField('country', e.target.value.trim())} />
                             </div>
                             <div className="form-field">
                                 <label className="form-label">Job title</label>
                                 <input className="form-input border-[#d1d5db]" type="text"
                                     value={selectUser?.job_title ?? ''}
-                                    onChange={(e) => updateField('job_title', e.target.value)} />
+                                    onChange={(e) => updateField('job_title', e.target.value.trim())} />
                             </div>
                         </div>
                         <div className="form-field">
                             <label className="form-label">Organisation</label>
                             <input className="form-input border-[#d1d5db]" type="text"
                                 value={selectUser?.organization ?? ''}
-                                onChange={(e) => updateField('organization', e.target.value)} />
+                                onChange={(e) => updateField('organization', e.target.value.trim())} />
                         </div>
                         <div className="form-field">
                             <label className="form-label">Bio</label>
                             <textarea className="form-input border-[#d1d5db] resize-y min-h-[90px]"
                                 value={selectUser?.bio ?? ''}
-                                onChange={(e) => updateField('bio', e.target.value)} />
+                                onChange={(e) => updateField('bio', e.target.value.trim())} />
                         </div>
                         <div className="form-field">
                             <label className="form-label">LinkedIn</label>
                             <input className={`form-input border-[#d1d5db] ${fieldErrors.linkedin_link ? "border-[#ef4444] focus:border-[#ef4444]" : ""}`} type="url"
                                 value={selectUser?.linkedin_link ?? ''}
-                                onChange={(e) => updateField('linkedin_link', e.target.value)} />
+                                onChange={(e) => updateField('linkedin_link', e.target.value.trim())} />
                             {fieldErrors.linkedin_link && <span className="text-xs text-[#ef4444] mt-0.5">{fieldErrors.linkedin_link}</span>}
                         </div>
                         <div className="form-field">
                             <label className="form-label">Phone</label>
                             <input className="form-input border-[#d1d5db]" type="tel"
                                 value={selectUser?.phone_number ?? ''}
-                                onChange={(e) => updateField('phone_number', e.target.value)} />
+                                onChange={(e) => updateField('phone_number', e.target.value.trim())} />
                         </div>
                     </div>
                     {modalError && <p className="text-xs text-[#ef4444] px-9">{modalError}</p>}

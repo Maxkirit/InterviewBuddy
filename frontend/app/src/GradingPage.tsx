@@ -257,7 +257,7 @@ export default function GradingPage() {
                                 className="form-input min-h-[110px] resize-y"
                                 placeholder="Add your personal observations, strengths, areas for improvement…"
                                 value={note}
-                                onChange={(e) => setNote(e.target.value)}
+                                onChange={(e) => setNote(e.target.value.trim())}
                             />
                         </div>
 

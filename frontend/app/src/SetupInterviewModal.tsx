@@ -185,7 +185,7 @@ export default function SetupInterviewModal({
                                 id="modal-position"
                                 placeholder="e.g. Backend Engineer"
                                 value={position}
-                                onChange={(e) => setPosition(e.target.value)}
+                                onChange={(e) => setPosition(e.target.value.trim())}
                             />
                             {fieldErrors.job_title && <span className="text-xs text-[#ef4444] mt-0.5">{fieldErrors.job_title}</span>}
                         </div>
