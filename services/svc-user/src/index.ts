@@ -1,18 +1,14 @@
-import express, { Request, Response } from "express";
+import express from "express";
 import { prisma, Prisma } from "./lib/prisma.js";
-import { gender_type } from './generated/prisma/enums.js';
 import { role_type } from './generated/prisma/enums.js';
-import { string, z } from 'zod';
+import { z } from 'zod';
 import sharp from 'sharp';
 import { randomBytes } from "node:crypto";
-import { error, profile } from 'node:console';
-import { resolveSoa } from 'node:dns';
 import { addConnection } from "./connections/addConnection.js";
-import { read } from "node:fs";
-import { create } from "node:domain";
 import dotenv from 'dotenv'
 import { DeleteConnection } from "./connections/deleteConnection.js";
 import { DeleteUser } from "./delete/dispatchDelete.js";
+import { profileUpdateTotal } from "./metrics.js";
 import { getConnection } from "./connections/getConnection.js";
 import { getAllConnections } from "./connections/getAllConnections.js";
 
@@ -311,6 +307,11 @@ app.patch("/user/profile/:user_id", async (req, res) => {
                         : req.body.body.phone_number,
             },
         });
+        const picked = (({gender, date_of_birth, country, job_title, organization, bio, linkedin_link, phone_number}) => ({gender, date_of_birth, country, job_title, organization, bio, linkedin_link, phone_number}))(req.body.body)
+        for (let field in Object.entries(picked)){
+            if (field)
+                profileUpdateTotal.inc({field_group: field});
+        }
         console.log("db updated\n");
         return res.status(201).json({ error: "User succesfully updated" });
     } catch (error) {

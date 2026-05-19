@@ -10,7 +10,8 @@ import { createPublicKey, randomBytes, createHash } from 'crypto'
 import { base64, string, z } from 'zod';
 import { access, readFileSync } from 'fs';
 import {PendingOAuthSession, createNewSession, validateState, validateGooglePayload, seekUser, create3rdPartyUser, login3rdPartyUser} from './lib/3rdPartyAuthGoogle.js';
-import { register } from 'module';
+import { monitoringMiddleware, register, tokenRevocationTotal, oauthFlowTotal, monitor} from './metrics.js';
+
 
 type ApiError = {
   error: string,
@@ -48,6 +49,10 @@ const port = 3000;
 
 app.use(express.json());
 
+//monitoring (order is important)
+app.use(monitoringMiddleware);
+app.use('/metrics', monitor);
+
 //builds link
 app.get('/auth/google/init', async(req, res) => {
     try {
@@ -68,8 +73,13 @@ app.post('/auth/google/validate', async(req, res) => {
         console.log("in auth/google/validate");
         //receives state and code, must validate matching state before anything
         const codeVerifier = validateState(req.body.state, oauthSessions);
-        if (codeVerifier?.error)
+        if (codeVerifier?.error) {
+            //event failed oauth
+            oauthFlowTotal.inc({provider: 'google', event: 'failed'})
             throw (new Error(codeVerifier.error));
+        }
+        //event success oauth
+        oauthFlowTotal.inc({provider: 'google', event: 'completed'})
         console.log("state validated");
         //POST to google server code
         //has to be passed as query parameters
@@ -309,6 +319,8 @@ app.patch('/auth/revoke/refresh-token/:userId', async (req, res) => {
                 updated_at: new Date(),
             }
         });
+        //for prometheus monitoring
+        tokenRevocationTotal.inc(tokens.count);
         return res.status(200).json({message: `Revoked ${tokens.count} refresh tokens`})
     } catch (error) {
         console.log("in revoke all refresh tokens error path");
@@ -352,6 +364,8 @@ app.patch("/auth/revoke/refresh-token", async (req, res) =>{
     } catch (error) {
         return res.status(404).json({error: "Refresh Token non existent in database"});
     }
+    //for prometheus monitoring
+    tokenRevocationTotal.inc();
     return res.status(200).json({message: "refresh token revoked", userId: decoded.userId});
 })
 

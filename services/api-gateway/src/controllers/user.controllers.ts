@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { ApiError } from "../index.js";
 import axios, { AxiosError } from "axios";
 import { ReqWithUser } from "../validateToken.js";
-import { file } from "zod";
+import { avatarUploadSizeBytes, avatarUploadTotal } from "../metrics.js";
 import sharp from "sharp";
 
 export const getUser = async (req: Request, res: Response) => {
@@ -181,18 +181,23 @@ export const uploadAvatar = async (req: Request, res: Response) => {
         validMagicBytes[1][1] === bytes[1] &&
         validMagicBytes[1][2] === bytes[2] &&
         validMagicBytes[1][3];
-    if (!isJpeg && !isPng)
+    if (!isJpeg && !isPng) {
+        avatarUploadTotal.inc({result: "invalid_type"});
         return res.status(400).json({ error: "Not an image" });
+    }
     //check with sharp if file is not malicious
     let image;
+    let size;
     try {
         console.log("in sharp validation");
         image = await sharp(bytes)
             .resize({ width: 512, height: 512 }) //limits size and standardizes for easier frontend handling
             .toFormat("jpeg", { quality: 80 }) //forces conversion to jpeg for standardisation
             .toBuffer(); //const image is a buffer, easier to send to svc-user
+        size = image.length;
     } catch (error) {
         console.log("sharp error path");
+        avatarUploadTotal.inc({result: "invalid_type"});
         return res.status(400).json({ error: "Invalid image format or file" });
     }
 
@@ -206,6 +211,8 @@ export const uploadAvatar = async (req: Request, res: Response) => {
                 imageContent: image.toString("base64"),
             },
         );
+        avatarUploadTotal.inc({result: "success"});
+        avatarUploadSizeBytes.observe(size);
         return res.status(201).json({ message: "Avatar uploaded" });
     } catch (error) {
         console.log("in normal error path");
