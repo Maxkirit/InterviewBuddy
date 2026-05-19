@@ -124,7 +124,7 @@ export default function Interview() {
                             className="form-input min-h-[160px] resize-y"
                             placeholder="Explain the key decisions in your design — component choices, tradeoffs, bottlenecks, and how you'd scale further…"
                             value={reasoning}
-                            onChange={(e) => setReasoning(e.target.value)}
+                            onChange={(e) => setReasoning(e.target.value.trim())}
                         />
                     </div>
                     <div className="flex flex-col items-end mt-4 gap-2">

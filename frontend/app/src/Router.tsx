@@ -21,14 +21,18 @@ import ViewProfile from "./ViewProfile";
 import LegalPage from "./Legal";
 import AdminInterviews from "./AdminInterviews";
 import AdminConnections from "./AdminConnections";
+import PublicRoutes from "./PublicRoutes";
 
 export default function Router() {
     return (
         <BrowserRouter>
             <Routes>
                 <Route path="/" element={<Navigate to="/profile" replace />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
+                <Route element={<PublicRoutes />}>
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/register" element={<Register />} />
+                </Route>
+                
                 <Route path="/auth/callback" element={<AuthCallback />}/>
                 <Route element={<ProtectedLayout />}>
                 <Route path="/pick-role" element={<PickRole />}/>

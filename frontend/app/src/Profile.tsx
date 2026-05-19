@@ -55,6 +55,7 @@ export default function MyProfile() {
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
     const [picError, setPicError] = useState<string | null>(null);
     const ref = useRef<HTMLDialogElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
     
 
     const authContext = useContext(AuthContext);
@@ -158,6 +159,7 @@ export default function MyProfile() {
         setSelectedFile(null);
         setPreviewUrl(null);
         setPicError(null);
+        if (fileInputRef.current) fileInputRef.current.value = "";
     }
 
     function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -277,7 +279,7 @@ export default function MyProfile() {
                                         type="text"
                                         id="country"
                                         value={country}
-                                        onChange={(e) => setCountry(e.target.value)}
+                                        onChange={(e) => setCountry(e.target.value.trim())}
                                     />
                                 </div>
                                 <div className="form-field">
@@ -290,7 +292,7 @@ export default function MyProfile() {
                                         id="phone"
                                         placeholder="+15550000000"
                                         value={phone}
-                                        onChange={(e) => setPhone(e.target.value)}
+                                        onChange={(e) => setPhone(e.target.value.trim())}
                                     />
                                     {fieldErrors.phone_number && <span className="text-xs text-[#ef4444] mt-0.5">{fieldErrors.phone_number}</span>}
                                 </div>
@@ -310,7 +312,7 @@ export default function MyProfile() {
                                         placeholder="e.g. Software Engineer"
                                         value={jobTitle}
                                         onChange={(e) =>
-                                            setJobTitle(e.target.value)
+                                            setJobTitle(e.target.value.trim())
                                         }
                                     />
                                 </div>
@@ -325,7 +327,7 @@ export default function MyProfile() {
                                         placeholder="e.g. Acme Corp"
                                         value={organisation}
                                         onChange={(e) =>
-                                            setOrganisation(e.target.value)
+                                            setOrganisation(e.target.value.trim())
                                         }
                                     />
                                 </div>
@@ -339,7 +341,7 @@ export default function MyProfile() {
                                     className="form-input resize-y min-h-[90px]"
                                     placeholder="Tell us a bit about yourself…"
                                     value={bio}
-                                    onChange={(e) => setBio(e.target.value)}
+                                    onChange={(e) => setBio(e.target.value.trim())}
                                 />
                             </div>
                             <div className="form-field">
@@ -352,7 +354,7 @@ export default function MyProfile() {
                                     id="socials"
                                     placeholder="https://linkedin.com/in/yourname"
                                     value={linkedin}
-                                    onChange={(e) => setLinkedin(e.target.value)}
+                                    onChange={(e) => setLinkedin(e.target.value.trim())}
                                 />
                                 {fieldErrors.linkedin_link && <span className="text-xs text-[#ef4444] mt-0.5">{fieldErrors.linkedin_link}</span>}
                             </div>
@@ -410,6 +412,7 @@ export default function MyProfile() {
                                     type="file"
                                     accept="image/jpeg,image/png"
                                     className="hidden"
+                                    ref={fileInputRef}
                                     onChange={handleFileChange}
                                 />
                             </label>

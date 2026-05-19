@@ -10,7 +10,7 @@ const port = 3000;
 
 const GradingReportSchema = z.object({
     unique_interview_id: z.int().min(1),
-    report: z.string().min(1),
+    report: z.string().min(1).max(1000),
 });
 
 const ReportSchema = z.object({

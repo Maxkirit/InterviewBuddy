@@ -39,7 +39,7 @@ type CandidateData = {
 };
 
 const ReportSchema = z.object({
-    report: z.string().min(1),
+    report: z.string().min(1).max(1000),
 });
 
 function sliderColor(v: number): string {
@@ -257,7 +257,7 @@ export default function GradingPage() {
                                 className="form-input min-h-[110px] resize-y"
                                 placeholder="Add your personal observations, strengths, areas for improvement…"
                                 value={note}
-                                onChange={(e) => setNote(e.target.value)}
+                                onChange={(e) => setNote(e.target.value.trim())}
                             />
                         </div>
 

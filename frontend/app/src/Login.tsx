@@ -116,7 +116,7 @@ export default function Login() {
                             id="email"
                             placeholder="you@example.com"
                             value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            onChange={(e) => setEmail(e.target.value.trim())}
                         />
                         {fieldErrors.email && <span className="text-xs text-[#ef4444] mt-0.5">{fieldErrors.email}</span>}
                     </div>
@@ -131,7 +131,7 @@ export default function Login() {
                             id="password"
                             placeholder="••••••••"
                             value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            onChange={(e) => setPassword(e.target.value.trim())}
                         />
                         {fieldErrors.password && <span className="text-xs text-[#ef4444] mt-0.5">{fieldErrors.password}</span>}
                     </div>

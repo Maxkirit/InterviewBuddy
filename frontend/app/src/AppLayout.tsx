@@ -183,6 +183,8 @@ export default function AppLayout() {
                     </div>
                 </nav>
             );
+        } else if (authContext?.role === "pending") {
+            return <Navigate to="/pick-role" replace />
         } else {
             authContext?.logout();
             return (

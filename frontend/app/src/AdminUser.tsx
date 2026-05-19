@@ -69,6 +69,14 @@ export default function AdminUsers(){
         editModalUser.current?.close();
     }
 
+    function handleBackdropClickEdit(e: React.MouseEvent<HTMLDialogElement>) {
+        if (e.target === editModalUser.current) closeEditModal();
+    }
+
+    function handleBackdropClickDelete(e: React.MouseEvent<HTMLDialogElement>) {
+        if (e.target === deleteModalUser.current) deleteModalUser.current?.close();
+    }
+
 	async function handleSave(){
         setModalError(null);
         setFieldErrors({});
@@ -210,7 +218,8 @@ export default function AdminUsers(){
                 </div>
 
                 {/* Modal Edit / Add */}
-                <dialog ref={editModalUser}>
+                <dialog ref={editModalUser} onClick={handleBackdropClickEdit}>
+                    <div onClick={(e) => e.stopPropagation()}>
                     <div className="flex items-center justify-between px-9 pt-8 mb-6">
                         <div>
                             <h2 className="text-[1.1rem] font-bold text-[#1a1d2e]">
@@ -235,39 +244,39 @@ export default function AdminUsers(){
                                 <label className="form-label">Country</label>
                                 <input className="form-input border-[#d1d5db]" type="text"
                                     value={selectUser?.country ?? ''}
-                                    onChange={(e) => updateField('country', e.target.value)} />
+                                    onChange={(e) => updateField('country', e.target.value.trim())} />
                             </div>
                             <div className="form-field">
                                 <label className="form-label">Job title</label>
                                 <input className="form-input border-[#d1d5db]" type="text"
                                     value={selectUser?.job_title ?? ''}
-                                    onChange={(e) => updateField('job_title', e.target.value)} />
+                                    onChange={(e) => updateField('job_title', e.target.value.trim())} />
                             </div>
                         </div>
                         <div className="form-field">
                             <label className="form-label">Organisation</label>
                             <input className="form-input border-[#d1d5db]" type="text"
                                 value={selectUser?.organization ?? ''}
-                                onChange={(e) => updateField('organization', e.target.value)} />
+                                onChange={(e) => updateField('organization', e.target.value.trim())} />
                         </div>
                         <div className="form-field">
                             <label className="form-label">Bio</label>
                             <textarea className="form-input border-[#d1d5db] resize-y min-h-[90px]"
                                 value={selectUser?.bio ?? ''}
-                                onChange={(e) => updateField('bio', e.target.value)} />
+                                onChange={(e) => updateField('bio', e.target.value.trim())} />
                         </div>
                         <div className="form-field">
                             <label className="form-label">LinkedIn</label>
                             <input className={`form-input border-[#d1d5db] ${fieldErrors.linkedin_link ? "border-[#ef4444] focus:border-[#ef4444]" : ""}`} type="url"
                                 value={selectUser?.linkedin_link ?? ''}
-                                onChange={(e) => updateField('linkedin_link', e.target.value)} />
+                                onChange={(e) => updateField('linkedin_link', e.target.value.trim())} />
                             {fieldErrors.linkedin_link && <span className="text-xs text-[#ef4444] mt-0.5">{fieldErrors.linkedin_link}</span>}
                         </div>
                         <div className="form-field">
                             <label className="form-label">Phone</label>
                             <input className="form-input border-[#d1d5db]" type="tel"
                                 value={selectUser?.phone_number ?? ''}
-                                onChange={(e) => updateField('phone_number', e.target.value)} />
+                                onChange={(e) => updateField('phone_number', e.target.value.trim())} />
                         </div>
                     </div>
                     {modalError && <p className="text-xs text-[#ef4444] px-9">{modalError}</p>}
@@ -275,10 +284,12 @@ export default function AdminUsers(){
                         <button className="btn-cancel" onClick={closeEditModal}>Cancel</button>
                         <button className="btn-primary px-6 py-[9px]" onClick={handleSave}>Save</button>
                     </div>
+                    </div>
                 </dialog>
 
                 {/* Modal Delete */}
-                <dialog ref={deleteModalUser}>
+                <dialog ref={deleteModalUser} onClick={handleBackdropClickDelete}>
+                    <div onClick={(e) => e.stopPropagation()}>
                     <div className="flex items-center justify-between px-9 pt-8 mb-6">
                         <h2 className="text-[1.1rem] font-bold text-[#1a1d2e]">Delete user?</h2>
                         <button
@@ -293,12 +304,13 @@ export default function AdminUsers(){
                     </div>
                     <div className="flex justify-end gap-2.5 px-9 py-6">
                         <button className="btn-cancel" onClick={() => deleteModalUser.current?.close()}>Cancel</button>
-                        <button 
+                        <button
 							className="btn-danger"
 							onClick={() => handleDeleteUser(selectUser?.user_id)}
 						>
 							Delete
 						</button>
+                    </div>
                     </div>
                 </dialog>
 
