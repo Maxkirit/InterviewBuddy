@@ -55,6 +55,7 @@ export default function MyProfile() {
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
     const [picError, setPicError] = useState<string | null>(null);
     const ref = useRef<HTMLDialogElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
     
 
     const authContext = useContext(AuthContext);
@@ -158,6 +159,7 @@ export default function MyProfile() {
         setSelectedFile(null);
         setPreviewUrl(null);
         setPicError(null);
+        if (fileInputRef.current) fileInputRef.current.value = "";
     }
 
     function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -410,6 +412,7 @@ export default function MyProfile() {
                                     type="file"
                                     accept="image/jpeg,image/png"
                                     className="hidden"
+                                    ref={fileInputRef}
                                     onChange={handleFileChange}
                                 />
                             </label>
